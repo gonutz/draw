@@ -187,8 +187,7 @@ public class MainWindow implements ToolView {
 		rectangleSelection.setToolTipText("Select Rectangle (S)");
 		rectangleSelection.setBackground(Color.WHITE);
 		rectangleSelection.setBorder(null);
-		rectangleSelection.setIcon(new ImageIcon(
-				"/home/me/workspace/Draw/rsc/rect_select.png"));
+		rectangleSelection.setIcon(new ImageIcon("./rsc/rect_select.png"));
 		GridBagConstraints gbc_rectangleSelection = new GridBagConstraints();
 		gbc_rectangleSelection.anchor = GridBagConstraints.NORTHWEST;
 		gbc_rectangleSelection.insets = new Insets(0, 0, 5, 5);
@@ -204,8 +203,7 @@ public class MainWindow implements ToolView {
 			}
 		});
 		penSelection.setToolTipText("Pen (P)");
-		penSelection.setIcon(new ImageIcon(
-				"/home/me/workspace/Draw/rsc/pen.png"));
+		penSelection.setIcon(new ImageIcon("./rsc/pen.png"));
 		penSelection.setBorder(null);
 		penSelection.setBackground(Color.WHITE);
 		GridBagConstraints gbc_penSelection = new GridBagConstraints();
@@ -223,8 +221,7 @@ public class MainWindow implements ToolView {
 			}
 		});
 		fillSelection.setToolTipText("Fill (F)");
-		fillSelection.setIcon(new ImageIcon(
-				"/home/me/workspace/Draw/rsc/fill.png"));
+		fillSelection.setIcon(new ImageIcon("./rsc/fill.png"));
 		fillSelection.setBorder(null);
 		fillSelection.setBackground(Color.WHITE);
 		GridBagConstraints gbc_fillSelection = new GridBagConstraints();
@@ -240,8 +237,7 @@ public class MainWindow implements ToolView {
 				toolViewController.selectTool(Tool.ColorPicker);
 			}
 		});
-		colorPickSelection.setIcon(new ImageIcon(
-				"/home/me/workspace/Draw/rsc/pick.png"));
+		colorPickSelection.setIcon(new ImageIcon("./rsc/pick.png"));
 		colorPickSelection.setToolTipText("Color Selection (C)");
 		colorPickSelection.setBorder(null);
 		colorPickSelection.setBackground(Color.WHITE);
@@ -258,8 +254,7 @@ public class MainWindow implements ToolView {
 				toolViewController.selectTool(Tool.Line);
 			}
 		});
-		lineSelection.setIcon(new ImageIcon(
-				"/home/me/workspace/Draw/rsc/line.png"));
+		lineSelection.setIcon(new ImageIcon("./rsc/line.png"));
 		lineSelection.setToolTipText("Line (L)");
 		lineSelection.setBorder(null);
 		lineSelection.setBackground(Color.WHITE);
@@ -276,8 +271,7 @@ public class MainWindow implements ToolView {
 				toolViewController.selectTool(Tool.Eraser);
 			}
 		});
-		eraseSelection.setIcon(new ImageIcon(
-				"/home/me/workspace/Draw/rsc/erase.png"));
+		eraseSelection.setIcon(new ImageIcon("./rsc/erase.png"));
 		eraseSelection.setToolTipText("Eraser (E)");
 		eraseSelection.setBorder(null);
 		eraseSelection.setBackground(Color.WHITE);
