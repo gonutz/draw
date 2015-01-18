@@ -30,7 +30,7 @@ public class CurrentColors extends JPanel implements CurrentColorsView {
 
 	public void SetBackgroundColor(Color color) {
 		background.setBackground(color);
-		foreground.invalidate();
+		foreground.repaint();
 	}
 
 	public void SetForegroundColor(Color color) {
