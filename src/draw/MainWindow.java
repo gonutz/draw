@@ -171,6 +171,7 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.setLayout(gbl_toolSelectionContainer);
 
 		rectangleSelection = new JButton("");
+		rectangleSelection.setFocusable(false);
 		rectangleSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				toolViewController.selectTool(Tool.RectangleSelection);
@@ -189,6 +190,7 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.add(rectangleSelection, gbc_rectangleSelection);
 
 		penSelection = new JButton("");
+		penSelection.setFocusable(false);
 		penSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Pen);
@@ -207,6 +209,7 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.add(penSelection, gbc_penSelection);
 
 		fillSelection = new JButton("");
+		fillSelection.setFocusable(false);
 		fillSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Fill);
@@ -224,6 +227,7 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.add(fillSelection, gbc_fillSelection);
 
 		colorPickSelection = new JButton("");
+		colorPickSelection.setFocusable(false);
 		colorPickSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.ColorPicker);
@@ -241,6 +245,7 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.add(colorPickSelection, gbc_colorPickSelection);
 
 		lineSelection = new JButton("");
+		lineSelection.setFocusable(false);
 		lineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Line);
@@ -258,6 +263,7 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.add(lineSelection, gbc_lineSelection);
 
 		eraseSelection = new JButton("");
+		eraseSelection.setFocusable(false);
 		eraseSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Eraser);
@@ -273,11 +279,11 @@ public class MainWindow implements ToolView {
 		gbc_eraseSelection.gridy = 2;
 		toolSelectionContainer.add(eraseSelection, gbc_eraseSelection);
 
-		JPanel panel_1 = new JPanel();
-		frmDraw.getContentPane().add(panel_1, BorderLayout.SOUTH);
+		JPanel colorContainer = new JPanel();
+		frmDraw.getContentPane().add(colorContainer, BorderLayout.SOUTH);
 
-		JPanel panel_2 = new JPanel();
-		frmDraw.getContentPane().add(panel_2, BorderLayout.CENTER);
+		JPanel paintArea = new JPanel();
+		frmDraw.getContentPane().add(paintArea, BorderLayout.CENTER);
 	}
 
 	@Override
