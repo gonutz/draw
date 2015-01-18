@@ -1,27 +1,29 @@
 package draw;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JMenu;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
 import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
-import javax.swing.border.BevelBorder;
 import java.awt.Color;
-import java.awt.GridBagLayout;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.border.BevelBorder;
 
 public class MainWindow implements ToolView {
 
@@ -60,6 +62,44 @@ public class MainWindow implements ToolView {
 	 */
 	public MainWindow() {
 		initialize();
+		addGlobalKeyListener();
+	}
+
+	private void addGlobalKeyListener() {
+		KeyboardFocusManager manager = KeyboardFocusManager
+				.getCurrentKeyboardFocusManager();
+		manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				globalKeyEvent(e);
+				// Allow the event to be re-dispatched
+				return false;
+			}
+		});
+	}
+
+	private void globalKeyEvent(KeyEvent e) {
+		if (e.getID() == KeyEvent.KEY_TYPED)
+			switch (e.getKeyChar()) {
+			case 's':
+				toolViewController.selectTool(Tool.RectangleSelection);
+				break;
+			case 'p':
+				toolViewController.selectTool(Tool.Pen);
+				break;
+			case 'f':
+				toolViewController.selectTool(Tool.Fill);
+				break;
+			case 'e':
+				toolViewController.selectTool(Tool.Eraser);
+				break;
+			case 'l':
+				toolViewController.selectTool(Tool.Line);
+				break;
+			case 'c':
+				toolViewController.selectTool(Tool.ColorPicker);
+				break;
+			}
 	}
 
 	/**
