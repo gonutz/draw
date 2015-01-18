@@ -24,6 +24,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
+import javax.swing.JScrollPane;
+import java.awt.FlowLayout;
 
 public class MainWindow implements ToolView {
 
@@ -35,6 +37,8 @@ public class MainWindow implements ToolView {
 	private JButton lineSelection;
 	private JButton eraseSelection;
 	private ToolViewController toolViewController;
+	private CurrentColors currentColors;
+	private ColorPalette colorPalette;
 
 	/**
 	 * Launch the application.
@@ -45,6 +49,9 @@ public class MainWindow implements ToolView {
 				try {
 					MainWindow window = new MainWindow();
 					window.setToolViewController(new ToolViewController(window));
+					window.colorPalette
+							.setController(new ColorPaletteViewController(
+									window.colorPalette, window.currentColors));
 					window.frmDraw.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -280,10 +287,18 @@ public class MainWindow implements ToolView {
 		toolSelectionContainer.add(eraseSelection, gbc_eraseSelection);
 
 		JPanel colorContainer = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) colorContainer.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		flowLayout.setHgap(20);
 		frmDraw.getContentPane().add(colorContainer, BorderLayout.SOUTH);
 
-		JPanel paintArea = new JPanel();
-		frmDraw.getContentPane().add(paintArea, BorderLayout.CENTER);
+		currentColors = new CurrentColors();
+		colorContainer.add(currentColors);
+		colorPalette = new ColorPalette();
+		colorContainer.add(colorPalette);
+
+		JScrollPane paintAreaScroller = new JScrollPane();
+		frmDraw.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
 	}
 
 	@Override
