@@ -3,6 +3,7 @@ package draw;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,15 +18,15 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
-import javax.swing.JScrollPane;
-import java.awt.FlowLayout;
 
 public class MainWindow implements ToolView {
 
@@ -165,12 +166,17 @@ public class MainWindow implements ToolView {
 		JMenuItem newImage = new JMenuItem("New");
 		newImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DimensionChooser dim = new DimensionChooser();
-				dim.askUserForDimensions();
-				if (dim.wasAccepted()) {
-					drawAreaController.newImage(dim.getWidth(),
-							dim.getHeight(), Color.white);
-				}
+
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						DimensionChooser dim = new DimensionChooser();
+						dim.setVisible(true);
+						if (dim.wasAccepted()) {
+							drawAreaController.newImage(dim.getCanvasWidth(),
+									dim.getCanvasHeight(), Color.white);
+						}
+					}
+				});
 			}
 		});
 		newImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
