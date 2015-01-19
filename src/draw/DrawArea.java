@@ -19,12 +19,10 @@ public class DrawArea extends JPanel implements DrawAreaView {
 		g.setBackground(getBackground());
 		g.clearRect(0, 0, getWidth(), getHeight());
 		g.drawImage(controller.getImage(), null, 0, 0);
-		System.out.println("painting");
 	}
 
 	@Override
 	public void refresh() {
 		repaint();
-		System.out.println("refreshing");
 	}
 }
