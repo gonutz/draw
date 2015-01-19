@@ -39,6 +39,8 @@ public class MainWindow implements ToolView {
 	private ToolViewController toolViewController;
 	private CurrentColors currentColors;
 	private ColorPalette colorPalette;
+	private DrawArea drawArea;
+	private DrawAreaController drawAreaController;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -49,6 +51,10 @@ public class MainWindow implements ToolView {
 					window.colorPalette
 							.setAndActivateController(new ColorPaletteViewController(
 									window.colorPalette, window.currentColors));
+					window.drawAreaController = new DrawAreaController(
+							window.drawArea);
+					window.drawArea.setController(window.drawAreaController);
+					window.drawAreaController.newImage(320, 240, Color.white);
 					window.frmDraw.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -152,41 +158,48 @@ public class MainWindow implements ToolView {
 		JMenuBar menuBar = new JMenuBar();
 		frmDraw.setJMenuBar(menuBar);
 
-		JMenu mnFilef = new JMenu("File");
-		mnFilef.setMnemonic('F');
-		menuBar.add(mnFilef);
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.setMnemonic('F');
+		menuBar.add(fileMenu);
 
-		JMenuItem mntmNew = new JMenuItem("New");
-		mntmNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+		JMenuItem newImage = new JMenuItem("New");
+		newImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DimensionChooser dim = new DimensionChooser();
+				dim.askUserForDimensions();
+				if (dim.wasAccepted()) {
+					drawAreaController.newImage(dim.getWidth(),
+							dim.getHeight(), Color.white);
+				}
+			}
+		});
+		newImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
 				InputEvent.CTRL_MASK));
-		mnFilef.add(mntmNew);
+		fileMenu.add(newImage);
 
-		JMenuItem mntmOpen = new JMenuItem("Open");
-		mntmOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+		JMenuItem openImage = new JMenuItem("Open");
+		openImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
 				InputEvent.CTRL_MASK));
-		mnFilef.add(mntmOpen);
+		fileMenu.add(openImage);
 
-		JMenuItem mntmSave = new JMenuItem("Save");
-		mntmSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+		JMenuItem saveImage = new JMenuItem("Save");
+		saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				InputEvent.CTRL_MASK));
-		mnFilef.add(mntmSave);
+		fileMenu.add(saveImage);
 
-		JMenuItem mntmSaveAs = new JMenuItem("Save As");
-		mntmSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+		JMenuItem saveImageAs = new JMenuItem("Save As");
+		saveImageAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
-		mnFilef.add(mntmSaveAs);
+		fileMenu.add(saveImageAs);
 
-		JMenu mnCanvas = new JMenu("Canvas");
-		mnCanvas.setMnemonic('C');
-		menuBar.add(mnCanvas);
+		JMenu canvasMenu = new JMenu("Canvas");
+		canvasMenu.setMnemonic('C');
+		menuBar.add(canvasMenu);
 
 		JMenuItem mntmResize = new JMenuItem("Resize");
 		mntmResize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 				InputEvent.CTRL_MASK));
-		mnCanvas.add(mntmResize);
-
-		JMenuBar menuBar_1 = new JMenuBar();
-		menuBar.add(menuBar_1);
+		canvasMenu.add(mntmResize);
 		frmDraw.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel toolSelectionContainer = new JPanel();
@@ -318,5 +331,7 @@ public class MainWindow implements ToolView {
 
 		JScrollPane paintAreaScroller = new JScrollPane();
 		frmDraw.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
+		drawArea = new DrawArea();
+		paintAreaScroller.getViewport().add(drawArea, null);
 	}
 }
