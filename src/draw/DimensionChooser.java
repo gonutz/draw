@@ -40,6 +40,7 @@ public class DimensionChooser extends JDialog {
 	}
 
 	public DimensionChooser() {
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setTitle("Canvas Size");
 		setBounds(100, 100, 330, 110);
 		setResizable(false);
