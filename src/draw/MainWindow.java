@@ -47,7 +47,7 @@ public class MainWindow implements ToolView {
 					MainWindow window = new MainWindow();
 					window.setToolViewController(new ToolViewController(window));
 					window.colorPalette
-							.setController(new ColorPaletteViewController(
+							.setAndActivateController(new ColorPaletteViewController(
 									window.colorPalette, window.currentColors));
 					window.frmDraw.setVisible(true);
 				} catch (Exception e) {
@@ -61,9 +61,6 @@ public class MainWindow implements ToolView {
 		toolViewController = c;
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public MainWindow() {
 		initialize();
 		addGlobalKeyListener();

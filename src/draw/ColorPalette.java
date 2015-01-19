@@ -75,7 +75,7 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 		colorBoxes[index].setBackground(color);
 	}
 
-	public void setController(ColorPaletteViewController controller) {
+	public void setAndActivateController(ColorPaletteViewController controller) {
 		this.controller = controller;
 		controller.activate();
 	}
