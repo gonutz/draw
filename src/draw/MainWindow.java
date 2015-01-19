@@ -40,9 +40,6 @@ public class MainWindow implements ToolView {
 	private CurrentColors currentColors;
 	private ColorPalette colorPalette;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -79,7 +76,7 @@ public class MainWindow implements ToolView {
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent e) {
 				globalKeyEvent(e);
-				// Allow the event to be re-dispatched
+				// returning false Allows the event to be re-dispatched
 				return false;
 			}
 		});
@@ -107,6 +104,37 @@ public class MainWindow implements ToolView {
 				toolViewController.selectTool(Tool.ColorPicker);
 				break;
 			}
+	}
+
+	@Override
+	public void setSelection(Tool selected) {
+		deselectAllTools();
+		getToolButton(selected).setBackground(Color.lightGray);
+	}
+
+	private void deselectAllTools() {
+		JButton[] tools = { rectangleSelection, penSelection, eraseSelection,
+				colorPickSelection, lineSelection, fillSelection };
+		for (JButton button : tools)
+			button.setBackground(Color.white);
+	}
+
+	private JButton getToolButton(Tool tool) {
+		switch (tool) {
+		case RectangleSelection:
+			return rectangleSelection;
+		case ColorPicker:
+			return colorPickSelection;
+		case Eraser:
+			return eraseSelection;
+		case Fill:
+			return fillSelection;
+		case Line:
+			return lineSelection;
+		case Pen:
+			return penSelection;
+		}
+		return null;
 	}
 
 	/**
@@ -293,36 +321,5 @@ public class MainWindow implements ToolView {
 
 		JScrollPane paintAreaScroller = new JScrollPane();
 		frmDraw.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
-	}
-
-	@Override
-	public void setSelection(Tool selected) {
-		deselectAllTools();
-		getToolButton(selected).setBackground(Color.lightGray);
-	}
-
-	private void deselectAllTools() {
-		JButton[] tools = { rectangleSelection, penSelection, eraseSelection,
-				colorPickSelection, lineSelection, fillSelection };
-		for (JButton button : tools)
-			button.setBackground(Color.white);
-	}
-
-	private JButton getToolButton(Tool tool) {
-		switch (tool) {
-		case RectangleSelection:
-			return rectangleSelection;
-		case ColorPicker:
-			return colorPickSelection;
-		case Eraser:
-			return eraseSelection;
-		case Fill:
-			return fillSelection;
-		case Line:
-			return lineSelection;
-		case Pen:
-			return penSelection;
-		}
-		return null;
 	}
 }
