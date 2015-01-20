@@ -24,6 +24,13 @@ public class TestToolViewController {
 		assertEquals(Tool.RectangleSelection, view.selection);
 	}
 
+	@Test
+	public void controllerKnowsTheCurrentlySelectedTool() throws Exception {
+		ToolViewController c = new ToolViewController(new SpyView());
+		c.selectTool(Tool.Pen);
+		assertEquals(Tool.Pen, c.getSelectedTool());
+	}
+
 	private class SpyView implements ToolView {
 		private Tool selection;
 
