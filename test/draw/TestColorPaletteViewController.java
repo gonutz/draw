@@ -60,6 +60,31 @@ public class TestColorPaletteViewController {
 	}
 
 	@Test
+	public void controllerKnowsCurrentForeAndBackgroundColors() {
+		controller.setPaletteEntry(2, Color.cyan);
+		controller.setPaletteEntry(4, Color.yellow);
+
+		controller.selectBackgroundColor(2);
+		controller.selectForegroundColor(4);
+
+		assertEquals(Color.cyan, controller.getBackgroundColor());
+		assertEquals(Color.yellow, controller.getForegroundColor());
+	}
+
+	@Test
+	public void defaultForeAndBackgroundColorsAreBlackAndWhite() {
+		assertEquals(Color.white, controller.getBackgroundColor());
+		assertEquals(Color.black, controller.getForegroundColor());
+	}
+
+	@Test
+	public void onActivate_DefaultCurrentColorsAreShown() {
+		controller.activate();
+		assertEquals(Color.white, currentColorView.background);
+		assertEquals(Color.black, currentColorView.foreground);
+	}
+
+	@Test
 	public void settingNewColor_ShowsItInView() {
 		controller.setPaletteEntry(5, Color.white);
 
@@ -78,24 +103,6 @@ public class TestColorPaletteViewController {
 
 		assertEquals(Color.white, currentColorView.background);
 		assertEquals(Color.black, currentColorView.foreground);
-	}
-
-	@Test
-	public void controllerKnowsCurrentForeAndBackgroundColors() {
-		controller.setPaletteEntry(2, Color.cyan);
-		controller.setPaletteEntry(4, Color.yellow);
-
-		controller.selectBackgroundColor(2);
-		controller.selectForegroundColor(4);
-
-		assertEquals(Color.cyan, controller.getBackgroundColor());
-		assertEquals(Color.yellow, controller.getForegroundColor());
-	}
-
-	@Test
-	public void defaultForeAndBackgroundColorsAreBlackAndWhite() {
-		assertEquals(Color.white, controller.getBackgroundColor());
-		assertEquals(Color.black, controller.getForegroundColor());
 	}
 
 }

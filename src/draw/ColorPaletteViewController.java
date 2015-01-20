@@ -26,6 +26,8 @@ public class ColorPaletteViewController {
 		for (int i = 0; i < defaultColors.length; i++) {
 			view.setColor(i, defaultColors[i]);
 		}
+		current.setForegroundColor(foregroundColor);
+		current.setBackgroundColor(backgroundColor);
 	}
 
 	public void selectForegroundColor(int index) {

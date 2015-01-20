@@ -61,7 +61,11 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 				}
 
 				@Override
-				public void mousePressed(MouseEvent arg0) {
+				public void mousePressed(MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON1)
+						controller.selectForegroundColor(index);
+					else if (e.getButton() == MouseEvent.BUTTON3)
+						controller.selectBackgroundColor(index);
 				}
 
 				@Override
