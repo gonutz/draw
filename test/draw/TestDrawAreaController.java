@@ -106,10 +106,9 @@ public class TestDrawAreaController {
 		new20x10imageWithPenForegroundColor(color);
 		final int x = 3, y = 4;
 		captureCurrentRefreshCount();
-		int previousRefreshs = view.refreshCount;
 
 		controller.leftMouseButtonDown(x, y);
-		controller.leftMouseButtonUp(x, y);
+		controller.leftMouseButtonUp();
 
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(x, y));
 		assertRefreshesSinceLastCapture(1);
@@ -120,7 +119,7 @@ public class TestDrawAreaController {
 	}
 
 	private void assertRefreshesSinceLastCapture(int i) {
-		assertEquals(previousRefreshs + i, view.refreshCount);
+		assertEquals(i, view.refreshCount - previousRefreshs);
 	}
 
 	private void new20x10imageWithPenForegroundColor(int color) {
@@ -139,7 +138,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(0, 0);
 		controller.mouseMovedTo(1, 3);
 		controller.mouseMovedTo(3, 3);
-		controller.leftMouseButtonUp(2, 3);
+		controller.leftMouseButtonUp();
 
 		assertRefreshesSinceLastCapture(3);
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, //
@@ -167,10 +166,10 @@ public class TestDrawAreaController {
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
-		controller.leftMouseButtonUp(0, 0);
+		controller.leftMouseButtonUp();
 		controller.mouseMovedTo(3, 3);
 		controller.leftMouseButtonDown(3, 3);
-		controller.leftMouseButtonUp(3, 3);
+		controller.leftMouseButtonUp();
 
 		assertRefreshesSinceLastCapture(2);
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(0, 0), p(3, 3));
@@ -189,16 +188,46 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void undoingPenStroke_ErasesLastSetDot() {
+	public void undoingPenDot_ErasesDot() {
 		new20x10imageWithPenForegroundColor(0xFF123456);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
-		controller.leftMouseButtonUp(0, 0);
+		controller.leftMouseButtonUp();
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(2);
 		assertForegroundPixelsAreSet(0xFF123456, 0xFFFFFFFF);
+	}
+
+	@Test
+	public void undoingPenStroke_ErasesLine() {
+		new20x10imageWithPenForegroundColor(0xFF123456);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(1, 2);
+		controller.mouseMovedTo(4, 5);
+		controller.leftMouseButtonUp();
+		controller.undoLastDrawAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertForegroundPixelsAreSet(0xFF123456, 0xFFFFFFFF);
+	}
+
+	@Test
+	public void undoPen_OnlyErasesLastStrokeSinceMouseWasUp() {
+		final int color = 0xFF321321;
+		new20x10imageWithPenForegroundColor(color);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(2, 2);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(3, 3);
+		controller.leftMouseButtonUp();
+		controller.undoLastDrawAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2));
 	}
 
 }

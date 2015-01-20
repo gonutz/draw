@@ -1,5 +1,6 @@
 package draw;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -27,10 +28,14 @@ public class DrawAreaController {
 
 	public void newImage(int width, int height) {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setBackground(drawSettings.getBackgroundColor());
-		g.clearRect(0, 0, width, height);
+		clearImageTo(drawSettings.getBackgroundColor());
 		view.refresh();
+	}
+
+	private void clearImageTo(Color c) {
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setBackground(c);
+		g.clearRect(0, 0, image.getWidth(), image.getHeight());
 	}
 
 	public void leftMouseButtonDown(int x, int y) {
@@ -45,7 +50,7 @@ public class DrawAreaController {
 		}
 	}
 
-	public void leftMouseButtonUp(int x, int y) {
+	public void leftMouseButtonUp() {
 		leftButtonDown = false;
 	}
 
@@ -61,6 +66,7 @@ public class DrawAreaController {
 	}
 
 	public void undoLastDrawAction() {
+		clearImageTo(Color.white);
 		view.refresh();
 	}
 

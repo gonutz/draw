@@ -51,7 +51,7 @@ public class DrawArea extends JPanel implements DrawAreaView {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					controller.leftMouseButtonUp(e.getX(), e.getY());
+					controller.leftMouseButtonUp();
 				}
 			}
 		});

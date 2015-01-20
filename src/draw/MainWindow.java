@@ -274,8 +274,8 @@ public class MainWindow implements ToolView {
 		GridBagConstraints gbc_penSelection = new GridBagConstraints();
 		gbc_penSelection.insets = new Insets(0, 0, 5, 0);
 		gbc_penSelection.anchor = GridBagConstraints.NORTHWEST;
-		gbc_penSelection.gridx = 1;
-		gbc_penSelection.gridy = 0;
+		gbc_penSelection.gridx = 0;
+		gbc_penSelection.gridy = 1;
 		toolSelectionContainer.add(penSelection, gbc_penSelection);
 
 		fillSelection = new JButton("");
@@ -292,7 +292,7 @@ public class MainWindow implements ToolView {
 		GridBagConstraints gbc_fillSelection = new GridBagConstraints();
 		gbc_fillSelection.insets = new Insets(0, 0, 5, 5);
 		gbc_fillSelection.gridx = 0;
-		gbc_fillSelection.gridy = 1;
+		gbc_fillSelection.gridy = 2;
 		toolSelectionContainer.add(fillSelection, gbc_fillSelection);
 
 		colorPickSelection = new JButton("");
@@ -309,7 +309,7 @@ public class MainWindow implements ToolView {
 		GridBagConstraints gbc_colorPickSelection = new GridBagConstraints();
 		gbc_colorPickSelection.insets = new Insets(0, 0, 5, 0);
 		gbc_colorPickSelection.gridx = 1;
-		gbc_colorPickSelection.gridy = 1;
+		gbc_colorPickSelection.gridy = 0;
 		toolSelectionContainer.add(colorPickSelection, gbc_colorPickSelection);
 
 		lineSelection = new JButton("");
@@ -325,8 +325,8 @@ public class MainWindow implements ToolView {
 		lineSelection.setBackground(Color.WHITE);
 		GridBagConstraints gbc_lineSelection = new GridBagConstraints();
 		gbc_lineSelection.insets = new Insets(0, 0, 0, 5);
-		gbc_lineSelection.gridx = 0;
-		gbc_lineSelection.gridy = 2;
+		gbc_lineSelection.gridx = 1;
+		gbc_lineSelection.gridy = 1;
 		toolSelectionContainer.add(lineSelection, gbc_lineSelection);
 
 		eraseSelection = new JButton("");
