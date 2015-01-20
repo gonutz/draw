@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 public class ColorPalette extends JPanel implements ColorPaletteView {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel[] colorBoxes;
 	private ColorPaletteViewController controller;
 

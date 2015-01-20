@@ -8,6 +8,7 @@ import javax.swing.border.BevelBorder;
 
 public class CurrentColors extends JPanel implements CurrentColorsView {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel foreground;
 	private JPanel background;
 

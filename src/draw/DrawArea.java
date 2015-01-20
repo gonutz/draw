@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 public class DrawArea extends JPanel implements DrawAreaView {
 
+	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
 
 	public void setController(DrawAreaController controller) {

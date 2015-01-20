@@ -17,6 +17,7 @@ import javax.swing.Box;
 
 public class DimensionChooser extends JDialog {
 
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private boolean accepted = false;
 	private JSpinner width;
