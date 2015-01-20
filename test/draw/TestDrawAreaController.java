@@ -13,6 +13,35 @@ public class TestDrawAreaController {
 	private DrawAreaController controller;
 	private StubDrawSettings drawSettings;
 
+	private class SpyView implements DrawAreaView {
+		private int refreshCount;
+
+		public void refresh() {
+			refreshCount++;
+		}
+	}
+
+	private class StubDrawSettings implements DrawSettings {
+		private Color foregroundColor;
+		private Color backgroundColor;
+		private Tool tool;
+
+		@Override
+		public Color getForegroundColor() {
+			return foregroundColor;
+		}
+
+		@Override
+		public Color getBackgroundColor() {
+			return backgroundColor;
+		}
+
+		@Override
+		public Tool getCurrentTool() {
+			return tool;
+		}
+	}
+
 	@Before
 	public void setup() {
 		view = new SpyView();
@@ -62,34 +91,5 @@ public class TestDrawAreaController {
 
 		assertEquals(color, controller.getImage().getRGB(x, y));
 		assertEquals(previousRefreshs + 1, view.refreshCount);
-	}
-
-	private class SpyView implements DrawAreaView {
-		private int refreshCount;
-
-		public void refresh() {
-			refreshCount++;
-		}
-	}
-
-	private class StubDrawSettings implements DrawSettings {
-		private Color foregroundColor;
-		private Color backgroundColor;
-		private Tool tool;
-
-		@Override
-		public Color getForegroundColor() {
-			return foregroundColor;
-		}
-
-		@Override
-		public Color getBackgroundColor() {
-			return backgroundColor;
-		}
-
-		@Override
-		public Tool getCurrentTool() {
-			return tool;
-		}
 	}
 }
