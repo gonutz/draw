@@ -51,6 +51,20 @@ public class TestColorPaletteViewController {
 		assertEquals(Color.black, currentColors.foreground);
 	}
 
+	@Test
+	public void controllerKnowsCurrentForeAndBackgroundColors() {
+		ColorPaletteViewController c = new ColorPaletteViewController(
+				new SpyView(), new SpyCurrentColorView());
+		c.setPaletteEntry(2, Color.cyan);
+		c.setPaletteEntry(4, Color.yellow);
+
+		c.selectBackgroundColor(2);
+		c.selectForegroundColor(4);
+
+		assertEquals(Color.cyan, c.getBackgroundColor());
+		assertEquals(Color.yellow, c.getForegroundColor());
+	}
+
 	private class SpyView implements ColorPaletteView {
 		private List<Integer> setIndices = new ArrayList<Integer>();
 		private List<Color> setColors = new ArrayList<Color>();
@@ -67,12 +81,12 @@ public class TestColorPaletteViewController {
 		private Color foreground;
 
 		@Override
-		public void SetBackgroundColor(Color color) {
+		public void setBackgroundColor(Color color) {
 			background = color;
 		}
 
 		@Override
-		public void SetForegroundColor(Color color) {
+		public void setForegroundColor(Color color) {
 			foreground = color;
 		}
 	}

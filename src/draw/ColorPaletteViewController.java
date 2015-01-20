@@ -13,6 +13,8 @@ public class ColorPaletteViewController {
 			new Color(128, 128, 0), new Color(0, 128, 0),
 			new Color(0, 128, 128), new Color(0, 0, 128),
 			new Color(128, 0, 128), new Color(128, 128, 255) };
+	private Color backgroundColor;
+	private Color foregroundColor;
 
 	public ColorPaletteViewController(ColorPaletteView view,
 			CurrentColorsView current) {
@@ -27,15 +29,25 @@ public class ColorPaletteViewController {
 	}
 
 	public void selectForegroundColor(int index) {
-		current.SetForegroundColor(defaultColors[index]);
+		foregroundColor = defaultColors[index];
+		current.setForegroundColor(foregroundColor);
 	}
 
 	public void selectBackgroundColor(int index) {
-		current.SetBackgroundColor(defaultColors[index]);
+		backgroundColor = defaultColors[index];
+		current.setBackgroundColor(backgroundColor);
 	}
 
 	public void setPaletteEntry(int index, Color color) {
 		view.setColor(index, color);
 		defaultColors[index] = color;
+	}
+
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public Color getForegroundColor() {
+		return foregroundColor;
 	}
 }
