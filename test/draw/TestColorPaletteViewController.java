@@ -6,30 +6,36 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestColorPaletteViewController {
 
+	private SpyView view;
+	private SpyCurrentColorView currentColorView;
+	private ColorPaletteViewController controller;
+
+	@Before
+	public void setup() {
+		view = new SpyView();
+		currentColorView = new SpyCurrentColorView();
+		controller = new ColorPaletteViewController(view, currentColorView);
+	}
+
 	@Test
 	public void onActivate_DefaultColorPaletteIsShown() throws Exception {
-		SpyView view = new SpyView();
-		ColorPaletteViewController c = new ColorPaletteViewController(view,
-				null);
-		c.activate();
-		assertEquals(c.defaultColors.length, view.setColors.size());
-		for (int i = 0; i < c.defaultColors.length; i++) {
+		controller.activate();
+
+		assertEquals(controller.defaultColors.length, view.setColors.size());
+		for (int i = 0; i < controller.defaultColors.length; i++) {
 			assertEquals(i, view.setIndices.get(i).intValue());
-			assertEquals(c.defaultColors[i], view.setColors.get(i));
+			assertEquals(controller.defaultColors[i], view.setColors.get(i));
 		}
 	}
 
 	@Test
 	public void settingNewColor_ShowsItInView() throws Exception {
-		SpyView view = new SpyView();
-		ColorPaletteViewController c = new ColorPaletteViewController(view,
-				null);
-
-		c.setPaletteEntry(5, Color.white);
+		controller.setPaletteEntry(5, Color.white);
 
 		assertEquals(1, view.setColors.size());
 		assertEquals(5, view.setIndices.get(0).intValue());
@@ -38,31 +44,26 @@ public class TestColorPaletteViewController {
 
 	@Test
 	public void selectingColor_ShowsItInCurrentColorView() throws Exception {
-		SpyCurrentColorView currentColors = new SpyCurrentColorView();
-		ColorPaletteViewController c = new ColorPaletteViewController(
-				new SpyView(), currentColors);
-		c.setPaletteEntry(1, Color.white);
-		c.setPaletteEntry(3, Color.black);
+		controller.setPaletteEntry(1, Color.white);
+		controller.setPaletteEntry(3, Color.black);
 
-		c.selectBackgroundColor(1);
-		c.selectForegroundColor(3);
+		controller.selectBackgroundColor(1);
+		controller.selectForegroundColor(3);
 
-		assertEquals(Color.white, currentColors.background);
-		assertEquals(Color.black, currentColors.foreground);
+		assertEquals(Color.white, currentColorView.background);
+		assertEquals(Color.black, currentColorView.foreground);
 	}
 
 	@Test
 	public void controllerKnowsCurrentForeAndBackgroundColors() {
-		ColorPaletteViewController c = new ColorPaletteViewController(
-				new SpyView(), new SpyCurrentColorView());
-		c.setPaletteEntry(2, Color.cyan);
-		c.setPaletteEntry(4, Color.yellow);
+		controller.setPaletteEntry(2, Color.cyan);
+		controller.setPaletteEntry(4, Color.yellow);
 
-		c.selectBackgroundColor(2);
-		c.selectForegroundColor(4);
+		controller.selectBackgroundColor(2);
+		controller.selectForegroundColor(4);
 
-		assertEquals(Color.cyan, c.getBackgroundColor());
-		assertEquals(Color.yellow, c.getForegroundColor());
+		assertEquals(Color.cyan, controller.getBackgroundColor());
+		assertEquals(Color.yellow, controller.getForegroundColor());
 	}
 
 	private class SpyView implements ColorPaletteView {
