@@ -4,8 +4,8 @@ import java.awt.Color;
 
 public interface CurrentColorsView {
 
-	void SetBackgroundColor(Color color);
+	void setBackgroundColor(Color color);
 
-	void SetForegroundColor(Color color);
+	void setForegroundColor(Color color);
 
 }
