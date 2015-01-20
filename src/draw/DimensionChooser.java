@@ -3,16 +3,22 @@ package draw;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.Component;
+
 import javax.swing.Box;
 
 public class DimensionChooser extends JDialog {
@@ -92,6 +98,19 @@ public class DimensionChooser extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
+		makeDialogCloseOnEscape();
 	}
 
+	private void makeDialogCloseOnEscape() {
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close");
+		getRootPane().getActionMap().put("close", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DimensionChooser.this.setVisible(false);
+			}
+		});
+	}
 }
