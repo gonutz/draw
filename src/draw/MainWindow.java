@@ -18,7 +18,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -48,14 +47,20 @@ public class MainWindow implements ToolView {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.setToolViewController(new ToolViewController(window));
+					ToolViewController toolController = new ToolViewController(
+							window);
+					window.setToolViewController(toolController);
+					ColorPaletteViewController paletteController = new ColorPaletteViewController(
+							window.colorPalette, window.currentColors);
 					window.colorPalette
-							.setAndActivateController(new ColorPaletteViewController(
-									window.colorPalette, window.currentColors));
+							.setAndActivateController(paletteController);
 					window.drawAreaController = new DrawAreaController(
 							window.drawArea);
 					window.drawArea.setController(window.drawAreaController);
-					window.drawAreaController.newImage(320, 240, Color.white);
+					window.drawAreaController
+							.setDrawSettings(new DrawSettingsAdapter(
+									paletteController, toolController));
+					window.drawAreaController.newImage(320, 240);
 					window.frmDraw.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -173,7 +178,7 @@ public class MainWindow implements ToolView {
 						dim.setVisible(true);
 						if (dim.wasAccepted()) {
 							drawAreaController.newImage(dim.getCanvasWidth(),
-									dim.getCanvasHeight(), Color.white);
+									dim.getCanvasHeight());
 						}
 					}
 				});
