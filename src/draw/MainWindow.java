@@ -203,6 +203,20 @@ public class MainWindow implements ToolView {
 				InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		fileMenu.add(saveImageAs);
 
+		JMenu mnEdit = new JMenu("Edit");
+		mnEdit.setMnemonic('E');
+		menuBar.add(mnEdit);
+
+		JMenuItem mntmUndo = new JMenuItem("Undo");
+		mntmUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+				InputEvent.CTRL_MASK));
+		mnEdit.add(mntmUndo);
+
+		JMenuItem mntmRedo = new JMenuItem("Redo");
+		mntmRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
+				InputEvent.CTRL_MASK));
+		mnEdit.add(mntmRedo);
+
 		JMenu canvasMenu = new JMenu("Canvas");
 		canvasMenu.setMnemonic('C');
 		menuBar.add(canvasMenu);
@@ -343,6 +357,6 @@ public class MainWindow implements ToolView {
 		JScrollPane paintAreaScroller = new JScrollPane();
 		frmDraw.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
 		drawArea = new DrawArea();
-		paintAreaScroller.getViewport().add(drawArea, null);
+		paintAreaScroller.setViewportView(drawArea);
 	}
 }
