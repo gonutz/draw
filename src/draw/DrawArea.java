@@ -35,7 +35,8 @@ public class DrawArea extends JPanel implements DrawAreaView {
 		Graphics2D g = (Graphics2D) graphics;
 		g.setBackground(getBackground());
 		g.clearRect(0, 0, getWidth(), getHeight());
-		g.drawImage(controller.getImage(), null, 0, 0);
+		if (controller != null)
+			g.drawImage(controller.getImage(), null, 0, 0);
 	}
 
 	private void initialize() {
