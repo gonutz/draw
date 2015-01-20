@@ -15,6 +15,32 @@ public class TestColorPaletteViewController {
 	private SpyCurrentColorView currentColorView;
 	private ColorPaletteViewController controller;
 
+	private class SpyView implements ColorPaletteView {
+		private List<Integer> setIndices = new ArrayList<Integer>();
+		private List<Color> setColors = new ArrayList<Color>();
+
+		@Override
+		public void setColor(int index, Color color) {
+			setIndices.add(index);
+			setColors.add(color);
+		}
+	}
+
+	private class SpyCurrentColorView implements CurrentColorsView {
+		private Color background;
+		private Color foreground;
+
+		@Override
+		public void setBackgroundColor(Color color) {
+			background = color;
+		}
+
+		@Override
+		public void setForegroundColor(Color color) {
+			foreground = color;
+		}
+	}
+
 	@Before
 	public void setup() {
 		view = new SpyView();
@@ -66,30 +92,11 @@ public class TestColorPaletteViewController {
 		assertEquals(Color.yellow, controller.getForegroundColor());
 	}
 
-	private class SpyView implements ColorPaletteView {
-		private List<Integer> setIndices = new ArrayList<Integer>();
-		private List<Color> setColors = new ArrayList<Color>();
-
-		@Override
-		public void setColor(int index, Color color) {
-			setIndices.add(index);
-			setColors.add(color);
-		}
-	}
-
-	private class SpyCurrentColorView implements CurrentColorsView {
-		private Color background;
-		private Color foreground;
-
-		@Override
-		public void setBackgroundColor(Color color) {
-			background = color;
-		}
-
-		@Override
-		public void setForegroundColor(Color color) {
-			foreground = color;
-		}
+	@Test
+	public void defaultForeAndBackgroundColorsAreBlackAndWhite()
+			throws Exception {
+		assertEquals(Color.white, controller.getBackgroundColor());
+		assertEquals(Color.black, controller.getForegroundColor());
 	}
 
 }

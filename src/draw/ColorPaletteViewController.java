@@ -13,8 +13,8 @@ public class ColorPaletteViewController {
 			new Color(128, 128, 0), new Color(0, 128, 0),
 			new Color(0, 128, 128), new Color(0, 0, 128),
 			new Color(128, 0, 128), new Color(128, 128, 255) };
-	private Color backgroundColor;
-	private Color foregroundColor;
+	private Color backgroundColor = Color.white;
+	private Color foregroundColor = Color.black;
 
 	public ColorPaletteViewController(ColorPaletteView view,
 			CurrentColorsView current) {
