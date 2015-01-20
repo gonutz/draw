@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
 import org.junit.Before;
@@ -63,12 +64,32 @@ public class TestDrawAreaController {
 
 		assertEquals(width, controller.getImage().getWidth());
 		assertEquals(height, controller.getImage().getHeight());
+		assertForegroundPixelsAreSet(0, color);
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				assertEquals(x + " " + y, color,
 						controller.getImage().getRGB(x, y));
 			}
 		}
+	}
+
+	private void assertForegroundPixelsAreSet(int foreground, int background,
+			Point... set) {
+		HashSet<Point> setPixels = new HashSet<Point>();
+		for (Point p : set)
+			setPixels.add(p);
+		BufferedImage img = controller.getImage();
+		for (int x = 0; x < img.getWidth(); x++)
+			for (int y = 0; y < img.getHeight(); y++) {
+				int expected = background;
+				if (setPixels.contains(p(x, y)))
+					expected = foreground;
+				assertEquals(x + " " + y, expected, img.getRGB(x, y));
+			}
+	}
+
+	private Point p(int x, int y) {
+		return new Point(x, y);
 	}
 
 	@Test
@@ -91,7 +112,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(x, y);
 		controller.leftMouseButtonUp(x, y);
 
-		assertEquals(color, controller.getImage().getRGB(x, y));
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(x, y));
 		assertEquals(previousRefreshs + 1, view.refreshCount);
 	}
 
@@ -109,24 +130,10 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(3, 3);
 		controller.leftMouseButtonUp(2, 3);
 
-		HashSet<Point> setPixels = new HashSet<Point>();
-		setPixels.add(new Point(0, 0));
-		setPixels.add(new Point(0, 1));
-		setPixels.add(new Point(1, 2));
-		setPixels.add(new Point(1, 3));
-
-		setPixels.add(new Point(2, 3));
-		setPixels.add(new Point(3, 3));
-
-		for (int x = 0; x < 20; x++)
-			for (int y = 0; y < 10; y++) {
-				int expectedColor = 0xFFFFFFFF;
-				if (setPixels.contains(new Point(x, y)))
-					expectedColor = color;
-				assertEquals(x + " " + y, expectedColor, controller.getImage()
-						.getRGB(x, y));
-			}
 		assertEquals(previousRefreshs + 3, view.refreshCount);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, //
+				p(0, 0), p(0, 1), p(1, 2), p(1, 3),//
+				p(2, 3), p(3, 3));
 	}
 
 	@Test
@@ -141,9 +148,8 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(0, 0);
 		controller.mouseMovedTo(1, 1);
 
-		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(0, 0));
-		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(1, 1));
 		assertEquals(previousRefreshs, view.refreshCount);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF);
 	}
 
 	@Test
@@ -161,9 +167,8 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(3, 3);
 		controller.leftMouseButtonUp(3, 3);
 
-		assertEquals(color, controller.getImage().getRGB(0, 0));
-		assertEquals(color, controller.getImage().getRGB(3, 3));
 		assertEquals(previousRefreshs + 2, view.refreshCount);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(0, 0), p(3, 3));
 	}
 
 	@Test
@@ -178,6 +183,7 @@ public class TestDrawAreaController {
 
 		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(0, 0));
 		assertEquals(previousRefreshs, view.refreshCount);
+		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF);
 	}
 
 }
