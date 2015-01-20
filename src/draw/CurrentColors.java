@@ -45,10 +45,12 @@ public class CurrentColors extends JPanel implements CurrentColorsView {
 		final int size = 10;
 		for (int x = 0; x <= getWidth() / size; x++)
 			for (int y = 0; y <= getHeight() / size; y++) {
-				g.setColor(Color.white);
-				if ((x + y) % 2 == 1)
-					g.setColor(Color.lightGray);
+				g.setColor(lightSquare(x, y) ? Color.white : Color.lightGray);
 				g.fillRect(x * size, y * size, size, size);
 			}
+	}
+
+	private boolean lightSquare(int x, int y) {
+		return (x + y) % 2 == 0;
 	}
 }
