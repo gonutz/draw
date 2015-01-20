@@ -99,6 +99,7 @@ public class DimensionChooser extends JDialog {
 			}
 		}
 		makeDialogCloseOnEscape();
+		makeDialogAcceptOnReturn();
 	}
 
 	private void makeDialogCloseOnEscape() {
@@ -109,6 +110,20 @@ public class DimensionChooser extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				DimensionChooser.this.setVisible(false);
+			}
+		});
+	}
+
+	private void makeDialogAcceptOnReturn() {
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "accept");
+		getRootPane().getActionMap().put("accept", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				accepted = true;
 				DimensionChooser.this.setVisible(false);
 			}
 		});
