@@ -70,14 +70,14 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void afterNewImageCreation_ViewIsRefreshed() throws Exception {
+	public void afterNewImageCreation_ViewIsRefreshed() {
 		assertEquals(0, view.refreshCount);
 		controller.newImage(10, 5);
 		assertEquals(1, view.refreshCount);
 	}
 
 	@Test
-	public void leftClickWithPen_PaintsDotInForegroundColor() throws Exception {
+	public void leftClickWithPen_PaintsDotInForegroundColor() {
 		final int color = 0xFFFFAACC;
 		drawSettings.foregroundColor = new Color(color);
 		drawSettings.backgroundColor = Color.white;

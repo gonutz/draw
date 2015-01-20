@@ -49,7 +49,7 @@ public class TestColorPaletteViewController {
 	}
 
 	@Test
-	public void onActivate_DefaultColorPaletteIsShown() throws Exception {
+	public void onActivate_DefaultColorPaletteIsShown() {
 		controller.activate();
 
 		assertEquals(controller.defaultColors.length, view.setColors.size());
@@ -60,7 +60,7 @@ public class TestColorPaletteViewController {
 	}
 
 	@Test
-	public void settingNewColor_ShowsItInView() throws Exception {
+	public void settingNewColor_ShowsItInView() {
 		controller.setPaletteEntry(5, Color.white);
 
 		assertEquals(1, view.setColors.size());
@@ -69,7 +69,7 @@ public class TestColorPaletteViewController {
 	}
 
 	@Test
-	public void selectingColor_ShowsItInCurrentColorView() throws Exception {
+	public void selectingColor_ShowsItInCurrentColorView() {
 		controller.setPaletteEntry(1, Color.white);
 		controller.setPaletteEntry(3, Color.black);
 
@@ -93,8 +93,7 @@ public class TestColorPaletteViewController {
 	}
 
 	@Test
-	public void defaultForeAndBackgroundColorsAreBlackAndWhite()
-			throws Exception {
+	public void defaultForeAndBackgroundColorsAreBlackAndWhite() {
 		assertEquals(Color.white, controller.getBackgroundColor());
 		assertEquals(Color.black, controller.getForegroundColor());
 	}

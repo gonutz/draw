@@ -16,7 +16,7 @@ public class TestToolViewController {
 	}
 
 	@Test
-	public void changingSelectedTool_UpdatesView() throws Exception {
+	public void changingSelectedTool_UpdatesView() {
 		SpyView view = new SpyView();
 		ToolViewController c = new ToolViewController(view);
 		for (Tool tool : Tool.values()) {
@@ -26,7 +26,7 @@ public class TestToolViewController {
 	}
 
 	@Test
-	public void onShow_RectangleSelectToolIsActive() throws Exception {
+	public void onShow_RectangleSelectToolIsActive() {
 		SpyView view = new SpyView();
 		ToolViewController c = new ToolViewController(view);
 		c.viewActivated();
@@ -34,14 +34,14 @@ public class TestToolViewController {
 	}
 
 	@Test
-	public void controllerKnowsTheCurrentlySelectedTool() throws Exception {
+	public void controllerKnowsTheCurrentlySelectedTool() {
 		ToolViewController c = new ToolViewController(new SpyView());
 		c.selectTool(Tool.Pen);
 		assertEquals(Tool.Pen, c.getSelectedTool());
 	}
 
 	@Test
-	public void defaultToolIsRectangleSelection() throws Exception {
+	public void defaultToolIsRectangleSelection() {
 		assertEquals(Tool.RectangleSelection,
 				new ToolViewController(null).getSelectedTool());
 	}
