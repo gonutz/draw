@@ -9,6 +9,9 @@ public class DrawAreaController {
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
 	private BufferedImage image;
+	private int lastX;
+	private int lastY;
+	private boolean leftButtonDown;
 
 	public DrawAreaController(DrawAreaView view) {
 		this.view = view;
@@ -31,15 +34,30 @@ public class DrawAreaController {
 	}
 
 	public void leftMouseButtonDown(int x, int y) {
-		Graphics g = image.getGraphics();
-		g.setColor(drawSettings.getForegroundColor());
-		g.drawLine(x, y, x, y);
-		view.refresh();
+		if (drawSettings.getCurrentTool() == Tool.Pen) {
+			Graphics g = image.getGraphics();
+			g.setColor(drawSettings.getForegroundColor());
+			g.drawLine(x, y, x, y);
+			lastX = x;
+			lastY = y;
+			leftButtonDown = true;
+			view.refresh();
+		}
 	}
 
 	public void leftMouseButtonUp(int x, int y) {
-		// TODO Auto-generated method stub
+		leftButtonDown = false;
+	}
 
+	public void mouseMovedTo(int x, int y) {
+		if (leftButtonDown) {
+			Graphics g = image.getGraphics();
+			g.setColor(drawSettings.getForegroundColor());
+			g.drawLine(lastX, lastY, x, y);
+			view.refresh();
+		}
+		lastX = x;
+		lastY = y;
 	}
 
 }

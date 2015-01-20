@@ -3,6 +3,8 @@ package draw;
 import static org.junit.Assert.*;
 
 import java.awt.Color;
+import java.awt.Point;
+import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -92,4 +94,90 @@ public class TestDrawAreaController {
 		assertEquals(color, controller.getImage().getRGB(x, y));
 		assertEquals(previousRefreshs + 1, view.refreshCount);
 	}
+
+	@Test
+	public void draggingPen_DrawsLine() {
+		final int color = 0xFF010203;
+		drawSettings.foregroundColor = new Color(color);
+		drawSettings.backgroundColor = Color.white;
+		drawSettings.tool = Tool.Pen;
+		controller.newImage(20, 10);
+		int previousRefreshs = view.refreshCount;
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(1, 3);
+		controller.mouseMovedTo(3, 3);
+		controller.leftMouseButtonUp(2, 3);
+
+		HashSet<Point> setPixels = new HashSet<Point>();
+		setPixels.add(new Point(0, 0));
+		setPixels.add(new Point(0, 1));
+		setPixels.add(new Point(1, 2));
+		setPixels.add(new Point(1, 3));
+
+		setPixels.add(new Point(2, 3));
+		setPixels.add(new Point(3, 3));
+
+		for (int x = 0; x < 20; x++)
+			for (int y = 0; y < 10; y++) {
+				int expectedColor = 0xFFFFFFFF;
+				if (setPixels.contains(new Point(x, y)))
+					expectedColor = color;
+				assertEquals(x + " " + y, expectedColor, controller.getImage()
+						.getRGB(x, y));
+			}
+		assertEquals(previousRefreshs + 3, view.refreshCount);
+	}
+
+	@Test
+	public void movingMouseWithLeftButtonUp_DrawsNothing() {
+		final int color = 0xFF123456;
+		drawSettings.foregroundColor = new Color(color);
+		drawSettings.backgroundColor = Color.white;
+		drawSettings.tool = Tool.Pen;
+		controller.newImage(20, 10);
+		int previousRefreshs = view.refreshCount;
+
+		controller.mouseMovedTo(0, 0);
+		controller.mouseMovedTo(1, 1);
+
+		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(0, 0));
+		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(1, 1));
+		assertEquals(previousRefreshs, view.refreshCount);
+	}
+
+	@Test
+	public void liftingAndDroppingPenAgain_DrawsTwoPoints() {
+		final int color = 0xFF006660;
+		drawSettings.foregroundColor = new Color(color);
+		drawSettings.backgroundColor = Color.white;
+		drawSettings.tool = Tool.Pen;
+		controller.newImage(20, 10);
+		int previousRefreshs = view.refreshCount;
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp(0, 0);
+		controller.mouseMovedTo(3, 3);
+		controller.leftMouseButtonDown(3, 3);
+		controller.leftMouseButtonUp(3, 3);
+
+		assertEquals(color, controller.getImage().getRGB(0, 0));
+		assertEquals(color, controller.getImage().getRGB(3, 3));
+		assertEquals(previousRefreshs + 2, view.refreshCount);
+	}
+
+	@Test
+	public void draggingLeftMouse_WithRectangleSelectionTool_DoesNotDraw() {
+		drawSettings.foregroundColor = Color.black;
+		drawSettings.backgroundColor = Color.white;
+		controller.newImage(20, 10);
+		int previousRefreshs = view.refreshCount;
+
+		drawSettings.tool = Tool.RectangleSelection;
+		controller.leftMouseButtonDown(0, 0);
+
+		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(0, 0));
+		assertEquals(previousRefreshs, view.refreshCount);
+	}
+
 }

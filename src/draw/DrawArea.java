@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
 public class DrawArea extends JPanel implements DrawAreaView {
 
@@ -47,6 +48,17 @@ public class DrawArea extends JPanel implements DrawAreaView {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					controller.leftMouseButtonUp(e.getX(), e.getY());
 				}
+			}
+		});
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				controller.mouseMovedTo(e.getX(), e.getY());
+			}
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				controller.mouseMovedTo(e.getX(), e.getY());
 			}
 		});
 	}
