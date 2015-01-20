@@ -15,6 +15,7 @@ public class TestDrawAreaController {
 	private SpyView view;
 	private DrawAreaController controller;
 	private StubDrawSettings drawSettings;
+	private int previousRefreshs;
 
 	private class SpyView implements DrawAreaView {
 		private int refreshCount;
@@ -104,13 +105,22 @@ public class TestDrawAreaController {
 		final int color = 0xFFFFAACC;
 		new20x10imageWithPenForegroundColor(color);
 		final int x = 3, y = 4;
+		captureCurrentRefreshCount();
 		int previousRefreshs = view.refreshCount;
 
 		controller.leftMouseButtonDown(x, y);
 		controller.leftMouseButtonUp(x, y);
 
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(x, y));
-		assertEquals(previousRefreshs + 1, view.refreshCount);
+		assertRefreshesSinceLastCapture(1);
+	}
+
+	private void captureCurrentRefreshCount() {
+		previousRefreshs = view.refreshCount;
+	}
+
+	private void assertRefreshesSinceLastCapture(int i) {
+		assertEquals(previousRefreshs + i, view.refreshCount);
 	}
 
 	private void new20x10imageWithPenForegroundColor(int color) {
@@ -124,14 +134,14 @@ public class TestDrawAreaController {
 	public void draggingPen_DrawsLine() {
 		final int color = 0xFF010203;
 		new20x10imageWithPenForegroundColor(color);
-		int previousRefreshs = view.refreshCount;
+		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
 		controller.mouseMovedTo(1, 3);
 		controller.mouseMovedTo(3, 3);
 		controller.leftMouseButtonUp(2, 3);
 
-		assertEquals(previousRefreshs + 3, view.refreshCount);
+		assertRefreshesSinceLastCapture(3);
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, //
 				p(0, 0), p(0, 1), p(1, 2), p(1, 3),//
 				p(2, 3), p(3, 3));
@@ -141,12 +151,12 @@ public class TestDrawAreaController {
 	public void movingMouseWithLeftButtonUp_DrawsNothing() {
 		final int color = 0xFF123456;
 		new20x10imageWithPenForegroundColor(color);
-		int previousRefreshs = view.refreshCount;
+		captureCurrentRefreshCount();
 
 		controller.mouseMovedTo(0, 0);
 		controller.mouseMovedTo(1, 1);
 
-		assertEquals(previousRefreshs, view.refreshCount);
+		assertRefreshesSinceLastCapture(0);
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF);
 	}
 
@@ -154,7 +164,7 @@ public class TestDrawAreaController {
 	public void liftingAndDroppingPenAgain_DrawsTwoPoints() {
 		final int color = 0xFF006660;
 		new20x10imageWithPenForegroundColor(color);
-		int previousRefreshs = view.refreshCount;
+		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
 		controller.leftMouseButtonUp(0, 0);
@@ -162,21 +172,33 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(3, 3);
 		controller.leftMouseButtonUp(3, 3);
 
-		assertEquals(previousRefreshs + 2, view.refreshCount);
+		assertRefreshesSinceLastCapture(2);
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(0, 0), p(3, 3));
 	}
 
 	@Test
 	public void draggingLeftMouse_WithRectangleSelectionTool_DoesNotDraw() {
 		new20x10imageWithPenForegroundColor(0xFF000000);
-		int previousRefreshs = view.refreshCount;
+		captureCurrentRefreshCount();
 
 		drawSettings.tool = Tool.RectangleSelection;
 		controller.leftMouseButtonDown(0, 0);
 
-		assertEquals(0xFFFFFFFF, controller.getImage().getRGB(0, 0));
-		assertEquals(previousRefreshs, view.refreshCount);
+		assertRefreshesSinceLastCapture(0);
 		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF);
+	}
+
+	@Test
+	public void undoingPenStroke_ErasesLastSetDot() {
+		new20x10imageWithPenForegroundColor(0xFF123456);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp(0, 0);
+		controller.undoLastDrawAction();
+
+		assertRefreshesSinceLastCapture(2);
+		assertForegroundPixelsAreSet(0xFF123456, 0xFFFFFFFF);
 	}
 
 }

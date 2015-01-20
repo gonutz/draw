@@ -60,4 +60,8 @@ public class DrawAreaController {
 		lastY = y;
 	}
 
+	public void undoLastDrawAction() {
+		view.refresh();
+	}
+
 }
