@@ -1,9 +1,11 @@
 package draw;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -23,6 +25,8 @@ public class DrawArea extends JPanel implements DrawAreaView {
 
 	@Override
 	public void refresh() {
+		setPreferredSize(new Dimension(controller.getImage().getWidth(),
+				controller.getImage().getHeight()));
 		repaint();
 	}
 
