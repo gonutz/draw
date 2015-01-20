@@ -6,6 +6,15 @@ import org.junit.Test;
 
 public class TestToolViewController {
 
+	private class SpyView implements ToolView {
+		private Tool selection;
+
+		@Override
+		public void setSelection(Tool selected) {
+			selection = selected;
+		}
+	}
+
 	@Test
 	public void changingSelectedTool_UpdatesView() throws Exception {
 		SpyView view = new SpyView();
@@ -29,14 +38,5 @@ public class TestToolViewController {
 		ToolViewController c = new ToolViewController(new SpyView());
 		c.selectTool(Tool.Pen);
 		assertEquals(Tool.Pen, c.getSelectedTool());
-	}
-
-	private class SpyView implements ToolView {
-		private Tool selection;
-
-		@Override
-		public void setSelection(Tool selected) {
-			selection = selected;
-		}
 	}
 }
