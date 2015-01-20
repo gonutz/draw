@@ -102,10 +102,7 @@ public class TestDrawAreaController {
 	@Test
 	public void leftClickWithPen_PaintsDotInForegroundColor() {
 		final int color = 0xFFFFAACC;
-		drawSettings.foregroundColor = new Color(color);
-		drawSettings.backgroundColor = Color.white;
-		drawSettings.tool = Tool.Pen;
-		controller.newImage(20, 10);
+		new20x10imageWithPenForegroundColor(color);
 		final int x = 3, y = 4;
 		int previousRefreshs = view.refreshCount;
 
@@ -116,13 +113,17 @@ public class TestDrawAreaController {
 		assertEquals(previousRefreshs + 1, view.refreshCount);
 	}
 
-	@Test
-	public void draggingPen_DrawsLine() {
-		final int color = 0xFF010203;
+	private void new20x10imageWithPenForegroundColor(int color) {
 		drawSettings.foregroundColor = new Color(color);
 		drawSettings.backgroundColor = Color.white;
 		drawSettings.tool = Tool.Pen;
 		controller.newImage(20, 10);
+	}
+
+	@Test
+	public void draggingPen_DrawsLine() {
+		final int color = 0xFF010203;
+		new20x10imageWithPenForegroundColor(color);
 		int previousRefreshs = view.refreshCount;
 
 		controller.leftMouseButtonDown(0, 0);
@@ -139,10 +140,7 @@ public class TestDrawAreaController {
 	@Test
 	public void movingMouseWithLeftButtonUp_DrawsNothing() {
 		final int color = 0xFF123456;
-		drawSettings.foregroundColor = new Color(color);
-		drawSettings.backgroundColor = Color.white;
-		drawSettings.tool = Tool.Pen;
-		controller.newImage(20, 10);
+		new20x10imageWithPenForegroundColor(color);
 		int previousRefreshs = view.refreshCount;
 
 		controller.mouseMovedTo(0, 0);
@@ -155,10 +153,7 @@ public class TestDrawAreaController {
 	@Test
 	public void liftingAndDroppingPenAgain_DrawsTwoPoints() {
 		final int color = 0xFF006660;
-		drawSettings.foregroundColor = new Color(color);
-		drawSettings.backgroundColor = Color.white;
-		drawSettings.tool = Tool.Pen;
-		controller.newImage(20, 10);
+		new20x10imageWithPenForegroundColor(color);
 		int previousRefreshs = view.refreshCount;
 
 		controller.leftMouseButtonDown(0, 0);
@@ -173,9 +168,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void draggingLeftMouse_WithRectangleSelectionTool_DoesNotDraw() {
-		drawSettings.foregroundColor = Color.black;
-		drawSettings.backgroundColor = Color.white;
-		controller.newImage(20, 10);
+		new20x10imageWithPenForegroundColor(0xFF000000);
 		int previousRefreshs = view.refreshCount;
 
 		drawSettings.tool = Tool.RectangleSelection;
