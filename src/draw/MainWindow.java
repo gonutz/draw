@@ -146,9 +146,6 @@ public class MainWindow implements ToolView {
 		return null;
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frmDraw = new JFrame();
 		frmDraw.addWindowListener(new WindowAdapter() {
@@ -208,6 +205,11 @@ public class MainWindow implements ToolView {
 		menuBar.add(mnEdit);
 
 		JMenuItem mntmUndo = new JMenuItem("Undo");
+		mntmUndo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.undoLastDrawAction();
+			}
+		});
 		mntmUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
 				InputEvent.CTRL_MASK));
 		mnEdit.add(mntmUndo);
