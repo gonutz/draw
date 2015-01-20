@@ -39,4 +39,10 @@ public class TestToolViewController {
 		c.selectTool(Tool.Pen);
 		assertEquals(Tool.Pen, c.getSelectedTool());
 	}
+
+	@Test
+	public void defaultToolIsRectangleSelection() throws Exception {
+		assertEquals(Tool.RectangleSelection,
+				new ToolViewController(null).getSelectedTool());
+	}
 }

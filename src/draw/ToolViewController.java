@@ -3,7 +3,7 @@ package draw;
 public class ToolViewController {
 
 	private ToolView view;
-	private Tool selected;
+	private Tool selected = Tool.RectangleSelection;
 
 	public ToolViewController(ToolView view) {
 		this.view = view;
