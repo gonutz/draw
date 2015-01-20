@@ -49,17 +49,19 @@ public class TestDrawAreaController {
 
 	@Test
 	public void leftClickWithPen_PaintsDotInForegroundColor() throws Exception {
-		drawSettings.backgroundColor = Color.white;
-		controller.newImage(20, 10);
-		drawSettings.tool = Tool.Pen;
 		final int color = 0xFFFFAACC;
 		drawSettings.foregroundColor = new Color(color);
-
+		drawSettings.backgroundColor = Color.white;
+		drawSettings.tool = Tool.Pen;
+		controller.newImage(20, 10);
 		final int x = 3, y = 4;
+		int previousRefreshs = view.refreshCount;
 
 		controller.leftMouseButtonDown(x, y);
 		controller.leftMouseButtonUp(x, y);
+
 		assertEquals(color, controller.getImage().getRGB(x, y));
+		assertEquals(previousRefreshs + 1, view.refreshCount);
 	}
 
 	private class SpyView implements DrawAreaView {

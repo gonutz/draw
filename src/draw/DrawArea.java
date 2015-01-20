@@ -4,14 +4,25 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DrawArea extends JPanel implements DrawAreaView {
 
 	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
 
+	public DrawArea() {
+		initialize();
+	}
+
 	public void setController(DrawAreaController controller) {
 		this.controller = controller;
+	}
+
+	@Override
+	public void refresh() {
+		repaint();
 	}
 
 	@Override
@@ -22,8 +33,21 @@ public class DrawArea extends JPanel implements DrawAreaView {
 		g.drawImage(controller.getImage(), null, 0, 0);
 	}
 
-	@Override
-	public void refresh() {
-		repaint();
+	private void initialize() {
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					controller.leftMouseButtonDown(e.getX(), e.getY());
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					controller.leftMouseButtonUp(e.getX(), e.getY());
+				}
+			}
+		});
 	}
 }

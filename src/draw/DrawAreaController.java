@@ -34,6 +34,7 @@ public class DrawAreaController {
 		Graphics g = image.getGraphics();
 		g.setColor(drawSettings.getForegroundColor());
 		g.drawLine(x, y, x, y);
+		view.refresh();
 	}
 
 	public void leftMouseButtonUp(int x, int y) {
