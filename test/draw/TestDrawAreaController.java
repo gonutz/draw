@@ -405,4 +405,25 @@ public class TestDrawAreaController {
 
 		assertPixelsAreSet(BLACK, WHITE);
 	}
+
+	@Test
+	public void undoRedoCombinationsWork() {
+		new20x10imageWithPenForegroundColor(BLACK);
+
+		controller.leftMouseButtonDown(1, 0);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(2, 0);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(3, 0);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		controller.undoLastAction();
+		controller.leftMouseButtonDown(4, 0);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		controller.undoLastAction();
+		// now there are four strokes and 4 undos => image should be empty
+
+		assertPixelsAreSet(BLACK, WHITE);
+	}
 }
