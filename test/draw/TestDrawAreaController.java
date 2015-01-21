@@ -12,6 +12,7 @@ import org.junit.Test;
 
 public class TestDrawAreaController {
 
+	private static final int WHITE = 0xFFFFFFFF;
 	private SpyView view;
 	private DrawAreaController controller;
 	private StubDrawSettings drawSettings;
@@ -65,7 +66,7 @@ public class TestDrawAreaController {
 
 		assertEquals(width, controller.getImage().getWidth());
 		assertEquals(height, controller.getImage().getHeight());
-		assertForegroundPixelsAreSet(0, color);
+		assertPixelsAreSet(0, color);
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				assertEquals(x + " " + y, color,
@@ -74,7 +75,7 @@ public class TestDrawAreaController {
 		}
 	}
 
-	private void assertForegroundPixelsAreSet(int foreground, int background,
+	private void assertPixelsAreSet(int foreground, int background,
 			Point... set) {
 		HashSet<Point> setPixels = new HashSet<Point>();
 		for (Point p : set)
@@ -110,7 +111,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(x, y);
 		controller.leftMouseButtonUp();
 
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(x, y));
+		assertPixelsAreSet(color, WHITE, p(x, y));
 		assertRefreshesSinceLastCapture(1);
 	}
 
@@ -141,7 +142,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonUp();
 
 		assertRefreshesSinceLastCapture(3);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, //
+		assertPixelsAreSet(color, WHITE, //
 				p(0, 0), p(0, 1), p(1, 2), p(1, 3),//
 				p(2, 3), p(3, 3));
 	}
@@ -156,7 +157,7 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(1, 1);
 
 		assertRefreshesSinceLastCapture(0);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF);
+		assertPixelsAreSet(color, WHITE);
 	}
 
 	@Test
@@ -172,7 +173,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonUp();
 
 		assertRefreshesSinceLastCapture(2);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(0, 0), p(3, 3));
+		assertPixelsAreSet(color, WHITE, p(0, 0), p(3, 3));
 	}
 
 	@Test
@@ -184,7 +185,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(0, 0);
 
 		assertRefreshesSinceLastCapture(0);
-		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF);
+		assertPixelsAreSet(0xFF000000, WHITE);
 	}
 
 	@Test
@@ -197,7 +198,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(2);
-		assertForegroundPixelsAreSet(0xFF123456, 0xFFFFFFFF);
+		assertPixelsAreSet(0xFF123456, WHITE);
 	}
 
 	@Test
@@ -212,7 +213,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(3);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF);
+		assertPixelsAreSet(color, WHITE);
 	}
 
 	@Test
@@ -228,7 +229,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(3);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2));
+		assertPixelsAreSet(color, WHITE, p(2, 2));
 	}
 
 	@Test
@@ -247,7 +248,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(6);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2), p(3, 3));
+		assertPixelsAreSet(color, WHITE, p(2, 2), p(3, 3));
 	}
 
 	@Test
@@ -258,7 +259,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(0);
-		assertForegroundPixelsAreSet(0xFF112233, 0xFFFFFFFF);
+		assertPixelsAreSet(0xFF112233, WHITE);
 	}
 
 	@Test
@@ -278,7 +279,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(6);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2), p(3, 3));
+		assertPixelsAreSet(color, WHITE, p(2, 2), p(3, 3));
 	}
 
 	@Test
@@ -294,7 +295,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonUp();
 		controller.undoLastDrawAction();
 
-		assertForegroundPixelsAreSet(firstColor, 0xFFFFFFFF, p(0, 0));
+		assertPixelsAreSet(firstColor, WHITE, p(0, 0));
 	}
 
 	@Test
@@ -308,7 +309,7 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(20, 10);
 		controller.leftMouseButtonUp();
 
-		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF, p(1, 1), p(0, 0), p(18, 8),
+		assertPixelsAreSet(0xFF000000, WHITE, p(1, 1), p(0, 0), p(18, 8),
 				p(19, 9));
 	}
 
@@ -326,7 +327,7 @@ public class TestDrawAreaController {
 		controller.rightMouseButtonUp();
 
 		assertRefreshesSinceLastCapture(2);
-		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(1, 1), p(2, 1), p(3, 1));
+		assertPixelsAreSet(color, WHITE, p(1, 1), p(2, 1), p(3, 1));
 	}
 
 }
