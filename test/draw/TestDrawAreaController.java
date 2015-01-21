@@ -12,7 +12,9 @@ import org.junit.Test;
 
 public class TestDrawAreaController {
 
+	private static final int BLACK = 0xFF000000;
 	private static final int WHITE = 0xFFFFFFFF;
+
 	private SpyView view;
 	private DrawAreaController controller;
 	private StubDrawSettings drawSettings;
@@ -178,14 +180,14 @@ public class TestDrawAreaController {
 
 	@Test
 	public void draggingLeftMouse_WithRectangleSelectionTool_DoesNotDraw() {
-		new20x10imageWithPenForegroundColor(0xFF000000);
+		new20x10imageWithPenForegroundColor(BLACK);
 		captureCurrentRefreshCount();
 
 		drawSettings.tool = Tool.RectangleSelection;
 		controller.leftMouseButtonDown(0, 0);
 
 		assertRefreshesSinceLastCapture(0);
-		assertPixelsAreSet(0xFF000000, WHITE);
+		assertPixelsAreSet(BLACK, WHITE);
 	}
 
 	@Test
@@ -300,7 +302,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void strokePenOutsideImage_SkipsInvalidPoints() {
-		new20x10imageWithPenForegroundColor(0xFF000000);
+		new20x10imageWithPenForegroundColor(BLACK);
 
 		controller.leftMouseButtonDown(1, 1);
 		controller.mouseMovedTo(-1, -1);
@@ -309,8 +311,7 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(20, 10);
 		controller.leftMouseButtonUp();
 
-		assertPixelsAreSet(0xFF000000, WHITE, p(1, 1), p(0, 0), p(18, 8),
-				p(19, 9));
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1), p(0, 0), p(18, 8), p(19, 9));
 	}
 
 	@Test
@@ -347,13 +348,13 @@ public class TestDrawAreaController {
 
 	@Test
 	public void redoingWhenNothingWasUndone_DoesNothing() {
-		new20x10imageWithPenForegroundColor(0xFF000000);
+		new20x10imageWithPenForegroundColor(BLACK);
 		captureCurrentRefreshCount();
 
 		controller.redoPreviousAction();
 
 		assertRefreshesSinceLastCapture(0);
-		assertPixelsAreSet(0xFF000000, WHITE);
+		assertPixelsAreSet(BLACK, WHITE);
 	}
 
 }
