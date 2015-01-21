@@ -202,7 +202,8 @@ public class TestDrawAreaController {
 
 	@Test
 	public void undoingPenStroke_ErasesLine() {
-		new20x10imageWithPenForegroundColor(0xFF123456);
+		final int color = 0xFF123456;
+		new20x10imageWithPenForegroundColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(1, 2);
@@ -211,7 +212,7 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertRefreshesSinceLastCapture(3);
-		assertForegroundPixelsAreSet(0xFF123456, 0xFFFFFFFF);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF);
 	}
 
 	@Test
@@ -294,6 +295,21 @@ public class TestDrawAreaController {
 		controller.undoLastDrawAction();
 
 		assertForegroundPixelsAreSet(firstColor, 0xFFFFFFFF, p(0, 0));
+	}
+
+	@Test
+	public void strokePenOutsideImage_SkipsInvalidPoints() {
+		new20x10imageWithPenForegroundColor(0xFF000000);
+
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(-1, -1);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(18, 8);
+		controller.mouseMovedTo(20, 10);
+		controller.leftMouseButtonUp();
+
+		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF, p(1, 1), p(0, 0),
+				p(18, 8), p(19, 9));
 	}
 
 }
