@@ -195,7 +195,7 @@ public class TestDrawAreaController {
 
 		controller.leftMouseButtonDown(0, 0);
 		controller.leftMouseButtonUp();
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(2);
 		assertPixelsAreSet(0xFF123456, WHITE);
@@ -210,7 +210,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonDown(1, 2);
 		controller.mouseMovedTo(4, 5);
 		controller.leftMouseButtonUp();
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(3);
 		assertPixelsAreSet(color, WHITE);
@@ -226,7 +226,7 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonUp();
 		controller.leftMouseButtonDown(3, 3);
 		controller.leftMouseButtonUp();
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(3);
 		assertPixelsAreSet(color, WHITE, p(2, 2));
@@ -245,7 +245,7 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(8, 5);
 		controller.mouseMovedTo(8, 6);
 		controller.leftMouseButtonUp();
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(6);
 		assertPixelsAreSet(color, WHITE, p(2, 2), p(3, 3));
@@ -256,7 +256,7 @@ public class TestDrawAreaController {
 		new20x10imageWithPenForegroundColor(0xFF112233);
 		captureCurrentRefreshCount();
 
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(0);
 		assertPixelsAreSet(0xFF112233, WHITE);
@@ -275,8 +275,8 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonUp();
 		controller.leftMouseButtonDown(8, 4);
 		controller.leftMouseButtonUp();
-		controller.undoLastDrawAction();
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(6);
 		assertPixelsAreSet(color, WHITE, p(2, 2), p(3, 3));
@@ -293,7 +293,7 @@ public class TestDrawAreaController {
 		drawSettings.foregroundColor = new Color(secondColor);
 		controller.leftMouseButtonDown(0, 0);
 		controller.leftMouseButtonUp();
-		controller.undoLastDrawAction();
+		controller.undoLastAction();
 
 		assertPixelsAreSet(firstColor, WHITE, p(0, 0));
 	}

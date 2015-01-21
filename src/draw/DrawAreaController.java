@@ -12,11 +12,11 @@ public class DrawAreaController {
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
 	private BufferedImage image;
+	private Color drawColor;
 	private int lastX;
 	private int lastY;
 	private boolean buttonDown;
 	private List<List<Pixel>> strokes = new ArrayList<List<Pixel>>();
-	private Color drawColor;
 
 	private class Pixel {
 		private int x, y, color;
@@ -113,7 +113,7 @@ public class DrawAreaController {
 		lastY = y;
 	}
 
-	public void undoLastDrawAction() {
+	public void undoLastAction() {
 		if (!strokes.isEmpty())
 			undoStroke(strokes.remove(0));
 	}

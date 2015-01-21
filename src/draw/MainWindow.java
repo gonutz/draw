@@ -207,7 +207,7 @@ public class MainWindow implements ToolView {
 		JMenuItem mntmUndo = new JMenuItem("Undo");
 		mntmUndo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				drawAreaController.undoLastDrawAction();
+				drawAreaController.undoLastAction();
 			}
 		});
 		mntmUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
