@@ -230,4 +230,70 @@ public class TestDrawAreaController {
 		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2));
 	}
 
+	@Test
+	public void undoPen_ErasesAllStrokesSinceMouseWasUp() {
+		final int color = 0xFF321355;
+		new20x10imageWithPenForegroundColor(color);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(2, 2);
+		controller.mouseMovedTo(3, 3);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(6, 5);
+		controller.mouseMovedTo(8, 5);
+		controller.mouseMovedTo(8, 6);
+		controller.leftMouseButtonUp();
+		controller.undoLastDrawAction();
+
+		assertRefreshesSinceLastCapture(6);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2), p(3, 3));
+	}
+
+	@Test
+	public void undoPen_WithoutAnyStroke_DoesNothing() {
+		new20x10imageWithPenForegroundColor(0xFF112233);
+		captureCurrentRefreshCount();
+
+		controller.undoLastDrawAction();
+
+		assertRefreshesSinceLastCapture(0);
+		assertForegroundPixelsAreSet(0xFF112233, 0xFFFFFFFF);
+	}
+
+	@Test
+	public void undoingPenTwice_ErasesLastTwoStrokes() {
+		final int color = 0xFF000001;
+		new20x10imageWithPenForegroundColor(color);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(2, 2);
+		controller.mouseMovedTo(3, 3);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(6, 5);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(8, 4);
+		controller.leftMouseButtonUp();
+		controller.undoLastDrawAction();
+		controller.undoLastDrawAction();
+
+		assertRefreshesSinceLastCapture(6);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(2, 2), p(3, 3));
+	}
+
+	@Test
+	public void undoPen_OverwritesPixelsWithPreviousColor() {
+		final int firstColor = 0xFFFF0000;
+		final int secondColor = 0xFF0000FF;
+		new20x10imageWithPenForegroundColor(firstColor);
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp();
+		drawSettings.foregroundColor = new Color(secondColor);
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp();
+		controller.undoLastDrawAction();
+
+		assertForegroundPixelsAreSet(firstColor, 0xFFFFFFFF, p(0, 0));
+	}
+
 }
