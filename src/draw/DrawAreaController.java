@@ -17,6 +17,7 @@ public class DrawAreaController {
 	private int lastY;
 	private boolean buttonDown;
 	private List<List<Pixel>> strokes = new ArrayList<List<Pixel>>();
+	private boolean somethingWasUndone;
 
 	private class Pixel {
 		private int x, y, color;
@@ -119,10 +120,9 @@ public class DrawAreaController {
 	}
 
 	private void undoStroke(List<Pixel> stroke) {
-		if (!stroke.isEmpty()) {
-			resetPixels(stroke);
-			view.refresh();
-		}
+		resetPixels(stroke);
+		view.refresh();
+		somethingWasUndone = true;
 	}
 
 	private void resetPixels(List<Pixel> stroke) {
@@ -130,6 +130,15 @@ public class DrawAreaController {
 		for (Pixel p : stroke) {
 			g.setColor(new Color(p.color, true));
 			g.drawLine(p.x, p.y, p.x, p.y);
+		}
+	}
+
+	public void redoPreviousAction() {
+		if (somethingWasUndone) {
+			Graphics g = image.getGraphics();
+			g.setColor(new Color(0xFF332211, true));
+			g.drawLine(0, 0, 0, 0);
+			view.refresh();
 		}
 	}
 }

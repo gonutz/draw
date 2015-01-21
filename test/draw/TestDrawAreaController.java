@@ -330,4 +330,30 @@ public class TestDrawAreaController {
 		assertPixelsAreSet(color, WHITE, p(1, 1), p(2, 1), p(3, 1));
 	}
 
+	@Test
+	public void redoingPenStroke_BringsItBack() {
+		final int color = 0xFF332211;
+		new20x10imageWithPenForegroundColor(color);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(color, WHITE, p(0, 0));
+	}
+
+	@Test
+	public void redoingWhenNothingWasUndone_DoesNothing() {
+		new20x10imageWithPenForegroundColor(0xFF000000);
+		captureCurrentRefreshCount();
+
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(0);
+		assertPixelsAreSet(0xFF000000, WHITE);
+	}
+
 }

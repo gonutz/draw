@@ -215,6 +215,11 @@ public class MainWindow implements ToolView {
 		mnEdit.add(mntmUndo);
 
 		JMenuItem mntmRedo = new JMenuItem("Redo");
+		mntmRedo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.redoPreviousAction();
+			}
+		});
 		mntmRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
 				InputEvent.CTRL_MASK));
 		mnEdit.add(mntmRedo);
