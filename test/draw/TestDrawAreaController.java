@@ -357,4 +357,52 @@ public class TestDrawAreaController {
 		assertPixelsAreSet(BLACK, WHITE);
 	}
 
+	@Test
+	public void redoingTwoStrokesBringsThemBack() {
+		new20x10imageWithPenForegroundColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(1, 2);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(5, 4);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		controller.undoLastAction();
+		controller.redoPreviousAction();
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(6);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 2), p(5, 4));
+	}
+
+	@Test
+	public void afterRedoingEverything_NothingIsRedoneAnymore() {
+		new20x10imageWithPenForegroundColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		for (int i = 0; i < 10; i++)
+			controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(3);
+	}
+
+	@Test
+	public void newPenStrokeAfterUndoing_ErasesRedoHistory() {
+		new20x10imageWithPenForegroundColor(BLACK);
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(1, 1);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		controller.leftMouseButtonDown(2, 2);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		controller.undoLastAction();
+
+		assertPixelsAreSet(BLACK, WHITE);
+	}
 }

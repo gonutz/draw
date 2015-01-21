@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DrawAreaController {
 
@@ -16,18 +14,8 @@ public class DrawAreaController {
 	private int lastX;
 	private int lastY;
 	private boolean buttonDown;
-	private List<List<Pixel>> strokes = new ArrayList<List<Pixel>>();
-	private boolean somethingWasUndone;
-
-	private class Pixel {
-		private int x, y, color;
-
-		public Pixel(int x, int y, int color) {
-			this.x = x;
-			this.y = y;
-			this.color = color;
-		}
-	}
+	private PenStrokeHistory history = new PenStrokeHistory();
+	private PenStroke currentStroke;
 
 	public DrawAreaController(DrawAreaView view) {
 		this.view = view;
@@ -65,8 +53,8 @@ public class DrawAreaController {
 
 	private void mouseDown(int x, int y) {
 		if (drawSettings.getCurrentTool() == Tool.Pen) {
-			startNewPath();
-			line(x, y, x, y, drawColor);
+			currentStroke = history.startNewStroke();
+			line(x, y, x, y);
 			lastX = x;
 			lastY = y;
 			buttonDown = true;
@@ -74,19 +62,16 @@ public class DrawAreaController {
 		}
 	}
 
-	private void startNewPath() {
-		strokes.add(0, new ArrayList<Pixel>());
-	}
-
-	private void line(int fromX, int fromY, int toX, int toY, Color color) {
+	private void line(int fromX, int fromY, int toX, int toY) {
 		Graphics g = image.getGraphics();
-		g.setColor(color);
+		g.setColor(drawColor);
 		int[] points = Bresenham.linePoints(fromX, fromY, toX, toY);
 		for (int i = 0; i < points.length; i += 2) {
 			int x = points[i];
 			int y = points[i + 1];
 			if (insideImage(x, y)) {
-				strokes.get(0).add(0, new Pixel(x, y, image.getRGB(x, y)));
+				currentStroke.addPixelChange(x, y, image.getRGB(x, y),
+						drawColor.getRGB());
 				g.drawLine(x, y, x, y);
 			}
 		}
@@ -107,7 +92,7 @@ public class DrawAreaController {
 
 	public void mouseMovedTo(int x, int y) {
 		if (buttonDown) {
-			line(lastX, lastY, x, y, drawColor);
+			line(lastX, lastY, x, y);
 			view.refresh();
 		}
 		lastX = x;
@@ -115,30 +100,12 @@ public class DrawAreaController {
 	}
 
 	public void undoLastAction() {
-		if (!strokes.isEmpty())
-			undoStroke(strokes.remove(0));
-	}
-
-	private void undoStroke(List<Pixel> stroke) {
-		resetPixels(stroke);
-		view.refresh();
-		somethingWasUndone = true;
-	}
-
-	private void resetPixels(List<Pixel> stroke) {
-		Graphics g = image.getGraphics();
-		for (Pixel p : stroke) {
-			g.setColor(new Color(p.color, true));
-			g.drawLine(p.x, p.y, p.x, p.y);
-		}
+		if (history.undoTo(image))
+			view.refresh();
 	}
 
 	public void redoPreviousAction() {
-		if (somethingWasUndone) {
-			Graphics g = image.getGraphics();
-			g.setColor(new Color(0xFF332211, true));
-			g.drawLine(0, 0, 0, 0);
+		if (history.redoTo(image))
 			view.refresh();
-		}
 	}
 }
