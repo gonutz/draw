@@ -46,12 +46,18 @@ public class DrawArea extends JPanel implements DrawAreaView {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					controller.leftMouseButtonDown(e.getX(), e.getY());
 				}
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					controller.rightMouseButtonDown(e.getX(), e.getY());
+				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					controller.leftMouseButtonUp();
+				}
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					controller.rightMouseButtonUp();
 				}
 			}
 		});

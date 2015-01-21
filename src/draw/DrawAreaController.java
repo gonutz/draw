@@ -14,8 +14,9 @@ public class DrawAreaController {
 	private BufferedImage image;
 	private int lastX;
 	private int lastY;
-	private boolean leftButtonDown;
+	private boolean buttonDown;
 	private List<List<Pixel>> strokes = new ArrayList<List<Pixel>>();
+	private Color drawColor;
 
 	private class Pixel {
 		private int x, y, color;
@@ -52,12 +53,22 @@ public class DrawAreaController {
 	}
 
 	public void leftMouseButtonDown(int x, int y) {
+		drawColor = drawSettings.getForegroundColor();
+		mouseDown(x, y);
+	}
+
+	public void rightMouseButtonDown(int x, int y) {
+		drawColor = drawSettings.getBackgroundColor();
+		mouseDown(x, y);
+	}
+
+	private void mouseDown(int x, int y) {
 		if (drawSettings.getCurrentTool() == Tool.Pen) {
 			startNewPath();
-			line(x, y, x, y, drawSettings.getForegroundColor());
+			line(x, y, x, y, drawColor);
 			lastX = x;
 			lastY = y;
-			leftButtonDown = true;
+			buttonDown = true;
 			view.refresh();
 		}
 	}
@@ -86,12 +97,16 @@ public class DrawAreaController {
 	}
 
 	public void leftMouseButtonUp() {
-		leftButtonDown = false;
+		buttonDown = false;
+	}
+
+	public void rightMouseButtonUp() {
+		buttonDown = false;
 	}
 
 	public void mouseMovedTo(int x, int y) {
-		if (leftButtonDown) {
-			line(lastX, lastY, x, y, drawSettings.getForegroundColor());
+		if (buttonDown) {
+			line(lastX, lastY, x, y, drawColor);
 			view.refresh();
 		}
 		lastX = x;

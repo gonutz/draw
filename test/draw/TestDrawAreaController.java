@@ -308,8 +308,25 @@ public class TestDrawAreaController {
 		controller.mouseMovedTo(20, 10);
 		controller.leftMouseButtonUp();
 
-		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF, p(1, 1), p(0, 0),
-				p(18, 8), p(19, 9));
+		assertForegroundPixelsAreSet(0xFF000000, 0xFFFFFFFF, p(1, 1), p(0, 0), p(18, 8),
+				p(19, 9));
+	}
+
+	@Test
+	public void rightDraggingPen_DrawsWithBackgroundColor() {
+		drawSettings.backgroundColor = Color.white;
+		controller.newImage(20, 10);
+		final int color = 0xFF123456;
+		drawSettings.backgroundColor = new Color(color, true);
+		drawSettings.tool = Tool.Pen;
+		captureCurrentRefreshCount();
+
+		controller.rightMouseButtonDown(1, 1);
+		controller.mouseMovedTo(3, 1);
+		controller.rightMouseButtonUp();
+
+		assertRefreshesSinceLastCapture(2);
+		assertForegroundPixelsAreSet(color, 0xFFFFFFFF, p(1, 1), p(2, 1), p(3, 1));
 	}
 
 }
