@@ -2,7 +2,6 @@ package draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper {
@@ -34,19 +33,13 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	}
 
 	public void newImage(int width, int height) {
-		// TODO add new width, height and background color to the command and
-		// then simple call doTo
-		if (image != null)
-			history.addNewCommand(new NewImageCommand(image));
-		image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-		clearImageTo(drawSettings.getBackgroundColor());
+		NewImageCommand newImageCommand = new NewImageCommand(image, width,
+				height, drawSettings.getBackgroundColor());
+		if (image != null) {
+			history.addNewCommand(newImageCommand);
+		}
+		newImageCommand.doTo(this);
 		view.refresh();
-	}
-
-	private void clearImageTo(Color c) {
-		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setBackground(c);
-		g.clearRect(0, 0, image.getWidth(), image.getHeight());
 	}
 
 	public void leftMouseButtonDown(int x, int y) {

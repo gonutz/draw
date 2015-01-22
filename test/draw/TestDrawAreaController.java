@@ -462,7 +462,6 @@ public class TestDrawAreaController {
 		controller.leftMouseButtonUp();
 		captureCurrentRefreshCount();
 
-		drawSettings.foregroundColor = Color.yellow;
 		drawSettings.backgroundColor = Color.cyan;
 		controller.newImage(5, 5);
 		controller.undoLastAction();
@@ -470,5 +469,21 @@ public class TestDrawAreaController {
 		assertRefreshesSinceLastCapture(2);
 		assertImageSize(20, 10);
 		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 1), p(2, 2));
+	}
+
+	@Test
+	public void redoingNewImage_BringsBackEmptyImage() {
+		new20x10imageWithPenForegroundColor(BLACK);
+		captureCurrentRefreshCount();
+
+		final int back = 0xFF123456;
+		drawSettings.backgroundColor = new Color(back);
+		controller.newImage(5, 10);
+		controller.undoLastAction();
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertImageSize(5, 10);
+		assertPixelsAreSet(BLACK, back);
 	}
 }
