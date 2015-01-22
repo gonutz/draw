@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class DrawAreaController {
+public class DrawAreaController implements ImageProvider {
 
 	private DrawAreaView view;
 	private DrawSettings drawSettings;

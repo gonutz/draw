@@ -22,12 +22,13 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
 
-public class MainWindow implements ToolView {
+public class MainWindow implements ToolView, ErrorDisplay {
 
 	private JFrame mainFrame;
 	private JButton rectangleSelection;
@@ -41,6 +42,7 @@ public class MainWindow implements ToolView {
 	private ColorPalette colorPalette;
 	private DrawArea drawArea;
 	private DrawAreaController drawAreaController;
+	private ImageSaveController imageSaveController;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -61,6 +63,10 @@ public class MainWindow implements ToolView {
 							.setDrawSettings(new DrawSettingsAdapter(
 									paletteController, toolController));
 					window.drawAreaController.newImage(320, 240);
+					window.imageSaveController = new ImageSaveController(
+							new SwingSaveFileDialog(),
+							window.drawAreaController, new ImageToFileSaver(),
+							window);
 					window.mainFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -191,11 +197,21 @@ public class MainWindow implements ToolView {
 		fileMenu.add(openImage);
 
 		JMenuItem saveImage = new JMenuItem("Save");
+		saveImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				imageSaveController.save();
+			}
+		});
 		saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				InputEvent.CTRL_MASK));
 		fileMenu.add(saveImage);
 
 		JMenuItem saveImageAs = new JMenuItem("Save As");
+		saveImageAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				imageSaveController.saveAsNewFile();
+			}
+		});
 		saveImageAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		fileMenu.add(saveImageAs);
@@ -366,5 +382,11 @@ public class MainWindow implements ToolView {
 		mainFrame.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
 		drawArea = new DrawArea();
 		paintAreaScroller.setViewportView(drawArea);
+	}
+
+	@Override
+	public void showError(String message) {
+		JOptionPane.showMessageDialog(null, message, "Error",
+				JOptionPane.ERROR_MESSAGE);
 	}
 }
