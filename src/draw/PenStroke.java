@@ -2,11 +2,10 @@ package draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PenStroke {
+public class PenStroke implements UndoableCommand {
 
 	private List<Pixel> pixels = new ArrayList<Pixel>();
 
@@ -14,16 +13,16 @@ public class PenStroke {
 		pixels.add(0, new Pixel(x, y, oldColor, newColor));
 	}
 
-	public void undoTo(BufferedImage image) {
-		Graphics g = image.getGraphics();
+	public void undoTo(ImageKeeper image) {
+		Graphics g = image.getImage().getGraphics();
 		for (Pixel p : pixels) {
 			g.setColor(new Color(p.oldColor));
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
 	}
 
-	public void doTo(BufferedImage image) {
-		Graphics g = image.getGraphics();
+	public void doTo(ImageKeeper image) {
+		Graphics g = image.getImage().getGraphics();
 		for (Pixel p : pixels) {
 			g.setColor(new Color(p.newColor));
 			g.drawLine(p.x, p.y, p.x, p.y);

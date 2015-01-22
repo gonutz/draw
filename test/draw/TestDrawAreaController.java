@@ -66,8 +66,7 @@ public class TestDrawAreaController {
 
 		controller.newImage(width, height);
 
-		assertEquals(width, controller.getImage().getWidth());
-		assertEquals(height, controller.getImage().getHeight());
+		assertImageSize(width, height);
 		assertPixelsAreSet(0, color);
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -75,6 +74,11 @@ public class TestDrawAreaController {
 						controller.getImage().getRGB(x, y));
 			}
 		}
+	}
+
+	private void assertImageSize(int width, int height) {
+		assertEquals(width, controller.getImage().getWidth());
+		assertEquals(height, controller.getImage().getHeight());
 	}
 
 	private void assertPixelsAreSet(int foreground, int background,
@@ -425,5 +429,46 @@ public class TestDrawAreaController {
 		// now there are four strokes and 4 undos => image should be empty
 
 		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void undoingFirstNewImage_DoesNothing() {
+		captureCurrentRefreshCount();
+
+		controller.newImage(10, 5);
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertImageSize(10, 5);
+	}
+
+	@Test
+	public void undoingNewImage_RestoresOldImageSize() {
+		captureCurrentRefreshCount();
+
+		controller.newImage(5, 10);
+		controller.newImage(20, 5);
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertImageSize(5, 10);
+	}
+
+	@Test
+	public void undoingNewImage_RestoresOldImage() {
+		new20x10imageWithPenForegroundColor(BLACK);
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 2);
+		controller.leftMouseButtonUp();
+		captureCurrentRefreshCount();
+
+		drawSettings.foregroundColor = Color.yellow;
+		drawSettings.backgroundColor = Color.cyan;
+		controller.newImage(5, 5);
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(2);
+		assertImageSize(20, 10);
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 1), p(2, 2));
 	}
 }

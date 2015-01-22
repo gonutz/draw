@@ -1,23 +1,27 @@
 package draw;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PenStrokeHistory {
+public class UndoHistory {
 
-	private List<PenStroke> undoList = new ArrayList<PenStroke>();
+	private List<UndoableCommand> undoList = new ArrayList<UndoableCommand>();
 	private int undoIndex = -1;
 
 	public PenStroke startNewStroke() {
-		for (int i = undoList.size() - 1; i > undoIndex; i--)
-			undoList.remove(i);
-		undoList.add(new PenStroke());
-		undoIndex = undoList.size() - 1;
-		return undoList.get(undoIndex);
+		PenStroke stroke = new PenStroke();
+		addNewCommand(stroke);
+		return stroke;
 	}
 
-	public boolean undoTo(BufferedImage image) {
+	public void addNewCommand(UndoableCommand command) {
+		for (int i = undoList.size() - 1; i > undoIndex; i--)
+			undoList.remove(i);
+		undoList.add(command);
+		undoIndex = undoList.size() - 1;
+	}
+
+	public boolean undoTo(ImageKeeper image) {
 		if (nothingToUndo())
 			return false;
 		undoList.get(undoIndex).undoTo(image);
@@ -29,7 +33,7 @@ public class PenStrokeHistory {
 		return undoIndex < 0;
 	}
 
-	public boolean redoTo(BufferedImage image) {
+	public boolean redoTo(ImageKeeper image) {
 		if (nothingToRedo())
 			return false;
 		undoIndex++;

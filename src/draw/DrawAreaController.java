@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class DrawAreaController implements ImageProvider {
+public class DrawAreaController implements ImageProvider, ImageKeeper {
 
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
@@ -14,7 +14,7 @@ public class DrawAreaController implements ImageProvider {
 	private int lastX;
 	private int lastY;
 	private boolean buttonDown;
-	private PenStrokeHistory history = new PenStrokeHistory();
+	private UndoHistory history = new UndoHistory();
 	private PenStroke currentStroke;
 
 	public DrawAreaController(DrawAreaView view) {
@@ -29,7 +29,15 @@ public class DrawAreaController implements ImageProvider {
 		return image;
 	}
 
+	public void setImage(BufferedImage image) {
+		this.image = image;
+	}
+
 	public void newImage(int width, int height) {
+		// TODO add new width, height and background color to the command and
+		// then simple call doTo
+		if (image != null)
+			history.addNewCommand(new NewImageCommand(image));
 		image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 		clearImageTo(drawSettings.getBackgroundColor());
 		view.refresh();
@@ -100,12 +108,13 @@ public class DrawAreaController implements ImageProvider {
 	}
 
 	public void undoLastAction() {
-		if (history.undoTo(image))
+		if (history.undoTo(this))
 			view.refresh();
 	}
 
 	public void redoPreviousAction() {
-		if (history.redoTo(image))
+		if (history.redoTo(this))
 			view.refresh();
 	}
+
 }
