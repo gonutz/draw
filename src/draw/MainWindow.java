@@ -29,7 +29,7 @@ import javax.swing.border.BevelBorder;
 
 public class MainWindow implements ToolView {
 
-	private JFrame frmDraw;
+	private JFrame mainFrame;
 	private JButton rectangleSelection;
 	private JButton penSelection;
 	private JButton fillSelection;
@@ -61,7 +61,7 @@ public class MainWindow implements ToolView {
 							.setDrawSettings(new DrawSettingsAdapter(
 									paletteController, toolController));
 					window.drawAreaController.newImage(320, 240);
-					window.frmDraw.setVisible(true);
+					window.mainFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -147,19 +147,19 @@ public class MainWindow implements ToolView {
 	}
 
 	private void initialize() {
-		frmDraw = new JFrame();
-		frmDraw.addWindowListener(new WindowAdapter() {
+		mainFrame = new JFrame();
+		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				toolViewController.viewActivated();
 			}
 		});
-		frmDraw.setTitle("Draw");
-		frmDraw.setBounds(100, 100, 450, 300);
-		frmDraw.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setTitle("Draw");
+		mainFrame.setBounds(100, 100, 450, 300);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JMenuBar menuBar = new JMenuBar();
-		frmDraw.setJMenuBar(menuBar);
+		mainFrame.setJMenuBar(menuBar);
 
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic('F');
@@ -204,40 +204,41 @@ public class MainWindow implements ToolView {
 		mnEdit.setMnemonic('E');
 		menuBar.add(mnEdit);
 
-		JMenuItem mntmUndo = new JMenuItem("Undo");
-		mntmUndo.addActionListener(new ActionListener() {
+		JMenuItem undo = new JMenuItem("Undo");
+		undo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				drawAreaController.undoLastAction();
 			}
 		});
-		mntmUndo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
 				InputEvent.CTRL_MASK));
-		mnEdit.add(mntmUndo);
+		mnEdit.add(undo);
 
-		JMenuItem mntmRedo = new JMenuItem("Redo");
-		mntmRedo.addActionListener(new ActionListener() {
+		JMenuItem redo = new JMenuItem("Redo");
+		redo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				drawAreaController.redoPreviousAction();
 			}
 		});
-		mntmRedo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
+		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
 				InputEvent.CTRL_MASK));
-		mnEdit.add(mntmRedo);
+		mnEdit.add(redo);
 
 		JMenu canvasMenu = new JMenu("Canvas");
 		canvasMenu.setMnemonic('C');
 		menuBar.add(canvasMenu);
 
-		JMenuItem mntmResize = new JMenuItem("Resize");
-		mntmResize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+		JMenuItem resizeCanvas = new JMenuItem("Resize");
+		resizeCanvas.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 				InputEvent.CTRL_MASK));
-		canvasMenu.add(mntmResize);
-		frmDraw.getContentPane().setLayout(new BorderLayout(0, 0));
+		canvasMenu.add(resizeCanvas);
+		mainFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel toolSelectionContainer = new JPanel();
 		toolSelectionContainer.setBorder(new BevelBorder(BevelBorder.LOWERED,
 				null, null, null, null));
-		frmDraw.getContentPane().add(toolSelectionContainer, BorderLayout.WEST);
+		mainFrame.getContentPane().add(toolSelectionContainer,
+				BorderLayout.WEST);
 		GridBagLayout gbl_toolSelectionContainer = new GridBagLayout();
 		gbl_toolSelectionContainer.columnWidths = new int[] { 32, 32, 0 };
 		gbl_toolSelectionContainer.rowHeights = new int[] { 32, 0, 0, 0 };
@@ -354,7 +355,7 @@ public class MainWindow implements ToolView {
 		FlowLayout flowLayout = (FlowLayout) colorContainer.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		flowLayout.setHgap(20);
-		frmDraw.getContentPane().add(colorContainer, BorderLayout.SOUTH);
+		mainFrame.getContentPane().add(colorContainer, BorderLayout.SOUTH);
 
 		currentColors = new CurrentColors();
 		colorContainer.add(currentColors);
@@ -362,7 +363,7 @@ public class MainWindow implements ToolView {
 		colorContainer.add(colorPalette);
 
 		JScrollPane paintAreaScroller = new JScrollPane();
-		frmDraw.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
+		mainFrame.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
 		drawArea = new DrawArea();
 		paintAreaScroller.setViewportView(drawArea);
 	}
