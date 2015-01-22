@@ -49,28 +49,30 @@ public class MainWindow implements ToolView, ErrorDisplay {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					ToolViewController toolController = new ToolViewController(
-							window);
-					window.setToolViewController(toolController);
-					ColorPaletteViewController paletteController = new ColorPaletteViewController(
-							window.colorPalette, window.currentColors);
-					window.colorPalette
-							.setAndActivateController(paletteController);
-					window.drawAreaController = new DrawAreaController(
-							window.drawArea);
-					window.drawArea.setController(window.drawAreaController);
-					window.drawAreaController
-							.setDrawSettings(new DrawSettingsAdapter(
-									paletteController, toolController));
-					window.drawAreaController.newImage(320, 240);
-					window.imageSaveController = new ImageSaveController(
-							new SwingSaveFileDialog(),
-							window.drawAreaController, new ImageToFileSaver(),
-							window);
+					wireUpControllers(window);
 					window.mainFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			}
+
+			private void wireUpControllers(MainWindow window) {
+				ToolViewController toolController = new ToolViewController(
+						window);
+				window.setToolViewController(toolController);
+				ColorPaletteViewController paletteController = new ColorPaletteViewController(
+						window.colorPalette, window.currentColors);
+				window.colorPalette.setAndActivateController(paletteController);
+				window.drawAreaController = new DrawAreaController(
+						window.drawArea);
+				window.drawArea.setController(window.drawAreaController);
+				window.drawAreaController
+						.setDrawSettings(new DrawSettingsAdapter(
+								paletteController, toolController));
+				window.drawAreaController.newImage(320, 240);
+				window.imageSaveController = new ImageSaveController(
+						new SwingSaveFileDialog(), window.drawAreaController,
+						new ImageToFileSaver(), window);
 			}
 		});
 	}
