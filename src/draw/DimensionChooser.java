@@ -41,7 +41,7 @@ public class DimensionChooser extends JDialog {
 		return (int) height.getValue();
 	}
 
-	public DimensionChooser() {
+	public DimensionChooser(int initialWidth, int initialHeight) {
 		setModal(true);
 		setTitle("Canvas Size");
 		setBounds(100, 100, 450, 130);
@@ -56,6 +56,7 @@ public class DimensionChooser extends JDialog {
 		{
 			width = new JSpinner();
 			width.setModel(new SpinnerNumberModel(1, 1, 99999, 1));
+			width.setValue(initialWidth);
 			contentPanel.add(width);
 		}
 		{
@@ -69,6 +70,7 @@ public class DimensionChooser extends JDialog {
 		{
 			height = new JSpinner();
 			height.setModel(new SpinnerNumberModel(1, 1, 99999, 1));
+			height.setValue(initialHeight);
 			contentPanel.add(height);
 		}
 		{

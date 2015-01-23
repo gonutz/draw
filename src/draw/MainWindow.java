@@ -30,6 +30,9 @@ import javax.swing.border.BevelBorder;
 
 public class MainWindow implements ToolView, ErrorDisplay {
 
+	private static final int INITIAL_CANVAS_WIDTH = 640;
+	private static final int INITIAL_CANVAS_HEIGHT = 480;
+
 	private JFrame mainFrame;
 	private JButton rectangleSelection;
 	private JButton penSelection;
@@ -69,7 +72,8 @@ public class MainWindow implements ToolView, ErrorDisplay {
 				window.drawAreaController
 						.setDrawSettings(new DrawSettingsAdapter(
 								paletteController, toolController));
-				window.drawAreaController.newImage(320, 240);
+				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,
+						INITIAL_CANVAS_HEIGHT);
 				window.imageSaveController = new ImageSaveController(
 						new SwingSaveFileDialog(), window.drawAreaController,
 						new ImageToFileSaver(), window);
@@ -174,12 +178,13 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		menuBar.add(fileMenu);
 
 		JMenuItem newImage = new JMenuItem("New");
+		final DimensionChooser dim = new DimensionChooser(INITIAL_CANVAS_WIDTH,
+				INITIAL_CANVAS_HEIGHT);
 		newImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						DimensionChooser dim = new DimensionChooser();
 						dim.setVisible(true);
 						if (dim.wasAccepted()) {
 							drawAreaController.newImage(dim.getCanvasWidth(),
