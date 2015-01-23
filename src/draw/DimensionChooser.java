@@ -1,50 +1,49 @@
 package draw;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.Component;
-
-import javax.swing.Box;
 
 public class DimensionChooser extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private boolean accepted = false;
-	private JSpinner width;
-	private JSpinner height;
+	private JTextField width;
+	private JTextField height;
 
 	public boolean wasAccepted() {
 		return accepted;
 	}
 
 	public int getCanvasWidth() {
-		return (int) width.getValue();
+		return Integer.parseInt(width.getText());
 	}
 
 	public int getCanvasHeight() {
-		return (int) height.getValue();
+		return Integer.parseInt(height.getText());
 	}
 
 	public DimensionChooser(int initialWidth, int initialHeight) {
 		setModal(true);
 		setTitle("Canvas Size");
-		setBounds(100, 100, 450, 130);
+		setBounds(100, 100, 453, 121);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -54,10 +53,16 @@ public class DimensionChooser extends JDialog {
 			contentPanel.add(lblWidth);
 		}
 		{
-			width = new JSpinner();
-			width.setModel(new SpinnerNumberModel(1, 1, 99999, 1));
-			width.setValue(initialWidth);
+			width = new JTextField();
+			width.setText("" + initialWidth);
+			width.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					width.selectAll();
+				}
+			});
 			contentPanel.add(width);
+			width.setColumns(10);
 		}
 		{
 			Component horizontalStrut = Box.createHorizontalStrut(10);
@@ -68,10 +73,16 @@ public class DimensionChooser extends JDialog {
 			contentPanel.add(lblHeight);
 		}
 		{
-			height = new JSpinner();
-			height.setModel(new SpinnerNumberModel(1, 1, 99999, 1));
-			height.setValue(initialHeight);
+			height = new JTextField();
+			height.setText("" + initialHeight);
+			height.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					height.selectAll();
+				}
+			});
 			contentPanel.add(height);
+			height.setColumns(10);
 		}
 		{
 			JPanel buttonPane = new JPanel();
@@ -129,5 +140,25 @@ public class DimensionChooser extends JDialog {
 				DimensionChooser.this.setVisible(false);
 			}
 		});
+	}
+
+	@Override
+	public void setVisible(boolean b) {
+		boolean widthOk = ensureTextIsNumber(width);
+		boolean heightOK = ensureTextIsNumber(height);
+		if (widthOk && heightOK) {
+			super.setVisible(b);
+			width.requestFocus();
+		}
+	}
+
+	private boolean ensureTextIsNumber(JTextField text) {
+		try {
+			Integer.parseInt(text.getText());
+			return true;
+		} catch (NumberFormatException e) {
+			text.setText("100");
+			return false;
+		}
 	}
 }
