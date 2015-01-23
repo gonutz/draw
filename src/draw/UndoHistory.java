@@ -8,12 +8,6 @@ public class UndoHistory {
 	private List<UndoableCommand> undoList = new ArrayList<UndoableCommand>();
 	private int undoIndex = -1;
 
-	public PenStroke startNewStroke() {
-		PenStroke stroke = new PenStroke();
-		addNewCommand(stroke);
-		return stroke;
-	}
-
 	public void addNewCommand(UndoableCommand command) {
 		for (int i = undoList.size() - 1; i > undoIndex; i--)
 			undoList.remove(i);

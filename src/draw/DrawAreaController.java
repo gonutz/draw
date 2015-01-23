@@ -1,7 +1,6 @@
 package draw;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper {
@@ -12,7 +11,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	private Color drawColor;
 	private int lastX;
 	private int lastY;
-	private boolean buttonDown;
+	private boolean penDown;
 	private UndoHistory history = new UndoHistory();
 	private PenStroke currentStroke;
 
@@ -40,10 +39,9 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 		view.refresh();
 	}
 
-	private void makeUndoableIfThisIsNotTheVeryFirstImage(
-			NewImageCommand command) {
+	private void makeUndoableIfThisIsNotTheVeryFirstImage(NewImageCommand c) {
 		if (image != null) {
-			history.addNewCommand(command);
+			history.addNewCommand(c);
 		}
 	}
 
@@ -59,46 +57,27 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 
 	private void mouseDown(int x, int y) {
 		if (drawSettings.getCurrentTool() == Tool.Pen) {
-			currentStroke = history.startNewStroke();
-			line(x, y, x, y);
+			currentStroke = new PenStroke(drawColor);
+			history.addNewCommand(currentStroke);
+			currentStroke.addLine(image, x, y, x, y);
 			lastX = x;
 			lastY = y;
-			buttonDown = true;
+			penDown = true;
 			view.refresh();
 		}
 	}
 
-	private void line(int fromX, int fromY, int toX, int toY) {
-		Graphics g = image.getGraphics();
-		g.setColor(drawColor);
-		int[] points = Bresenham.linePoints(fromX, fromY, toX, toY);
-		for (int i = 0; i < points.length; i += 2) {
-			int x = points[i];
-			int y = points[i + 1];
-			if (insideImage(x, y)) {
-				currentStroke.addPixelChange(x, y, image.getRGB(x, y),
-						drawColor.getRGB());
-				g.drawLine(x, y, x, y);
-			}
-		}
-	}
-
-	private boolean insideImage(int x, int y) {
-		return x >= 0 && y >= 0 && x < image.getWidth()
-				&& y < image.getHeight();
-	}
-
 	public void leftMouseButtonUp() {
-		buttonDown = false;
+		penDown = false;
 	}
 
 	public void rightMouseButtonUp() {
-		buttonDown = false;
+		penDown = false;
 	}
 
 	public void mouseMovedTo(int x, int y) {
-		if (buttonDown) {
-			line(lastX, lastY, x, y);
+		if (penDown) {
+			currentStroke.addLine(image, lastX, lastY, x, y);
 			view.refresh();
 		}
 		lastX = x;
