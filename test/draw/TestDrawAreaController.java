@@ -486,4 +486,27 @@ public class TestDrawAreaController {
 		assertImageSize(5, 10);
 		assertPixelsAreSet(BLACK, back);
 	}
+
+	@Test
+	public void chainedUndoAndRedos_ReproducePreviousImages() {
+		new20x10imageWithPenForegroundColor(BLACK);
+		controller.newImage(20, 10);
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(1, 1);
+		controller.leftMouseButtonUp();
+		controller.newImage(20, 10);
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(1, 1);
+		controller.leftMouseButtonUp();
+		// did: new, new, pen, new, pen
+		for (int i = 0; i < 20; i++)
+			controller.undoLastAction();
+		for (int i = 0; i < 20; i++)
+			controller.redoPreviousAction();
+		// everything should be back to where we ended
+		controller.undoLastAction(); // last pen
+		controller.undoLastAction(); // last new image
+
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 1));
+	}
 }

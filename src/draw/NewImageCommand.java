@@ -21,7 +21,16 @@ public class NewImageCommand implements UndoableCommand {
 
 	@Override
 	public void undoTo(ImageKeeper image) {
-		image.setImage(oldImage);
+		image.setImage(copyImage(oldImage));
+	}
+
+	private BufferedImage copyImage(BufferedImage image) {
+		if (image == null)
+			return null;
+		BufferedImage copy = new BufferedImage(image.getWidth(),
+				image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		copy.getGraphics().drawImage(image, 0, 0, null);
+		return copy;
 	}
 
 	@Override
