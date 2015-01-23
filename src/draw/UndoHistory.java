@@ -8,7 +8,7 @@ public class UndoHistory {
 	private List<UndoableCommand> undoList = new ArrayList<UndoableCommand>();
 	private int undoIndex = -1;
 
-	public void addNewCommand(UndoableCommand command) {
+	public void addCommand(UndoableCommand command) {
 		for (int i = undoList.size() - 1; i > undoIndex; i--)
 			undoList.remove(i);
 		undoList.add(command);
