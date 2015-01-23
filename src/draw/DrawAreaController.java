@@ -35,11 +35,16 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	public void newImage(int width, int height) {
 		NewImageCommand newImageCommand = new NewImageCommand(image, width,
 				height, drawSettings.getBackgroundColor());
-		if (image != null) {
-			history.addNewCommand(newImageCommand);
-		}
+		makeUndoableIfThisIsNotTheVeryFirstImage(newImageCommand);
 		newImageCommand.doTo(this);
 		view.refresh();
+	}
+
+	private void makeUndoableIfThisIsNotTheVeryFirstImage(
+			NewImageCommand command) {
+		if (image != null) {
+			history.addNewCommand(command);
+		}
 	}
 
 	public void leftMouseButtonDown(int x, int y) {
