@@ -8,8 +8,18 @@ import java.util.List;
 
 public class PenStroke implements UndoableCommand {
 
-	private List<Pixel> pixels = new ArrayList<Pixel>();
 	private Color strokeColor;
+	private List<Pixel> pixels = new ArrayList<Pixel>();
+
+	private class Pixel {
+		private int x, y, oldColor;
+
+		public Pixel(int x, int y, int oldColor) {
+			this.x = x;
+			this.y = y;
+			this.oldColor = oldColor;
+		}
+	}
 
 	public PenStroke(Color strokeColor) {
 		this.strokeColor = strokeColor;
@@ -58,16 +68,6 @@ public class PenStroke implements UndoableCommand {
 		for (Pixel p : pixels) {
 			g.setColor(strokeColor);
 			g.drawLine(p.x, p.y, p.x, p.y);
-		}
-	}
-
-	private class Pixel {
-		private int x, y, oldColor;
-
-		public Pixel(int x, int y, int oldColor) {
-			this.x = x;
-			this.y = y;
-			this.oldColor = oldColor;
 		}
 	}
 }
