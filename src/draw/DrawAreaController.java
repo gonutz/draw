@@ -57,21 +57,38 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 
 	private void mouseDown(int x, int y) {
 		if (drawSettings.getCurrentTool() == Tool.Pen) {
-			currentStroke = new PenStroke(drawColor);
-			history.addCommand(currentStroke);
-			currentStroke.addLine(image, x, y, x, y);
-			lastX = x;
-			lastY = y;
-			penDown = true;
+			if (penDown)
+				undoCurrentStroke();
+			else
+				startNewPenStroke(x, y);
 			view.refresh();
 		}
 	}
 
-	public void leftMouseButtonUp() {
+	private void undoCurrentStroke() {
+		currentStroke.undoTo(this);
 		penDown = false;
 	}
 
+	private void startNewPenStroke(int x, int y) {
+		currentStroke = new PenStroke(drawColor);
+		currentStroke.addLine(image, x, y, x, y);
+		lastX = x;
+		lastY = y;
+		penDown = true;
+	}
+
+	public void leftMouseButtonUp() {
+		liftUpPen();
+	}
+
 	public void rightMouseButtonUp() {
+		liftUpPen();
+	}
+
+	private void liftUpPen() {
+		if (penDown)
+			history.addCommand(currentStroke);
 		penDown = false;
 	}
 
