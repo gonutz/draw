@@ -110,7 +110,7 @@ public class TestDrawAreaController {
 	@Test
 	public void leftClickWithPen_PaintsDotInForegroundColor() {
 		final int color = 0xFFFFAACC;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		final int x = 3, y = 4;
 		captureCurrentRefreshCount();
 
@@ -129,7 +129,7 @@ public class TestDrawAreaController {
 		assertEquals(i, view.refreshCount - previousRefreshs);
 	}
 
-	private void new20x10imageWithPenForegroundColor(int color) {
+	private void new20x10imageWithPenColor(int color) {
 		drawSettings.foregroundColor = new Color(color);
 		drawSettings.backgroundColor = Color.white;
 		drawSettings.tool = Tool.Pen;
@@ -139,7 +139,7 @@ public class TestDrawAreaController {
 	@Test
 	public void draggingPen_DrawsLine() {
 		final int color = 0xFF010203;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
@@ -156,7 +156,7 @@ public class TestDrawAreaController {
 	@Test
 	public void movingMouseWithLeftButtonUp_DrawsNothing() {
 		final int color = 0xFF123456;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.mouseMovedTo(0, 0);
@@ -169,7 +169,7 @@ public class TestDrawAreaController {
 	@Test
 	public void liftingAndDroppingPenAgain_DrawsTwoPoints() {
 		final int color = 0xFF006660;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
@@ -184,7 +184,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void draggingLeftMouse_WithRectangleSelectionTool_DoesNotDraw() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		captureCurrentRefreshCount();
 
 		drawSettings.tool = Tool.RectangleSelection;
@@ -196,7 +196,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void undoingPenDot_ErasesDot() {
-		new20x10imageWithPenForegroundColor(0xFF123456);
+		new20x10imageWithPenColor(0xFF123456);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
@@ -210,7 +210,7 @@ public class TestDrawAreaController {
 	@Test
 	public void undoingPenStroke_ErasesLine() {
 		final int color = 0xFF123456;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(1, 2);
@@ -225,7 +225,7 @@ public class TestDrawAreaController {
 	@Test
 	public void undoPen_OnlyErasesLastStrokeSinceMouseWasUp() {
 		final int color = 0xFF321321;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(2, 2);
@@ -241,7 +241,7 @@ public class TestDrawAreaController {
 	@Test
 	public void undoPen_ErasesAllStrokesSinceMouseWasUp() {
 		final int color = 0xFF321355;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(2, 2);
@@ -259,7 +259,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void undoPen_WithoutAnyStroke_DoesNothing() {
-		new20x10imageWithPenForegroundColor(0xFF112233);
+		new20x10imageWithPenColor(0xFF112233);
 		captureCurrentRefreshCount();
 
 		controller.undoLastAction();
@@ -271,7 +271,7 @@ public class TestDrawAreaController {
 	@Test
 	public void undoingPenTwice_ErasesLastTwoStrokes() {
 		final int color = 0xFF000001;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(2, 2);
@@ -292,7 +292,7 @@ public class TestDrawAreaController {
 	public void undoPen_OverwritesPixelsWithPreviousColor() {
 		final int firstColor = 0xFFFF0000;
 		final int secondColor = 0xFF0000FF;
-		new20x10imageWithPenForegroundColor(firstColor);
+		new20x10imageWithPenColor(firstColor);
 
 		controller.leftMouseButtonDown(0, 0);
 		controller.leftMouseButtonUp();
@@ -306,7 +306,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void strokePenOutsideImage_SkipsInvalidPoints() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 
 		controller.leftMouseButtonDown(1, 1);
 		controller.mouseMovedTo(-1, -1);
@@ -338,7 +338,7 @@ public class TestDrawAreaController {
 	@Test
 	public void redoingPenStroke_BringsItBack() {
 		final int color = 0xFF332211;
-		new20x10imageWithPenForegroundColor(color);
+		new20x10imageWithPenColor(color);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
@@ -352,7 +352,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void redoingWhenNothingWasUndone_DoesNothing() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		captureCurrentRefreshCount();
 
 		controller.redoPreviousAction();
@@ -363,7 +363,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void redoingTwoStrokesBringsThemBack() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(1, 2);
@@ -381,7 +381,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void afterRedoingEverything_NothingIsRedoneAnymore() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
@@ -395,7 +395,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void newPenStrokeAfterUndoing_ErasesRedoHistory() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 
 		controller.leftMouseButtonDown(0, 0);
 		controller.leftMouseButtonUp();
@@ -412,7 +412,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void undoRedoCombinationsWork() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 
 		controller.leftMouseButtonDown(1, 0);
 		controller.leftMouseButtonUp();
@@ -456,7 +456,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void undoingNewImage_RestoresOldImage() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		controller.leftMouseButtonDown(0, 0);
 		controller.mouseMovedTo(2, 2);
 		controller.leftMouseButtonUp();
@@ -473,7 +473,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void redoingNewImage_BringsBackEmptyImage() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		captureCurrentRefreshCount();
 
 		final int back = 0xFF123456;
@@ -489,7 +489,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void chainedUndoAndRedos_ReproducePreviousImages() {
-		new20x10imageWithPenForegroundColor(BLACK);
+		new20x10imageWithPenColor(BLACK);
 		controller.newImage(20, 10);
 		controller.leftMouseButtonDown(0, 0);
 		controller.leftMouseButtonUp();
@@ -506,5 +506,68 @@ public class TestDrawAreaController {
 		controller.undoLastAction(); // last new image
 
 		assertPixelsAreSet(BLACK, WHITE, p(0, 0));
+	}
+
+	@Test
+	public void leftDragPenStroke_IsAbortedOnRightMouseDown() {
+		new20x10imageWithPenColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 0);
+		controller.rightMouseButtonDown(2, 0);
+		controller.rightMouseButtonUp();
+		controller.leftMouseButtonUp();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void abortedLeftPenStroke_IsNotStoredInUndoHistory() {
+		new20x10imageWithPenColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 0);
+		controller.rightMouseButtonDown(2, 0);
+		controller.rightMouseButtonUp();
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void abortingLeftPenStrokeWithRightClick_EndsStroke() {
+		new20x10imageWithPenColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.rightMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 0);
+		controller.rightMouseButtonUp();
+		controller.leftMouseButtonUp();
+
+		assertRefreshesSinceLastCapture(2);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void rightPenStrokesAreUndoable() {
+		new20x10imageWithPenColor(BLACK);
+		final int color = 0xFF445566;
+		drawSettings.backgroundColor = new Color(color, true);
+		captureCurrentRefreshCount();
+
+		controller.rightMouseButtonDown(0, 0);
+		controller.rightMouseButtonUp();
+		controller.rightMouseButtonDown(1, 1);
+		controller.rightMouseButtonUp();
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(color, WHITE, p(0, 0));
 	}
 }
