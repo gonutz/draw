@@ -59,11 +59,8 @@ public class DrawArea extends JPanel implements DrawAreaView {
 		if (selection != null) {
 			g.setColor(Color.black);
 			g.setStroke(dashed);
-			int x = Math.min(selection.x, selection.x2);
-			int width = Math.max(selection.x, selection.x2) - x;
-			int y = Math.min(selection.y, selection.y2);
-			int height = Math.max(selection.y, selection.y2) - y;
-			g.drawRect(x, y, width, height);
+			g.drawRect(selection.left(), selection.top(),
+					selection.width() - 1, selection.height() - 1);
 		}
 	}
 
