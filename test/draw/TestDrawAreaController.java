@@ -577,6 +577,8 @@ public class TestDrawAreaController {
 	}
 
 	private void new20x10imageWithSelectionTool() {
+		drawSettings.foregroundColor = Color.black;
+		drawSettings.backgroundColor = Color.white;
 		drawSettings.tool = Tool.RectangleSelection;
 		controller.newImage(20, 10);
 	}
@@ -704,6 +706,7 @@ public class TestDrawAreaController {
 	}
 
 	private void selectRect(int x, int y, int x2, int y2) {
+		drawSettings.tool = Tool.RectangleSelection;
 		controller.leftMouseButtonDown(x, y);
 		controller.mouseMovedTo(x2, y2);
 		controller.leftMouseButtonUp();
@@ -724,22 +727,73 @@ public class TestDrawAreaController {
 		assertSelection(0, 2, 4, 6);
 	}
 
-	// @Test
-	// public void draggingSelectionMovesBothSelectionAndImagePart() {
-	// new20x10imageWithPenColor(BLACK);
-	// captureCurrentRefreshCount();
-	//
-	// controller.leftMouseButtonDown(2, 2);
-	// controller.leftMouseButtonUp();
-	// drawSettings.tool = Tool.RectangleSelection;
-	// controller.leftMouseButtonDown(0, 0);
-	// controller.mouseMovedTo(6, 6);
-	// controller.leftMouseButtonUp();
-	// // ...
-	// }
+	@Test
+	public void draggingSelectionMovesImagePart() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(10, 0);
+		drawPenDot(10, 1);
+		drawPenDot(12, 0);
+		selectRect(10, 0, 12, 2);
+		captureCurrentRefreshCount();
 
-	// @Test
-	// public void activatingOtherTool_DisablesCurrentSelection() {
-	// // TODO observer for the tools instead of polling
-	// }
+		controller.leftMouseButtonDown(10, 0);
+		controller.mouseMovedTo(12, 1);
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(12, 1), p(12, 2), p(14, 1));
+	}
+
+	private void drawPenDot(int x, int y) {
+		drawSettings.tool = Tool.Pen;
+		controller.leftMouseButtonDown(x, y);
+		controller.leftMouseButtonUp();
+	}
+
+	@Test
+	public void movingSelection_ReplacesOriginalWithBackgroundColor() {
+		new20x10imageWithSelectionTool();
+
+		// move background from = to X
+		// ...... => ......
+		// .OOO.. => .OOO..
+		// .OOO.. => .OXXX.
+		// ...... => ..XXX.
+		// ...... => ......
+		selectRect(1, 1, 3, 2);
+		drawSettings.backgroundColor = Color.black;
+		controller.leftMouseButtonDown(2, 1);
+		controller.mouseMovedTo(3, 2);
+
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1), p(2, 1), p(3, 1), p(1, 2));
+	}
+
+	@Test
+	public void selectionIsMovedUntilDeselected() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(0, 0);
+
+		// place a background pixel on top of the black pixel
+		selectRect(1, 1, 2, 2);
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(0, 0);
+		controller.leftMouseButtonUp();
+		// move the selection back off the black pixel
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(1, 1);
+		controller.leftMouseButtonUp();
+
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0));
+	}
+
+	@Test
+	public void selectionOutsideImageIsNotPossible() {
+		new20x10imageWithSelectionTool();
+		selectRect(100, 100, 102, 102);
+		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void activatingOtherTool_DisablesCurrentSelection() {
+		// TODO observer for the tools instead of polling
+	}
 }

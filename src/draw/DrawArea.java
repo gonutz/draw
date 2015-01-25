@@ -61,6 +61,9 @@ public class DrawArea extends JPanel implements DrawAreaView {
 			g.setStroke(dashed);
 			g.drawRect(selection.left(), selection.top(),
 					selection.width() - 1, selection.height() - 1);
+			g.setColor(new Color(0x100000FF, true));
+			g.fillRect(selection.left() + 1, selection.top() + 1,
+					selection.width() - 2, selection.height() - 2);
 		}
 	}
 
