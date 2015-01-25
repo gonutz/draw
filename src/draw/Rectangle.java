@@ -66,4 +66,8 @@ public class Rectangle {
 	public String toString() {
 		return String.format("(%d,%d)-(%d,%d)", x, y, x2, y2);
 	}
+
+	public Rectangle copy() {
+		return new Rectangle(x, y, x2, y2);
+	}
 }

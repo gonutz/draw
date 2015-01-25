@@ -1,11 +1,10 @@
 package draw;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class DrawAreaController implements ImageProvider, ImageKeeper {
+public class DrawAreaController implements ImageProvider, ImageKeeper,
+		SelectionKeeper {
 
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
@@ -19,8 +18,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	private boolean makingSelection;
 	private Rectangle selection;
 	private boolean movingSelection;
-	private BufferedImage selectedImage;
-	private BufferedImage imageWithoutSelection;
+	private SelectionMovement movement;
 
 	public DrawAreaController(DrawAreaView view) {
 		this.view = view;
@@ -121,6 +119,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 				makingSelection = true;
 				selection = new Rectangle(x, y, x, y);
 			}
+			movement = null;
 		} else
 			startMovingSelection();
 	}
@@ -138,29 +137,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 
 	private void startMovingSelection() {
 		movingSelection = true;
-		if (selectedImage != null)
-			return;
-		copyImageWithSelectionSetToBackgroundColor();
-		copySelectionImage();
-	}
-
-	private void copyImageWithSelectionSetToBackgroundColor() {
-		imageWithoutSelection = new BufferedImage(image.getWidth(),
-				image.getHeight(), image.getType());
-		Graphics2D g = (Graphics2D) imageWithoutSelection.getGraphics();
-		g.drawImage(image, 0, 0, null);
-		g.setBackground(drawSettings.getBackgroundColor());
-		g.clearRect(selection.left(), selection.top(), selection.width(), selection.height());
-	}
-
-	private void copySelectionImage() {
-		int x = selection.left();
-		int y = selection.top();
-		int w = selection.width();
-		int h = selection.height();
-		selectedImage = new BufferedImage(w, h, image.getType());
-		selectedImage.getGraphics().drawImage(image, 0, 0, w, h, x, y, x + w,
-				y + h, null);
+		if (movement == null) {
+			movement = new SelectionMovement(image, selection,
+					drawSettings.getBackgroundColor(), this);
+			history.addCommand(movement);
+		}
 	}
 
 	public void leftMouseButtonUp() {
@@ -175,15 +156,20 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 		if (penDown)
 			history.addCommand(currentStroke);
 		if (makingSelection && selection.x == lastX && selection.y == lastY) {
-			selectedImage = null;
-			setSelection(null);
+			movement = null;
+			updateSelection(null);
 		}
 		makingSelection = false;
 		movingSelection = false;
 		penDown = false;
 	}
 
-	private void setSelection(Rectangle selection) {
+	public void setSelection(Rectangle selection) {
+		this.selection = selection;
+		view.setSelection(selection);
+	}
+
+	private void updateSelection(Rectangle selection) {
 		this.selection = selection;
 		view.setSelection(selection);
 		view.refresh();
@@ -197,13 +183,14 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 		if (makingSelection) {
 			selection.x2 = clampToImageX(x);
 			selection.y2 = clampToImageY(y);
-			setSelection(selection);
+			updateSelection(selection);
 		}
 		if (movingSelection) {
 			int dx = x - lastX;
 			int dy = y - lastY;
-			moveSelectionBy(dx, dy);
-			setSelection(selection);
+			movement.moveBy(dx, dy);
+			movement.drawCompositeTo(image.getGraphics());
+			updateSelection(selection);
 		}
 		lastX = x;
 		lastY = y;
@@ -217,10 +204,4 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 		return Math.min(Math.max(x, 0), image.getWidth() - 1);
 	}
 
-	private void moveSelectionBy(int dx, int dy) {
-		selection.moveBy(dx, dy);
-		Graphics g = image.getGraphics();
-		g.drawImage(imageWithoutSelection, 0, 0, null);
-		g.drawImage(selectedImage, selection.left(), selection.top(), null);
-	}
 }

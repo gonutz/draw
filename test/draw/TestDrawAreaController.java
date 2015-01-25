@@ -793,7 +793,68 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void movingSelectionCanBeUndone() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+		selectRect(0, 0, 2, 2);
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(5, 5);
+		controller.leftMouseButtonUp();
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1));
+		assertSelection(0, 0, 2, 2);
+	}
+
+	@Test
+	public void twoDifferentAreasCanBeMoved() {
+		new20x10imageWithSelectionTool();
+		drawSettings.backgroundColor = Color.black;
+
+		selectRect(0, 0, 1, 0);
+		dragLeftMouseFromTo(0, 0, 1, 1);
+		selectRect(3, 3, 4, 3);
+		dragLeftMouseFromTo(3, 3, 4, 4);
+
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 0), p(3, 3), p(4, 3));
+	}
+
+	@Test
+	public void movingSelectionCanBeRedone() {
+		new20x10imageWithSelectionTool();
+		drawSettings.backgroundColor = Color.black;
+		selectRect(0, 0, 1, 0);
+		dragLeftMouseFromTo(0, 0, 2, 2);
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(2);
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 0));
+	}
+
+	private void dragLeftMouseFromTo(int fromX, int fromY, int toX, int toY) {
+		controller.leftMouseButtonDown(fromX, fromY);
+		controller.mouseMovedTo(toX, toY);
+		controller.leftMouseButtonUp();
+	}
+
+	@Test
 	public void activatingOtherTool_DisablesCurrentSelection() {
 		// TODO observer for the tools instead of polling
+	}
+
+	@Test
+	public void pressingEscape_DisablesCurrentSelection() {
+		// TODO make new methods for key events
+	}
+
+	@Test
+	public void cursorKeyMoveSelection() {
+		// TODO left/right/up/down move selection by 1 pixel
 	}
 }

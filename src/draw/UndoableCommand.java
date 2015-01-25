@@ -2,8 +2,8 @@ package draw;
 
 public interface UndoableCommand {
 
-	void undoTo(ImageKeeper image);
+	void undoTo(ImageKeeper keeper);
 
-	public void doTo(ImageKeeper image);
+	public void doTo(ImageKeeper keeper);
 
 }
