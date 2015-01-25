@@ -8,16 +8,30 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
 
 public class DrawArea extends JPanel implements DrawAreaView {
 
 	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
 	private Rectangle selection;
+	private int zoomFactor = 1;
 
 	public DrawArea() {
+		addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (e.isControlDown()) {
+					if (e.getWheelRotation() < 0)
+						zoomIn();
+					if (e.getWheelRotation() > 0)
+						zoomOut();
+				}
+			}
+		});
 		initialize();
 	}
 
@@ -25,10 +39,25 @@ public class DrawArea extends JPanel implements DrawAreaView {
 		this.controller = controller;
 	}
 
+	public void zoomIn() {
+		if (zoomFactor < 16) {
+			zoomFactor *= 2;
+			refresh();
+		}
+	}
+
+	public void zoomOut() {
+		if (zoomFactor > 1) {
+			zoomFactor /= 2;
+			refresh();
+		}
+	}
+
 	@Override
 	public void refresh() {
-		setPreferredSize(new Dimension(controller.getImage().getWidth(),
-				controller.getImage().getHeight()));
+		BufferedImage img = controller.getImage();
+		setPreferredSize(new Dimension(img.getWidth() * zoomFactor,
+				img.getHeight() * zoomFactor));
 		repaint();
 	}
 
@@ -51,19 +80,24 @@ public class DrawArea extends JPanel implements DrawAreaView {
 	}
 
 	private void drawImage(Graphics2D g) {
-		if (controller != null)
-			g.drawImage(controller.getImage(), null, 0, 0);
+		if (controller != null) {
+			BufferedImage img = controller.getImage();
+			g.drawImage(img, 0, 0, img.getWidth() * zoomFactor, img.getHeight()
+					* zoomFactor, null);
+		}
 	}
 
 	private void paintSelection(Graphics2D g) {
 		if (selection != null) {
 			g.setColor(Color.black);
 			g.setStroke(dashed);
-			g.drawRect(selection.left(), selection.top(),
-					selection.width() - 1, selection.height() - 1);
+			g.drawRect(selection.left() * zoomFactor, selection.top()
+					* zoomFactor, selection.width() * zoomFactor - 1,
+					selection.height() * zoomFactor - 1);
 			g.setColor(new Color(0x100000FF, true));
-			g.fillRect(selection.left() + 1, selection.top() + 1,
-					selection.width() - 2, selection.height() - 2);
+			g.fillRect(selection.left() * zoomFactor + 1, selection.top()
+					* zoomFactor + 1, selection.width() * zoomFactor - 2,
+					selection.height() * zoomFactor - 2);
 		}
 	}
 
@@ -76,10 +110,12 @@ public class DrawArea extends JPanel implements DrawAreaView {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					controller.leftMouseButtonDown(e.getX(), e.getY());
+					controller.leftMouseButtonDown(e.getX() / zoomFactor,
+							e.getY() / zoomFactor);
 				}
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					controller.rightMouseButtonDown(e.getX(), e.getY());
+					controller.rightMouseButtonDown(e.getX() / zoomFactor,
+							e.getY() / zoomFactor);
 				}
 			}
 
@@ -96,12 +132,14 @@ public class DrawArea extends JPanel implements DrawAreaView {
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				controller.mouseMovedTo(e.getX(), e.getY());
+				controller.mouseMovedTo(e.getX() / zoomFactor, e.getY()
+						/ zoomFactor);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				controller.mouseMovedTo(e.getX(), e.getY());
+				controller.mouseMovedTo(e.getX() / zoomFactor, e.getY()
+						/ zoomFactor);
 			}
 		});
 	}

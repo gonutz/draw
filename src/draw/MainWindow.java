@@ -223,9 +223,9 @@ public class MainWindow implements ToolView, ErrorDisplay {
 				InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		fileMenu.add(saveImageAs);
 
-		JMenu mnEdit = new JMenu("Edit");
-		mnEdit.setMnemonic('E');
-		menuBar.add(mnEdit);
+		JMenu editMenu = new JMenu("Edit");
+		editMenu.setMnemonic('E');
+		menuBar.add(editMenu);
 
 		JMenuItem undo = new JMenuItem("Undo");
 		undo.addActionListener(new ActionListener() {
@@ -235,7 +235,7 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		});
 		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
 				InputEvent.CTRL_MASK));
-		mnEdit.add(undo);
+		editMenu.add(undo);
 
 		JMenuItem redo = new JMenuItem("Redo");
 		redo.addActionListener(new ActionListener() {
@@ -245,7 +245,7 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		});
 		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
 				InputEvent.CTRL_MASK));
-		mnEdit.add(redo);
+		editMenu.add(redo);
 
 		JMenu canvasMenu = new JMenu("Canvas");
 		canvasMenu.setMnemonic('C');
@@ -255,6 +255,30 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		resizeCanvas.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 				InputEvent.CTRL_MASK));
 		canvasMenu.add(resizeCanvas);
+
+		JMenu viewMenu = new JMenu("View");
+		viewMenu.setMnemonic('V');
+		menuBar.add(viewMenu);
+
+		JMenuItem zoomIn = new JMenuItem("Zoom In");
+		viewMenu.add(zoomIn);
+		zoomIn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawArea.zoomIn();
+			}
+		});
+		zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS,
+				InputEvent.CTRL_MASK));
+
+		JMenuItem zoomOut = new JMenuItem("Zoom Out");
+		viewMenu.add(zoomOut);
+		zoomOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawArea.zoomOut();
+			}
+		});
+		zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
+				InputEvent.CTRL_MASK));
 		mainFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel toolSelectionContainer = new JPanel();
