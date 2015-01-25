@@ -14,6 +14,9 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	private boolean penDown;
 	private UndoHistory history = new UndoHistory();
 	private PenStroke currentStroke;
+	private boolean makingSelection;
+	private Rectangle selection;
+	private boolean movingSelection;
 
 	public DrawAreaController(DrawAreaView view) {
 		this.view = view;
@@ -31,6 +34,16 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 		this.image = image;
 	}
 
+	public void undoLastAction() {
+		if (history.undoTo(this))
+			view.refresh();
+	}
+
+	public void redoPreviousAction() {
+		if (history.redoTo(this))
+			view.refresh();
+	}
+
 	public void newImage(int width, int height) {
 		NewImageCommand newImageCommand = new NewImageCommand(image, width,
 				height, drawSettings.getBackgroundColor());
@@ -46,22 +59,44 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	}
 
 	public void leftMouseButtonDown(int x, int y) {
-		drawColor = drawSettings.getForegroundColor();
-		mouseDown(x, y);
+		mouseDown(x, y, LEFT_BUTTON);
 	}
+
+	private static final int LEFT_BUTTON = 1;
+	private static final int RIGHT_BUTTON = 2;
 
 	public void rightMouseButtonDown(int x, int y) {
-		drawColor = drawSettings.getBackgroundColor();
-		mouseDown(x, y);
+		mouseDown(x, y, RIGHT_BUTTON);
 	}
 
-	private void mouseDown(int x, int y) {
-		if (drawSettings.getCurrentTool() == Tool.Pen) {
-			if (penDown)
-				undoCurrentStroke();
-			else
-				startNewPenStroke(x, y);
-			view.refresh();
+	private void mouseDown(int x, int y, int button) {
+		Tool tool = drawSettings.getCurrentTool();
+		if (tool == Tool.Pen)
+			mouseDownWithPenSelected(x, y, button);
+		if (tool == Tool.RectangleSelection && button == LEFT_BUTTON) {
+			mouseDownWithRectangleSelectionTool(x, y);
+		}
+		lastX = x;
+		lastY = y;
+	}
+
+	private void mouseDownWithPenSelected(int x, int y, int button) {
+		selectDrawColorForButton(button);
+		if (penDown)
+			undoCurrentStroke();
+		else
+			startNewPenStroke(x, y);
+		view.refresh();
+	}
+
+	private void selectDrawColorForButton(int button) {
+		switch (button) {
+		case LEFT_BUTTON:
+			drawColor = drawSettings.getForegroundColor();
+			break;
+		case RIGHT_BUTTON:
+			drawColor = drawSettings.getBackgroundColor();
+			break;
 		}
 	}
 
@@ -73,23 +108,45 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 	private void startNewPenStroke(int x, int y) {
 		currentStroke = new PenStroke(drawColor);
 		currentStroke.addLine(image, x, y, x, y);
-		lastX = x;
-		lastY = y;
 		penDown = true;
 	}
 
+	private void mouseDownWithRectangleSelectionTool(int x, int y) {
+		if (!isInSelection(x, y)) {
+			makingSelection = true;
+			selection = new Rectangle(x, y, x, y);
+		} else
+			movingSelection = true;
+	}
+
+	private boolean isInSelection(int x, int y) {
+		if (selection == null)
+			return false;
+		return selection.contains(x, y);
+	}
+
 	public void leftMouseButtonUp() {
-		liftUpPen();
+		mouseUp();
 	}
 
 	public void rightMouseButtonUp() {
-		liftUpPen();
+		mouseUp();
 	}
 
-	private void liftUpPen() {
+	private void mouseUp() {
 		if (penDown)
 			history.addCommand(currentStroke);
+		if (makingSelection && selection.x == lastX && selection.y == lastY) {
+			setSelection(null);
+		}
+		makingSelection = false;
+		movingSelection = false;
 		penDown = false;
+	}
+
+	private void setSelection(Rectangle selection) {
+		view.setSelection(selection);
+		view.refresh();
 	}
 
 	public void mouseMovedTo(int x, int y) {
@@ -97,18 +154,30 @@ public class DrawAreaController implements ImageProvider, ImageKeeper {
 			currentStroke.addLine(image, lastX, lastY, x, y);
 			view.refresh();
 		}
+		if (makingSelection) {
+			selection.x2 = clampToImageX(x);
+			selection.y2 = clampToImageY(y);
+			setSelection(selection);
+		}
+		if (movingSelection) {
+			int dx = x - lastX;
+			int dy = y - lastY;
+			selection.x += dx;
+			selection.x2 += dx;
+			selection.y += dy;
+			selection.y2 += dy;
+			setSelection(selection);
+		}
 		lastX = x;
 		lastY = y;
 	}
 
-	public void undoLastAction() {
-		if (history.undoTo(this))
-			view.refresh();
+	private int clampToImageY(int y) {
+		return Math.min(Math.max(y, 0), image.getHeight() - 1);
 	}
 
-	public void redoPreviousAction() {
-		if (history.redoTo(this))
-			view.refresh();
+	private int clampToImageX(int x) {
+		return Math.min(Math.max(x, 0), image.getWidth() - 1);
 	}
 
 }

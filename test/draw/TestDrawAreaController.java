@@ -22,9 +22,14 @@ public class TestDrawAreaController {
 
 	private class SpyView implements DrawAreaView {
 		private int refreshCount;
+		private Rectangle selecetion;
 
 		public void refresh() {
 			refreshCount++;
+		}
+
+		public void setSelection(Rectangle selection) {
+			this.selecetion = selection;
 		}
 	}
 
@@ -570,4 +575,171 @@ public class TestDrawAreaController {
 		assertRefreshesSinceLastCapture(3);
 		assertPixelsAreSet(color, WHITE, p(0, 0));
 	}
+
+	private void new20x10imageWithSelectionTool() {
+		drawSettings.tool = Tool.RectangleSelection;
+		controller.newImage(20, 10);
+	}
+
+	private void assertSelection(int x, int y, int x2, int y2) {
+		assertEquals("x", x, view.selecetion.x);
+		assertEquals("y", y, view.selecetion.y);
+		assertEquals("x2", x2, view.selecetion.x2);
+		assertEquals("y2", y2, view.selecetion.y2);
+	}
+
+	private void assertNoSelectionIsMade() {
+		assertNull(view.selecetion);
+	}
+
+	@Test
+	public void selectionRectangleIsSetInView() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 2);
+
+		assertRefreshesSinceLastCapture(1);
+		assertSelection(0, 0, 2, 2);
+	}
+
+	@Test
+	public void selectionRectangleCanGoUpLeft() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(5, 6);
+		controller.mouseMovedTo(3, 1);
+
+		assertRefreshesSinceLastCapture(1);
+		assertSelection(5, 6, 3, 1);
+	}
+
+	@Test
+	public void selectionRectangleIsResizedWhileLeftMouseDown() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(2, 3);
+		controller.mouseMovedTo(0, 0);
+		controller.mouseMovedTo(5, 6);
+
+		assertRefreshesSinceLastCapture(2);
+		assertSelection(2, 3, 5, 6);
+	}
+
+	@Test
+	public void selectionIsDoneWhenLeftMouseIsLieftedUp() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 2);
+		controller.leftMouseButtonUp();
+		controller.mouseMovedTo(4, 4);
+
+		assertRefreshesSinceLastCapture(1);
+		assertSelection(0, 0, 2, 2);
+	}
+
+	@Test
+	public void selectionStaysInUpperLeftImageBounds() {
+		new20x10imageWithSelectionTool();
+
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(-2, -4);
+
+		assertSelection(1, 1, 0, 0);
+	}
+
+	@Test
+	public void selectionStaysInLowerRightImageBounds() {
+		new20x10imageWithSelectionTool();
+
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(100, 100);
+
+		assertSelection(1, 1, 19, 9);
+	}
+
+	@Test
+	public void leftClick_RemovesSelectionRectangle() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(3, 3);
+		controller.leftMouseButtonUp();
+		controller.leftMouseButtonDown(5, 5);
+		controller.leftMouseButtonUp();
+
+		assertRefreshesSinceLastCapture(2);
+		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void rightMouseDoesNotSelectRectangle() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.rightMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 2);
+
+		assertRefreshesSinceLastCapture(0);
+		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void selectionCanBeDragged() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		selectRect(2, 2, 6, 6);
+		controller.leftMouseButtonDown(4, 4);
+		controller.mouseMovedTo(2, 4);
+
+		assertRefreshesSinceLastCapture(2);
+		assertSelection(0, 2, 4, 6);
+	}
+
+	private void selectRect(int x, int y, int x2, int y2) {
+		controller.leftMouseButtonDown(x, y);
+		controller.mouseMovedTo(x2, y2);
+		controller.leftMouseButtonUp();
+	}
+
+	@Test
+	public void draggingSelectionStops_WhenLeftMouseIsLiftedUp() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		selectRect(2, 2, 6, 6);
+		controller.leftMouseButtonDown(4, 4);
+		controller.mouseMovedTo(2, 4);
+		controller.leftMouseButtonUp();
+		controller.mouseMovedTo(-5, -5);
+
+		assertRefreshesSinceLastCapture(2);
+		assertSelection(0, 2, 4, 6);
+	}
+
+	// @Test
+	// public void draggingSelectionMovesBothSelectionAndImagePart() {
+	// new20x10imageWithPenColor(BLACK);
+	// captureCurrentRefreshCount();
+	//
+	// controller.leftMouseButtonDown(2, 2);
+	// controller.leftMouseButtonUp();
+	// drawSettings.tool = Tool.RectangleSelection;
+	// controller.leftMouseButtonDown(0, 0);
+	// controller.mouseMovedTo(6, 6);
+	// controller.leftMouseButtonUp();
+	// // ...
+	// }
+
+	// @Test
+	// public void activatingOtherTool_DisablesCurrentSelection() {
+	// // TODO observer for the tools instead of polling
+	// }
 }
