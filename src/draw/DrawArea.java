@@ -166,6 +166,8 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
 
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
+		if (controller == null)
+			return null;
 		return new Dimension(controller.getImage().getWidth() * zoomFactor,
 				controller.getImage().getHeight() * zoomFactor);
 	}
