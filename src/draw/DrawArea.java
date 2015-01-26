@@ -33,7 +33,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
 	}
 
 	public void zoomIn() {
-		if (zoomFactor < 16) {
+		if (zoomFactor < 32) {
 			zoomFactor *= 2;
 			refresh();
 		}
@@ -48,11 +48,10 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
 
 	@Override
 	public void refresh() {
-		// TODO is this still needed?
 		BufferedImage img = controller.getImage();
 		setPreferredSize(new Dimension(img.getWidth() * zoomFactor,
 				img.getHeight() * zoomFactor));
-		invalidate();
+		revalidate();
 		repaint();
 	}
 
