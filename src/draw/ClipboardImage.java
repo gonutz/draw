@@ -5,17 +5,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 
-/**
- * read from clipboard:
- * 
- * try
- * 
- * if (t != null && t.isDataFlavorSupported(DataFlavor.imageFlavor))
- * 
- * Image image = (Image)t.getTransferData(DataFlavor.imageFlavor);
- * 
- * catch (Exception e) { image = null; }
- */
 public class ClipboardImage implements Transferable {
 	private Image image;
 
