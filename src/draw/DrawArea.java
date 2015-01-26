@@ -11,10 +11,13 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
+
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseWheelEvent;
 
-public class DrawArea extends JPanel implements DrawAreaView {
+public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
 
 	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
@@ -22,16 +25,6 @@ public class DrawArea extends JPanel implements DrawAreaView {
 	private int zoomFactor = 1;
 
 	public DrawArea() {
-		addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (e.isControlDown()) {
-					if (e.getWheelRotation() < 0)
-						zoomIn();
-					if (e.getWheelRotation() > 0)
-						zoomOut();
-				}
-			}
-		});
 		initialize();
 	}
 
@@ -55,9 +48,11 @@ public class DrawArea extends JPanel implements DrawAreaView {
 
 	@Override
 	public void refresh() {
+		// TODO is this still needed?
 		BufferedImage img = controller.getImage();
 		setPreferredSize(new Dimension(img.getWidth() * zoomFactor,
 				img.getHeight() * zoomFactor));
+		invalidate();
 		repaint();
 	}
 
@@ -142,5 +137,66 @@ public class DrawArea extends JPanel implements DrawAreaView {
 						/ zoomFactor);
 			}
 		});
+		addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
+						.clone();
+				int dx = visible.width / 5;
+				int dy = visible.height / 5;
+				if (e.isControlDown()) {
+					if (e.getWheelRotation() < 0)
+						zoomIn();
+					if (e.getWheelRotation() > 0)
+						zoomOut();
+				} else if (e.isShiftDown() || e.isAltDown()) {
+					if (e.getWheelRotation() < 0)
+						visible.x -= dx;
+					if (e.getWheelRotation() > 0)
+						visible.x += dx;
+					scrollRectToVisible(visible);
+				} else {
+					if (e.getWheelRotation() < 0)
+						visible.y -= dy;
+					if (e.getWheelRotation() > 0)
+						visible.y += dy;
+					scrollRectToVisible(visible);
+				}
+			}
+		});
 	}
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return new Dimension(controller.getImage().getWidth() * zoomFactor,
+				controller.getImage().getHeight() * zoomFactor);
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(java.awt.Rectangle visibleRect,
+			int orientation, int direction) {
+		if (orientation == SwingConstants.HORIZONTAL)
+			return visibleRect.width / 5;
+		else
+			return visibleRect.height / 5;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(java.awt.Rectangle visibleRect,
+			int orientation, int direction) {
+		if (orientation == SwingConstants.HORIZONTAL)
+			return visibleRect.width - 2 * zoomFactor;
+		else
+			return visibleRect.height - 2 * zoomFactor;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return false;
+	}
+
 }
