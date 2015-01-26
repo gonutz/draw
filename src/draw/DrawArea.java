@@ -17,7 +17,8 @@ import javax.swing.SwingConstants;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseWheelEvent;
 
-public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
+public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
+		MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
@@ -136,32 +137,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
 						/ zoomFactor);
 			}
 		});
-		addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
-						.clone();
-				int dx = visible.width / 5;
-				int dy = visible.height / 5;
-				if (e.isControlDown()) {
-					if (e.getWheelRotation() < 0)
-						zoomIn();
-					if (e.getWheelRotation() > 0)
-						zoomOut();
-				} else if (e.isShiftDown() || e.isAltDown()) {
-					if (e.getWheelRotation() < 0)
-						visible.x -= dx;
-					if (e.getWheelRotation() > 0)
-						visible.x += dx;
-					scrollRectToVisible(visible);
-				} else {
-					if (e.getWheelRotation() < 0)
-						visible.y -= dy;
-					if (e.getWheelRotation() > 0)
-						visible.y += dy;
-					scrollRectToVisible(visible);
-				}
-			}
-		});
+		addMouseWheelListener(this);
 	}
 
 	@Override
@@ -198,6 +174,32 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable {
 	@Override
 	public boolean getScrollableTracksViewportWidth() {
 		return false;
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
+				.clone();
+		int dx = visible.width / 5;
+		int dy = visible.height / 5;
+		if (e.isControlDown()) {
+			if (e.getWheelRotation() < 0)
+				zoomIn();
+			if (e.getWheelRotation() > 0)
+				zoomOut();
+		} else if (e.isShiftDown() || e.isAltDown()) {
+			if (e.getWheelRotation() < 0)
+				visible.x -= dx;
+			if (e.getWheelRotation() > 0)
+				visible.x += dx;
+			scrollRectToVisible(visible);
+		} else {
+			if (e.getWheelRotation() < 0)
+				visible.y -= dy;
+			if (e.getWheelRotation() > 0)
+				visible.y += dy;
+			scrollRectToVisible(visible);
+		}
 	}
 
 }

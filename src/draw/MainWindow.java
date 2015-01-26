@@ -410,9 +410,11 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		colorContainer.add(colorPalette);
 
 		JScrollPane paintAreaScroller = new JScrollPane();
+
 		mainFrame.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
 		drawArea = new DrawArea();
 		paintAreaScroller.setViewportView(drawArea);
+		paintAreaScroller.addMouseWheelListener(drawArea);
 	}
 
 	@Override
