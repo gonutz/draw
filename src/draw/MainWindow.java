@@ -60,9 +60,7 @@ public class MainWindow implements ToolView, ErrorDisplay {
 			}
 
 			private void wireUpControllers(MainWindow window) {
-				ToolViewController toolController = new ToolViewController(
-						window);
-				window.setToolViewController(toolController);
+				window.toolViewController = new ToolViewController(window);
 				ColorPaletteViewController paletteController = new ColorPaletteViewController(
 						window.colorPalette, window.currentColors);
 				window.colorPalette.setAndActivateController(paletteController);
@@ -71,7 +69,9 @@ public class MainWindow implements ToolView, ErrorDisplay {
 				window.drawArea.setController(window.drawAreaController);
 				window.drawAreaController
 						.setDrawSettings(new DrawSettingsAdapter(
-								paletteController, toolController));
+								paletteController, window.toolViewController));
+				window.toolViewController
+						.setObserver(window.drawAreaController);
 				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,
 						INITIAL_CANVAS_HEIGHT);
 				window.imageSaveController = new ImageSaveController(
@@ -79,10 +79,6 @@ public class MainWindow implements ToolView, ErrorDisplay {
 						new ImageToFileSaver(), window);
 			}
 		});
-	}
-
-	private void setToolViewController(ToolViewController c) {
-		toolViewController = c;
 	}
 
 	public MainWindow() {
@@ -298,7 +294,7 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		rectangleSelection = new JButton("");
 		rectangleSelection.setFocusable(false);
 		rectangleSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.RectangleSelection);
 			}
 		});

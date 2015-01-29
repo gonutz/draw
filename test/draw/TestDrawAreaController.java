@@ -845,7 +845,14 @@ public class TestDrawAreaController {
 
 	@Test
 	public void activatingOtherTool_DisablesCurrentSelection() {
-		// TODO observer for the tools instead of polling
+		new20x10imageWithSelectionTool();
+		selectRect(1, 2, 3, 4);
+		captureCurrentRefreshCount();
+
+		controller.toolChangedTo(Tool.Pen);
+
+		assertRefreshesSinceLastCapture(1);
+		assertNoSelectionIsMade();
 	}
 
 	@Test

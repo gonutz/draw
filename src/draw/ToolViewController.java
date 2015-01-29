@@ -4,6 +4,7 @@ public class ToolViewController {
 
 	private ToolView view;
 	private Tool selected = Tool.RectangleSelection;
+	private ToolChangeObserver observer;
 
 	public ToolViewController(ToolView view) {
 		this.view = view;
@@ -12,6 +13,8 @@ public class ToolViewController {
 	public void selectTool(Tool tool) {
 		selected = tool;
 		view.setSelection(tool);
+		if (observer != null)
+			observer.toolChangedTo(tool);
 	}
 
 	public void viewActivated() {
@@ -20,6 +23,10 @@ public class ToolViewController {
 
 	public Tool getSelectedTool() {
 		return selected;
+	}
+
+	public void setObserver(ToolChangeObserver o) {
+		this.observer = o;
 	}
 
 }

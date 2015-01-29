@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper,
-		SelectionKeeper {
+		SelectionKeeper, ToolChangeObserver {
 
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
@@ -204,4 +204,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		return Math.min(Math.max(x, 0), image.getWidth() - 1);
 	}
 
+	@Override
+	public void toolChangedTo(Tool tool) {
+		updateSelection(null);
+	}
 }
