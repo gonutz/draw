@@ -9,16 +9,27 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
 	private BufferedImage image;
-	private Color drawColor;
-	private int lastX;
-	private int lastY;
-	private boolean penDown;
 	private UndoHistory history = new UndoHistory();
-	private PenStroke currentStroke;
-	private boolean makingSelection;
-	private Rectangle selection;
-	private boolean movingSelection;
-	private SelectionMovement movement;
+	private Mouse lastMouse = new Mouse();
+	private Selection selection = new Selection();
+	private Pen pen = new Pen();
+
+	private class Mouse {
+		int x, y;
+	}
+
+	private class Selection {
+		boolean selecting;
+		boolean moving;
+		Rectangle rect;
+		SelectionMovement movement;
+	}
+
+	private class Pen {
+		boolean down;
+		PenStroke stroke;
+		Color color;
+	}
 
 	public DrawAreaController(DrawAreaView view) {
 		this.view = view;
@@ -78,13 +89,13 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (tool == Tool.RectangleSelection && button == LEFT_BUTTON) {
 			mouseDownWithRectangleSelectionTool(x, y);
 		}
-		lastX = x;
-		lastY = y;
+		lastMouse.x = x;
+		lastMouse.y = y;
 	}
 
 	private void mouseDownWithPenSelected(int x, int y, int button) {
 		selectDrawColorForButton(button);
-		if (penDown)
+		if (pen.down)
 			undoCurrentStroke();
 		else
 			startNewPenStroke(x, y);
@@ -94,40 +105,40 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void selectDrawColorForButton(int button) {
 		switch (button) {
 		case LEFT_BUTTON:
-			drawColor = drawSettings.getForegroundColor();
+			pen.color = drawSettings.getForegroundColor();
 			break;
 		case RIGHT_BUTTON:
-			drawColor = drawSettings.getBackgroundColor();
+			pen.color = drawSettings.getBackgroundColor();
 			break;
 		}
 	}
 
 	private void undoCurrentStroke() {
-		currentStroke.undoTo(this);
-		penDown = false;
+		pen.stroke.undoTo(this);
+		pen.down = false;
 	}
 
 	private void startNewPenStroke(int x, int y) {
-		currentStroke = new PenStroke(drawColor);
-		currentStroke.addLine(image, x, y, x, y);
-		penDown = true;
+		pen.stroke = new PenStroke(pen.color);
+		pen.stroke.addLine(image, x, y, x, y);
+		pen.down = true;
 	}
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
 		if (!isInSelection(x, y)) {
 			if (isInsideImage(x, y)) {
-				makingSelection = true;
-				selection = new Rectangle(x, y, x, y);
+				selection.selecting = true;
+				selection.rect = new Rectangle(x, y, x, y);
 			}
-			movement = null;
+			selection.movement = null;
 		} else
 			startMovingSelection();
 	}
 
 	private boolean isInSelection(int x, int y) {
-		if (selection == null)
+		if (selection.rect == null)
 			return false;
-		return selection.contains(x, y);
+		return selection.rect.contains(x, y);
 	}
 
 	private boolean isInsideImage(int x, int y) {
@@ -136,11 +147,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void startMovingSelection() {
-		movingSelection = true;
-		if (movement == null) {
-			movement = new SelectionMovement(image, selection,
+		selection.moving = true;
+		if (selection.movement == null) {
+			selection.movement = new SelectionMovement(image, selection.rect,
 					drawSettings.getBackgroundColor(), this);
-			history.addCommand(movement);
+			history.addCommand(selection.movement);
 		}
 	}
 
@@ -153,47 +164,47 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void mouseUp() {
-		if (penDown)
-			history.addCommand(currentStroke);
-		if (makingSelection && selection.x == lastX && selection.y == lastY) {
-			movement = null;
+		if (pen.down)
+			history.addCommand(pen.stroke);
+		if (selection.selecting && selection.rect.x == lastMouse.x
+				&& selection.rect.y == lastMouse.y) {
+			selection.movement = null;
 			updateSelection(null);
 		}
-		makingSelection = false;
-		movingSelection = false;
-		penDown = false;
+		selection.selecting = false;
+		selection.moving = false;
+		pen.down = false;
 	}
 
-	public void setSelection(Rectangle selection) {
-		this.selection = selection;
-		view.setSelection(selection);
+	public void setSelection(Rectangle rect) {
+		selection.rect = rect;
+		view.setSelection(rect);
 	}
 
-	private void updateSelection(Rectangle selection) {
-		this.selection = selection;
-		view.setSelection(selection);
+	private void updateSelection(Rectangle rect) {
+		setSelection(rect);
 		view.refresh();
 	}
 
 	public void mouseMovedTo(int x, int y) {
-		if (penDown) {
-			currentStroke.addLine(image, lastX, lastY, x, y);
+		if (pen.down) {
+			pen.stroke.addLine(image, lastMouse.x, lastMouse.y, x, y);
 			view.refresh();
 		}
-		if (makingSelection) {
-			selection.x2 = clampToImageX(x);
-			selection.y2 = clampToImageY(y);
-			updateSelection(selection);
+		if (selection.selecting) {
+			selection.rect.x2 = clampToImageX(x);
+			selection.rect.y2 = clampToImageY(y);
+			updateSelection(selection.rect);
 		}
-		if (movingSelection) {
-			int dx = x - lastX;
-			int dy = y - lastY;
-			movement.moveBy(dx, dy);
-			movement.drawCompositeTo(image.getGraphics());
-			updateSelection(selection);
+		if (selection.moving) {
+			int dx = x - lastMouse.x;
+			int dy = y - lastMouse.y;
+			selection.movement.moveBy(dx, dy);
+			selection.movement.drawCompositeTo(image.getGraphics());
+			updateSelection(selection.rect);
 		}
-		lastX = x;
-		lastY = y;
+		lastMouse.x = x;
+		lastMouse.y = y;
 	}
 
 	private int clampToImageY(int y) {
