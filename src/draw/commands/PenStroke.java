@@ -8,6 +8,8 @@ import java.util.List;
 
 import draw.Bresenham;
 import draw.ImageKeeper;
+import draw.Tool;
+import draw.ToolController;
 import draw.UndoableCommand;
 
 public class PenStroke implements UndoableCommand {
@@ -59,12 +61,13 @@ public class PenStroke implements UndoableCommand {
 		pixels.add(0, new Pixel(x, y, oldColor));
 	}
 
-	public void undoTo(ImageKeeper image) {
+	public void undoTo(ImageKeeper image, ToolController toolController) {
 		Graphics g = image.getImage().getGraphics();
 		for (Pixel p : pixels) {
 			g.setColor(new Color(p.oldColor));
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
+		toolController.selectTool(Tool.Pen);
 	}
 
 	public void doTo(ImageKeeper image) {

@@ -12,12 +12,14 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
+	private ToolController toolController;
 	private BufferedImage image;
 	private UndoHistory history = new UndoHistory();
 	private Mouse lastMouse = new Mouse();
 	private Selection selection = new Selection();
 	private Pen pen = new Pen();
 	private State state = State.Idle;
+	private boolean refreshed;
 
 	private enum State {
 		Idle, PenDown, Selecting, MovingSelection
@@ -55,7 +57,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		}
 
 		public void stopMovement() {
-			// moving = false; // TODO not needed for tests to pass - why?
 			movement = null;
 		}
 
@@ -78,6 +79,10 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		this.drawSettings = drawSettings;
 	}
 
+	public void setToolController(ToolController toolController) {
+		this.toolController = toolController;
+	}
+
 	public BufferedImage getImage() {
 		return image;
 	}
@@ -87,7 +92,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void undoLastAction() {
-		if (history.undoTo(this))
+		refreshed = false;
+		if (history.undoTo(this, toolController) && !refreshed)
 			view.refresh();
 		selection.movement = null;
 	}
@@ -120,7 +126,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void mouseDown(int x, int y, int button) {
-		Tool tool = drawSettings.getCurrentTool();
+		Tool tool = toolController.getSelectedTool();
 		if (tool == Tool.Pen)
 			mouseDownWithPenSelected(x, y, button);
 		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton) {
@@ -150,7 +156,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void undoCurrentStroke() {
-		pen.stroke.undoTo(this);
+		pen.stroke.undoTo(this, toolController);
 		state = State.Idle;
 	}
 
@@ -203,6 +209,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void updateSelection(Rectangle rect) {
 		setSelection(rect);
 		view.refresh();
+		refreshed = true;
 	}
 
 	public void mouseMovedTo(int x, int y) {
@@ -239,6 +246,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	@Override
 	public void toolChangedTo(Tool tool) {
-		updateSelection(null);
+		if (selection.rect != null)
+			updateSelection(null);
 	}
 }

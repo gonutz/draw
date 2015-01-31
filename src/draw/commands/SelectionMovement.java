@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 import draw.ImageKeeper;
 import draw.Rectangle;
 import draw.SelectionKeeper;
+import draw.Tool;
+import draw.ToolController;
 import draw.UndoableCommand;
 
 public class SelectionMovement implements UndoableCommand {
@@ -64,7 +66,8 @@ public class SelectionMovement implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper) {
+	public void undoTo(ImageKeeper keeper, ToolController toolController) {
+		toolController.selectTool(Tool.RectangleSelection);
 		setImageAndSelectionTo(keeper, original);
 	}
 

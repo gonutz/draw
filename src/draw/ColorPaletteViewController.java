@@ -2,7 +2,7 @@ package draw;
 
 import java.awt.Color;
 
-public class ColorPaletteViewController {
+public class ColorPaletteViewController implements DrawSettings {
 
 	private ColorPaletteView view;
 	private CurrentColorsView current;
@@ -45,10 +45,12 @@ public class ColorPaletteViewController {
 		defaultColors[index] = color;
 	}
 
+	@Override
 	public Color getBackgroundColor() {
 		return backgroundColor;
 	}
 
+	@Override
 	public Color getForegroundColor() {
 		return foregroundColor;
 	}

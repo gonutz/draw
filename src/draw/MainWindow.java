@@ -67,9 +67,9 @@ public class MainWindow implements ToolView, ErrorDisplay {
 				window.drawAreaController = new DrawAreaController(
 						window.drawArea);
 				window.drawArea.setController(window.drawAreaController);
+				window.drawAreaController.setDrawSettings(paletteController);
 				window.drawAreaController
-						.setDrawSettings(new DrawSettingsAdapter(
-								paletteController, window.toolViewController));
+						.setToolController(window.toolViewController);
 				window.toolViewController
 						.setObserver(window.drawAreaController);
 				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,

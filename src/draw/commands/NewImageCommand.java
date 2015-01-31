@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import draw.ImageKeeper;
 import draw.ImageUtils;
+import draw.ToolController;
 import draw.UndoableCommand;
 
 public class NewImageCommand implements UndoableCommand {
@@ -24,7 +25,7 @@ public class NewImageCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper) {
+	public void undoTo(ImageKeeper keeper, ToolController toolController) {
 		keeper.setImage(ImageUtils.copyImage(oldImage));
 	}
 

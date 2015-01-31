@@ -18,6 +18,7 @@ public class TestDrawAreaController {
 	private SpyView view;
 	private DrawAreaController controller;
 	private StubDrawSettings drawSettings;
+	private ToolViewController toolController;
 	private int previousRefreshs;
 
 	private class SpyView implements DrawAreaView {
@@ -36,7 +37,6 @@ public class TestDrawAreaController {
 	private class StubDrawSettings implements DrawSettings {
 		private Color foregroundColor;
 		private Color backgroundColor;
-		private Tool tool;
 
 		@Override
 		public Color getForegroundColor() {
@@ -47,10 +47,10 @@ public class TestDrawAreaController {
 		public Color getBackgroundColor() {
 			return backgroundColor;
 		}
+	}
 
-		@Override
-		public Tool getCurrentTool() {
-			return tool;
+	private class DummyToolView implements ToolView {
+		public void setSelection(Tool selected) {
 		}
 	}
 
@@ -60,6 +60,9 @@ public class TestDrawAreaController {
 		controller = new DrawAreaController(view);
 		drawSettings = new StubDrawSettings();
 		controller.setDrawSettings(drawSettings);
+		toolController = new ToolViewController(new DummyToolView());
+		controller.setToolController(toolController);
+		toolController.setObserver(controller);
 	}
 
 	@Test
@@ -145,7 +148,7 @@ public class TestDrawAreaController {
 	private void new20x10imageWithPenColor(int color) {
 		drawSettings.foregroundColor = new Color(color);
 		drawSettings.backgroundColor = Color.white;
-		drawSettings.tool = Tool.Pen;
+		toolController.selectTool(Tool.Pen);
 		controller.newImage(20, 10);
 	}
 
@@ -200,7 +203,7 @@ public class TestDrawAreaController {
 		new20x10imageWithPenColor(BLACK);
 		captureCurrentRefreshCount();
 
-		drawSettings.tool = Tool.RectangleSelection;
+		toolController.selectTool(Tool.RectangleSelection);
 		controller.leftMouseButtonDown(0, 0);
 
 		assertRefreshesSinceLastCapture(0);
@@ -337,7 +340,7 @@ public class TestDrawAreaController {
 		controller.newImage(20, 10);
 		final int color = 0xFF123456;
 		drawSettings.backgroundColor = new Color(color, true);
-		drawSettings.tool = Tool.Pen;
+		toolController.selectTool(Tool.Pen);
 		captureCurrentRefreshCount();
 
 		controller.rightMouseButtonDown(1, 1);
@@ -587,7 +590,7 @@ public class TestDrawAreaController {
 	private void new20x10imageWithSelectionTool() {
 		drawSettings.foregroundColor = Color.black;
 		drawSettings.backgroundColor = Color.white;
-		drawSettings.tool = Tool.RectangleSelection;
+		toolController.selectTool(Tool.RectangleSelection);
 		controller.newImage(20, 10);
 	}
 
@@ -714,7 +717,7 @@ public class TestDrawAreaController {
 	}
 
 	private void selectRect(int x, int y, int x2, int y2) {
-		drawSettings.tool = Tool.RectangleSelection;
+		toolController.selectTool(Tool.RectangleSelection);
 		controller.leftMouseButtonDown(x, y);
 		controller.mouseMovedTo(x2, y2);
 		controller.leftMouseButtonUp();
@@ -752,7 +755,7 @@ public class TestDrawAreaController {
 	}
 
 	private void drawPenDot(int x, int y) {
-		drawSettings.tool = Tool.Pen;
+		toolController.selectTool(Tool.Pen);
 		controller.leftMouseButtonDown(x, y);
 		controller.leftMouseButtonUp();
 	}
@@ -843,9 +846,9 @@ public class TestDrawAreaController {
 		drawSettings.backgroundColor = Color.black;
 
 		selectRect(0, 0, 1, 0);
-		dragLeftMouseFromTo(0, 0, 1, 1);
+		dragLeftMouse(from(0, 0), to(1, 1));
 		selectRect(3, 3, 4, 3);
-		dragLeftMouseFromTo(3, 3, 4, 4);
+		dragLeftMouse(from(3, 3), to(4, 4));
 
 		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 0), p(3, 3), p(4, 3));
 	}
@@ -855,7 +858,7 @@ public class TestDrawAreaController {
 		new20x10imageWithSelectionTool();
 		drawSettings.backgroundColor = Color.black;
 		selectRect(0, 0, 1, 0);
-		dragLeftMouseFromTo(0, 0, 2, 2);
+		dragLeftMouse(from(0, 0), to(2, 2));
 		captureCurrentRefreshCount();
 
 		controller.undoLastAction();
@@ -865,14 +868,8 @@ public class TestDrawAreaController {
 		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(1, 0));
 	}
 
-	private void dragLeftMouseFromTo(int fromX, int fromY, int toX, int toY) {
-		controller.leftMouseButtonDown(fromX, fromY);
-		controller.mouseMovedTo(toX, toY);
-		controller.leftMouseButtonUp();
-	}
-
 	@Test
-	public void activatingOtherTool_DisablesCurrentSelection() {
+	public void activatingPen_DisablesCurrentSelection() {
 		new20x10imageWithSelectionTool();
 		selectRect(1, 2, 3, 4);
 		captureCurrentRefreshCount();
@@ -881,6 +878,41 @@ public class TestDrawAreaController {
 
 		assertRefreshesSinceLastCapture(1);
 		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void reactivatingSelectionTool_DisablesCurrentSelection() {
+		new20x10imageWithSelectionTool();
+		selectRect(1, 2, 3, 4);
+		captureCurrentRefreshCount();
+
+		controller.toolChangedTo(Tool.RectangleSelection);
+
+		assertRefreshesSinceLastCapture(1);
+		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void undoingPenStrokeSetsToolToPen() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+		toolController.selectTool(null);
+
+		controller.undoLastAction();
+
+		assertEquals(Tool.Pen, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void undoingSelectionEnablesSelectionTool() {
+		new20x10imageWithSelectionTool();
+		selectRect(0, 0, 5, 5);
+		dragLeftMouse(from(1, 1), to(4, 4));
+		toolController.selectTool(null);
+
+		controller.undoLastAction();
+
+		assertEquals(Tool.RectangleSelection, toolController.getSelectedTool());
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 package draw;
 
-public class ToolViewController {
+public class ToolViewController implements ToolController {
 
 	private ToolView view;
 	private Tool selected = Tool.RectangleSelection;

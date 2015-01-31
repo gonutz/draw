@@ -8,6 +8,4 @@ public interface DrawSettings {
 
 	Color getBackgroundColor();
 
-	Tool getCurrentTool();
-
 }

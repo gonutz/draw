@@ -26,10 +26,10 @@ public class UndoHistory {
 	 * @return true if there was a command undone and false if not (if the
 	 *         history is empty).
 	 */
-	public boolean undoTo(ImageKeeper image) {
+	public boolean undoTo(ImageKeeper image, ToolController c) {
 		if (nothingToUndo())
 			return false;
-		undoList.get(undoIndex).undoTo(image);
+		undoList.get(undoIndex).undoTo(image, c);
 		undoIndex--;
 		return true;
 	}
