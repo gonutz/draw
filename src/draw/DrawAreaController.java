@@ -3,6 +3,10 @@ package draw;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+import draw.commands.NewImageCommand;
+import draw.commands.PenStroke;
+import draw.commands.SelectionMovement;
+
 public class DrawAreaController implements ImageProvider, ImageKeeper,
 		SelectionKeeper, ToolChangeObserver {
 

@@ -1,10 +1,14 @@
-package draw;
+package draw.commands;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import draw.Bresenham;
+import draw.ImageKeeper;
+import draw.UndoableCommand;
 
 public class PenStroke implements UndoableCommand {
 

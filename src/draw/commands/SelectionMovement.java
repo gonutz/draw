@@ -1,9 +1,14 @@
-package draw;
+package draw.commands;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import draw.ImageKeeper;
+import draw.Rectangle;
+import draw.SelectionKeeper;
+import draw.UndoableCommand;
 
 public class SelectionMovement implements UndoableCommand {
 

@@ -1,8 +1,12 @@
-package draw;
+package draw.commands;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import draw.ImageKeeper;
+import draw.ImageUtils;
+import draw.UndoableCommand;
 
 public class NewImageCommand implements UndoableCommand {
 
