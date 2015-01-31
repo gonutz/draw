@@ -72,7 +72,8 @@ public class SelectionMovement implements UndoableCommand {
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper) {
+	public void doTo(ImageKeeper keeper, ToolController toolController) {
+		toolController.selectTool(Tool.RectangleSelection);
 		setImageAndSelectionTo(keeper, selection);
 	}
 

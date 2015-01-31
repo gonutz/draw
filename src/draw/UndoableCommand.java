@@ -4,6 +4,6 @@ public interface UndoableCommand {
 
 	void undoTo(ImageKeeper keeper, ToolController toolController);
 
-	public void doTo(ImageKeeper keeper);
+	public void doTo(ImageKeeper keeper, ToolController toolController);
 
 }

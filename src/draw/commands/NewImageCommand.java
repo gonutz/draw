@@ -30,7 +30,7 @@ public class NewImageCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper) {
+	public void doTo(ImageKeeper keeper, ToolController toolController) {
 		BufferedImage newImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_4BYTE_ABGR);
 		clearImageTo(newImage, newBackgroundColor);

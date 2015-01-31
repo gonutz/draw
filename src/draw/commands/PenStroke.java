@@ -70,11 +70,12 @@ public class PenStroke implements UndoableCommand {
 		toolController.selectTool(Tool.Pen);
 	}
 
-	public void doTo(ImageKeeper image) {
+	public void doTo(ImageKeeper image, ToolController toolController) {
 		Graphics g = image.getImage().getGraphics();
 		for (Pixel p : pixels) {
 			g.setColor(strokeColor);
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
+		toolController.selectTool(Tool.Pen);
 	}
 }

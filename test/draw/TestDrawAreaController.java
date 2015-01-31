@@ -904,13 +904,38 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void undoingSelectionEnablesSelectionTool() {
+	public void undoingSelectionMovement_EnablesSelectionTool() {
 		new20x10imageWithSelectionTool();
 		selectRect(0, 0, 5, 5);
 		dragLeftMouse(from(1, 1), to(4, 4));
 		toolController.selectTool(null);
 
 		controller.undoLastAction();
+
+		assertEquals(Tool.RectangleSelection, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void redoingPen_EnablesPenTool() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+		controller.undoLastAction();
+		toolController.selectTool(null);
+
+		controller.redoPreviousAction();
+
+		assertEquals(Tool.Pen, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void redoingSelectionMovement_EnablesSelectionTool() {
+		new20x10imageWithSelectionTool();
+		selectRect(0, 0, 5, 5);
+		dragLeftMouse(from(1, 1), to(4, 4));
+		controller.undoLastAction();
+		toolController.selectTool(null);
+
+		controller.redoPreviousAction();
 
 		assertEquals(Tool.RectangleSelection, toolController.getSelectedTool());
 	}

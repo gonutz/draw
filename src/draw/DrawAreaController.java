@@ -99,7 +99,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void redoPreviousAction() {
-		if (history.redoTo(this))
+		refreshed = false;
+		if (history.redoTo(this, toolController) && !refreshed)
 			view.refresh();
 	}
 
@@ -107,7 +108,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		NewImageCommand newImageCommand = new NewImageCommand(image, width,
 				height, drawSettings.getBackgroundColor());
 		makeUndoableIfThisIsNotTheVeryFirstImage(newImageCommand);
-		newImageCommand.doTo(this);
+		newImageCommand.doTo(this, toolController);
 		view.refresh();
 	}
 
