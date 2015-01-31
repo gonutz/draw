@@ -15,7 +15,14 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Pen pen = new Pen();
 
 	private class Mouse {
+		static final int LeftButton = 1;
+		static final int RightButton = 2;
 		int x, y;
+
+		public void setCursor(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 
 	private class Selection {
@@ -71,26 +78,22 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		}
 	}
 
-	private static final int LEFT_BUTTON = 1;
-	private static final int RIGHT_BUTTON = 2;
-
 	public void leftMouseButtonDown(int x, int y) {
-		mouseDown(x, y, LEFT_BUTTON);
+		mouseDown(x, y, Mouse.LeftButton);
 	}
 
 	public void rightMouseButtonDown(int x, int y) {
-		mouseDown(x, y, RIGHT_BUTTON);
+		mouseDown(x, y, Mouse.RightButton);
 	}
 
 	private void mouseDown(int x, int y, int button) {
 		Tool tool = drawSettings.getCurrentTool();
 		if (tool == Tool.Pen)
 			mouseDownWithPenSelected(x, y, button);
-		if (tool == Tool.RectangleSelection && button == LEFT_BUTTON) {
+		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton) {
 			mouseDownWithRectangleSelectionTool(x, y);
 		}
-		lastMouse.x = x;
-		lastMouse.y = y;
+		lastMouse.setCursor(x, y);
 	}
 
 	private void mouseDownWithPenSelected(int x, int y, int button) {
@@ -104,10 +107,10 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private void selectDrawColorForButton(int button) {
 		switch (button) {
-		case LEFT_BUTTON:
+		case Mouse.LeftButton:
 			pen.color = drawSettings.getForegroundColor();
 			break;
-		case RIGHT_BUTTON:
+		case Mouse.RightButton:
 			pen.color = drawSettings.getBackgroundColor();
 			break;
 		}
@@ -203,8 +206,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
 		}
-		lastMouse.x = x;
-		lastMouse.y = y;
+		lastMouse.setCursor(x, y);
 	}
 
 	private int clampToImageY(int y) {
