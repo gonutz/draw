@@ -105,6 +105,14 @@ public class TestDrawAreaController {
 		return new Point(x, y);
 	}
 
+	private Point from(int x, int y) {
+		return new Point(x, y);
+	}
+
+	private Point to(int x, int y) {
+		return new Point(x, y);
+	}
+
 	@Test
 	public void afterNewImageCreation_ViewIsRefreshed() {
 		assertEquals(0, view.refreshCount);
@@ -807,6 +815,26 @@ public class TestDrawAreaController {
 		assertRefreshesSinceLastCapture(1);
 		assertPixelsAreSet(BLACK, WHITE, p(1, 1));
 		assertSelection(0, 0, 2, 2);
+	}
+
+	@Test
+	public void undoneSelectionCanBeMovedAgain() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+
+		selectRect(0, 0, 2, 2);
+		dragLeftMouse(from(1, 1), to(6, 6));
+		controller.undoLastAction();
+		dragLeftMouse(from(1, 1), to(6, 1));
+
+		assertPixelsAreSet(BLACK, WHITE, p(6, 1));
+		assertSelection(5, 0, 7, 2);
+	}
+
+	private void dragLeftMouse(Point from, Point to) {
+		controller.leftMouseButtonDown(from.x, from.y);
+		controller.mouseMovedTo(to.x, to.y);
+		controller.leftMouseButtonUp();
 	}
 
 	@Test

@@ -13,6 +13,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Mouse lastMouse = new Mouse();
 	private Selection selection = new Selection();
 	private Pen pen = new Pen();
+	private State state = State.Idle;
+
+	private enum State {
+		Idle, PenDown, Selecting, MovingSelection
+	}
 
 	private class Mouse {
 		static final int LeftButton = 1;
@@ -26,14 +31,37 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private class Selection {
-		boolean selecting;
-		boolean moving;
 		Rectangle rect;
 		SelectionMovement movement;
+
+		public boolean contains(int x, int y) {
+			if (rect == null)
+				return false;
+			return rect.contains(x, y);
+		}
+
+		public void startMoving() {
+			state = State.MovingSelection;
+			if (movement == null) {
+				movement = new SelectionMovement(image, rect,
+						drawSettings.getBackgroundColor(),
+						DrawAreaController.this);
+				history.addCommand(selection.movement);
+			}
+		}
+
+		public void stopMovement() {
+			// moving = false; // TODO not needed for tests to pass - why?
+			movement = null;
+		}
+
+		public void startSelectionAt(int x, int y) {
+			state = State.Selecting;
+			rect = new Rectangle(x, y, x, y);
+		}
 	}
 
 	private class Pen {
-		boolean down;
 		PenStroke stroke;
 		Color color;
 	}
@@ -57,6 +85,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void undoLastAction() {
 		if (history.undoTo(this))
 			view.refresh();
+		selection.movement = null;
 	}
 
 	public void redoPreviousAction() {
@@ -98,7 +127,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private void mouseDownWithPenSelected(int x, int y, int button) {
 		selectDrawColorForButton(button);
-		if (pen.down)
+		if (state == State.PenDown)
 			undoCurrentStroke();
 		else
 			startNewPenStroke(x, y);
@@ -118,44 +147,28 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private void undoCurrentStroke() {
 		pen.stroke.undoTo(this);
-		pen.down = false;
+		state = State.Idle;
 	}
 
 	private void startNewPenStroke(int x, int y) {
 		pen.stroke = new PenStroke(pen.color);
 		pen.stroke.addLine(image, x, y, x, y);
-		pen.down = true;
+		state = State.PenDown;
 	}
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
-		if (!isInSelection(x, y)) {
-			if (isInsideImage(x, y)) {
-				selection.selecting = true;
-				selection.rect = new Rectangle(x, y, x, y);
-			}
-			selection.movement = null;
-		} else
-			startMovingSelection();
-	}
-
-	private boolean isInSelection(int x, int y) {
-		if (selection.rect == null)
-			return false;
-		return selection.rect.contains(x, y);
+		if (selection.contains(x, y))
+			selection.startMoving();
+		else {
+			selection.stopMovement();
+			if (isInsideImage(x, y))
+				selection.startSelectionAt(x, y);
+		}
 	}
 
 	private boolean isInsideImage(int x, int y) {
 		return x >= 0 && x < image.getWidth() && y >= 0
 				&& y < image.getHeight();
-	}
-
-	private void startMovingSelection() {
-		selection.moving = true;
-		if (selection.movement == null) {
-			selection.movement = new SelectionMovement(image, selection.rect,
-					drawSettings.getBackgroundColor(), this);
-			history.addCommand(selection.movement);
-		}
 	}
 
 	public void leftMouseButtonUp() {
@@ -167,19 +180,18 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void mouseUp() {
-		if (pen.down)
+		if (state == State.PenDown)
 			history.addCommand(pen.stroke);
-		if (selection.selecting && selection.rect.x == lastMouse.x
+		if (state == State.Selecting && selection.rect.x == lastMouse.x
 				&& selection.rect.y == lastMouse.y) {
-			selection.movement = null;
+			selection.stopMovement();
 			updateSelection(null);
 		}
-		selection.selecting = false;
-		selection.moving = false;
-		pen.down = false;
+		state = State.Idle;
 	}
 
 	public void setSelection(Rectangle rect) {
+		// selection.stopMovement(); // TODO breaks some tests
 		selection.rect = rect;
 		view.setSelection(rect);
 	}
@@ -190,21 +202,25 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void mouseMovedTo(int x, int y) {
-		if (pen.down) {
+		switch (state) {
+		case Idle:
+			break;
+		case PenDown:
 			pen.stroke.addLine(image, lastMouse.x, lastMouse.y, x, y);
 			view.refresh();
-		}
-		if (selection.selecting) {
+			break;
+		case Selecting:
 			selection.rect.x2 = clampToImageX(x);
 			selection.rect.y2 = clampToImageY(y);
 			updateSelection(selection.rect);
-		}
-		if (selection.moving) {
+			break;
+		case MovingSelection:
 			int dx = x - lastMouse.x;
 			int dy = y - lastMouse.y;
 			selection.movement.moveBy(dx, dy);
 			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
+			break;
 		}
 		lastMouse.setCursor(x, y);
 	}
