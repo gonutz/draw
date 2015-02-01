@@ -109,6 +109,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 				height, drawSettings.getBackgroundColor());
 		makeUndoableIfThisIsNotTheVeryFirstImage(newImageCommand);
 		newImageCommand.doTo(this, toolController);
+		setSelection(null);
 		view.refresh();
 	}
 
@@ -202,7 +203,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void setSelection(Rectangle rect) {
-		// selection.stopMovement(); // TODO breaks some tests
 		selection.rect = rect;
 		view.setSelection(rect);
 	}

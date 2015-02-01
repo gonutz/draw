@@ -941,6 +941,18 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void newImageDisablesCurrentSelection() {
+		new20x10imageWithSelectionTool();
+		selectRect(0, 0, 5, 5);
+		captureCurrentRefreshCount();
+
+		controller.newImage(10, 5);
+
+		assertRefreshesSinceLastCapture(1);
+		assertNoSelectionIsMade();
+	}
+
+	@Test
 	public void pressingEscape_DisablesCurrentSelection() {
 		// TODO make new methods for key events
 	}
