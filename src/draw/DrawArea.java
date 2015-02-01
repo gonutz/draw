@@ -218,6 +218,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 				zoomIn(visible, e.getX(), e.getY());
 			if (e.getWheelRotation() > 0)
 				zoomOut(visible, e.getX(), e.getY());
+			positionView.setNoPosition();
 		} else if (e.isShiftDown() || e.isAltDown()) {
 			if (e.getWheelRotation() < 0)
 				visible.x -= dx;
