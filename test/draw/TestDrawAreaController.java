@@ -958,7 +958,7 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void cursorKeyMoveSelection() {
+	public void cursorKeysMoveSelection() {
 		// TODO left/right/up/down move selection by 1 pixel
 	}
 }
