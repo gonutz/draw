@@ -1043,6 +1043,37 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void pressingOtherButtonWhileDrawingLine_ErasesLine() {
+		new10x8imageWithLineColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 2);
+		controller.rightMouseButtonDown(2, 2);
+		controller.leftMouseButtonUp();
+		controller.rightMouseButtonUp();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void lineAbortedWithOtherButton_IsNotInHistory() {
+		new10x8imageWithLineColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+		controller.mouseMovedTo(2, 2);
+		controller.rightMouseButtonDown(2, 2);
+		controller.leftMouseButtonUp();
+		controller.rightMouseButtonUp();
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
 	public void pressingEscape_DisablesCurrentSelection() {
 		// TODO make new methods for key events
 	}

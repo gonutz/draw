@@ -20,9 +20,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Pen pen = new Pen();
 	private State state = State.Idle;
 	private boolean refreshed;
-	private int lineStartX;
-	private int lineStartY;
-	private Stroke lineStroke;
+	private Line line = new Line();
+
+	private class Line {
+		int startX, startY;
+		Stroke stroke;
+	}
 
 	private enum State {
 		Idle, PenDown, Selecting, MovingSelection, DrawingLine
@@ -144,7 +147,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void mouseDownWithPenSelected(int x, int y, int button) {
 		pen.color = getDrawColorForMouseButton(button);
 		if (state == State.PenDown) // pressing other mouse key undoes stroke
-			undoCurrentStroke();
+			undoCurrentPenStroke();
 		else
 			startNewPenStroke(x, y);
 		view.refresh();
@@ -156,7 +159,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		return drawSettings.getBackgroundColor();
 	}
 
-	private void undoCurrentStroke() {
+	private void undoCurrentPenStroke() {
 		pen.stroke.undoTo(this, toolController);
 		state = State.Idle;
 	}
@@ -168,13 +171,23 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void mouseDownWithLineSelected(int x, int y, int button) {
-		lineStartX = x;
-		lineStartY = y;
-		state = State.DrawingLine;
-		lineStroke = new Stroke(Tool.Line, getDrawColorForMouseButton(button));
-		lineStroke.addLine(image, x, y, x, y);
-		history.addCommand(lineStroke);
+		if (state == State.DrawingLine)
+			undoCurrentLineStroke();
+		else
+			startLineStroke(x, y, button);
 		view.refresh();
+	}
+
+	private void undoCurrentLineStroke() {
+		line.stroke.undoTo(this, toolController);
+	}
+
+	private void startLineStroke(int x, int y, int button) {
+		line.startX = x;
+		line.startY = y;
+		state = State.DrawingLine;
+		line.stroke = new Stroke(Tool.Line, getDrawColorForMouseButton(button));
+		line.stroke.addLine(image, x, y, x, y);
 	}
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
@@ -208,6 +221,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			selection.stopMovement();
 			updateSelection(null);
 		}
+		if (state == State.DrawingLine)
+			history.addCommand(line.stroke);
 		state = State.Idle;
 	}
 
@@ -243,8 +258,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			updateSelection(selection.rect);
 			break;
 		case DrawingLine:
-			lineStroke.undoTo(this, toolController);
-			lineStroke.setLine(image, lineStartX, lineStartY, x, y);
+			undoCurrentLineStroke();
+			line.stroke.setLine(image, line.startX, line.startY, x, y);
 			view.refresh();
 			break;
 		}
