@@ -22,10 +22,12 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 
 	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
+	private PositionView positionView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
 
-	public DrawArea() {
+	public DrawArea(PositionView positionView) {
+		this.positionView = positionView;
 		initialize();
 	}
 
@@ -143,18 +145,27 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 					controller.rightMouseButtonUp();
 				}
 			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				positionView.setNoPosition();
+			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				controller.mouseMovedTo(e.getX() / zoomFactor, e.getY()
-						/ zoomFactor);
+				int x = e.getX() / zoomFactor;
+				int y = e.getY() / zoomFactor;
+				controller.mouseMovedTo(x, y);
+				positionView.setPosition(x, y);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				controller.mouseMovedTo(e.getX() / zoomFactor, e.getY()
-						/ zoomFactor);
+				int x = e.getX() / zoomFactor;
+				int y = e.getY() / zoomFactor;
+				controller.mouseMovedTo(x, y);
+				positionView.setPosition(x, y);
 			}
 		});
 		addMouseWheelListener(this);

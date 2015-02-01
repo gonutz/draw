@@ -27,8 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
+import javax.swing.JLabel;
+import java.awt.Font;
 
-public class MainWindow implements ToolView, ErrorDisplay {
+public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 
 	private static final int INITIAL_CANVAS_WIDTH = 640;
 	private static final int INITIAL_CANVAS_HEIGHT = 480;
@@ -46,6 +48,7 @@ public class MainWindow implements ToolView, ErrorDisplay {
 	private DrawArea drawArea;
 	private DrawAreaController drawAreaController;
 	private ImageSaveController imageSaveController;
+	private JLabel positionLabel;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -163,7 +166,7 @@ public class MainWindow implements ToolView, ErrorDisplay {
 			}
 		});
 		mainFrame.setTitle("Draw");
-		mainFrame.setBounds(100, 100, 450, 300);
+		mainFrame.setBounds(100, 100, 800, 600);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -405,10 +408,14 @@ public class MainWindow implements ToolView, ErrorDisplay {
 		colorPalette = new ColorPalette();
 		colorContainer.add(colorPalette);
 
+		positionLabel = new JLabel("");
+		positionLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		colorContainer.add(positionLabel);
+
 		JScrollPane paintAreaScroller = new JScrollPane();
 
 		mainFrame.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
-		drawArea = new DrawArea();
+		drawArea = new DrawArea(this);
 		paintAreaScroller.setViewportView(drawArea);
 		paintAreaScroller.addMouseWheelListener(drawArea);
 	}
@@ -417,5 +424,15 @@ public class MainWindow implements ToolView, ErrorDisplay {
 	public void showError(String message) {
 		JOptionPane.showMessageDialog(null, message, "Error",
 				JOptionPane.ERROR_MESSAGE);
+	}
+
+	@Override
+	public void setNoPosition() {
+		positionLabel.setText("");
+	}
+
+	@Override
+	public void setPosition(int x, int y) {
+		positionLabel.setText("x: " + x + "  y: " + y);
 	}
 }
