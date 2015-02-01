@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import draw.commands.NewImageCommand;
-import draw.commands.PenStroke;
+import draw.commands.Stroke;
 import draw.commands.SelectionMovement;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper,
@@ -20,9 +20,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Pen pen = new Pen();
 	private State state = State.Idle;
 	private boolean refreshed;
+	private int lineStartX;
+	private int lineStartY;
+	private Stroke lineStroke;
 
 	private enum State {
-		Idle, PenDown, Selecting, MovingSelection
+		Idle, PenDown, Selecting, MovingSelection, DrawingLine
 	}
 
 	private class Mouse {
@@ -67,7 +70,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private class Pen {
-		PenStroke stroke;
+		Stroke stroke;
 		Color color;
 	}
 
@@ -131,30 +134,26 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		Tool tool = toolController.getSelectedTool();
 		if (tool == Tool.Pen)
 			mouseDownWithPenSelected(x, y, button);
-		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton) {
+		if (tool == Tool.Line)
+			mouseDownWithLineSelected(x, y, button);
+		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton)
 			mouseDownWithRectangleSelectionTool(x, y);
-		}
 		lastMouse.setCursor(x, y);
 	}
 
 	private void mouseDownWithPenSelected(int x, int y, int button) {
-		selectDrawColorForButton(button);
-		if (state == State.PenDown)
+		pen.color = getDrawColorForMouseButton(button);
+		if (state == State.PenDown) // pressing other mouse key undoes stroke
 			undoCurrentStroke();
 		else
 			startNewPenStroke(x, y);
 		view.refresh();
 	}
 
-	private void selectDrawColorForButton(int button) {
-		switch (button) {
-		case Mouse.LeftButton:
-			pen.color = drawSettings.getForegroundColor();
-			break;
-		case Mouse.RightButton:
-			pen.color = drawSettings.getBackgroundColor();
-			break;
-		}
+	private Color getDrawColorForMouseButton(int button) {
+		if (button == Mouse.LeftButton)
+			return drawSettings.getForegroundColor();
+		return drawSettings.getBackgroundColor();
 	}
 
 	private void undoCurrentStroke() {
@@ -163,9 +162,19 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void startNewPenStroke(int x, int y) {
-		pen.stroke = new PenStroke(pen.color);
+		pen.stroke = new Stroke(Tool.Pen, pen.color);
 		pen.stroke.addLine(image, x, y, x, y);
 		state = State.PenDown;
+	}
+
+	private void mouseDownWithLineSelected(int x, int y, int button) {
+		lineStartX = x;
+		lineStartY = y;
+		state = State.DrawingLine;
+		lineStroke = new Stroke(Tool.Line, getDrawColorForMouseButton(button));
+		lineStroke.addLine(image, x, y, x, y);
+		history.addCommand(lineStroke);
+		view.refresh();
 	}
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
@@ -232,6 +241,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			selection.movement.moveBy(dx, dy);
 			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
+			break;
+		case DrawingLine:
+			lineStroke.undoTo(this, toolController);
+			lineStroke.setLine(image, lineStartX, lineStartY, x, y);
+			view.refresh();
 			break;
 		}
 		lastMouse.setCursor(x, y);

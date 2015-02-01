@@ -152,6 +152,13 @@ public class TestDrawAreaController {
 		controller.newImage(20, 10);
 	}
 
+	private void new10x8imageWithLineColor(int color) {
+		drawSettings.foregroundColor = new Color(color);
+		drawSettings.backgroundColor = Color.white;
+		toolController.selectTool(Tool.Line);
+		controller.newImage(10, 8);
+	}
+
 	@Test
 	public void draggingPen_DrawsLine() {
 		final int color = 0xFF010203;
@@ -953,12 +960,96 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void leftMouseDownWithLineTool_DrawsOnePixel() {
+		final int color = 0xFF123654;
+		new10x8imageWithLineColor(color);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(color, WHITE, p(0, 0));
+	}
+
+	@Test
+	public void lineCanBeDrawn() {
+		new10x8imageWithLineColor(BLACK);
+		captureCurrentRefreshCount();
+
+		dragLeftMouse(from(2, 0), to(4, 0));
+
+		assertRefreshesSinceLastCapture(2);
+		assertPixelsAreSet(BLACK, WHITE, p(2, 0), p(3, 0), p(4, 0));
+	}
+
+	@Test
+	public void movingLineRedrawsItAndRemovesPreviousLine() {
+		new10x8imageWithLineColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(1, 1);
+		controller.mouseMovedTo(5, 0);
+		controller.mouseMovedTo(1, 3);
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1), p(1, 2), p(1, 3));
+	}
+
+	@Test
+	public void lineToolIsStillSelectedAfterLine() {
+		new10x8imageWithLineColor(BLACK);
+		dragLeftMouse(from(0, 0), to(1, 1));
+		assertEquals(Tool.Line, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void lineWithRightMouse_HasBakcgroundColor() {
+		new10x8imageWithLineColor(BLACK);
+		final int color = 0xFF554433;
+		drawSettings.backgroundColor = new Color(color, true);
+
+		controller.rightMouseButtonDown(0, 0);
+		controller.mouseMovedTo(0, 1);
+
+		assertPixelsAreSet(color, WHITE, p(0, 0), p(0, 1));
+	}
+
+	@Test
+	public void lineCanBeUndone() {
+		new10x8imageWithLineColor(BLACK);
+		dragLeftMouse(from(0, 0), to(3, 6));
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void undoneLineCanBeRedone() {
+		new10x8imageWithLineColor(BLACK);
+		controller.leftMouseButtonDown(2, 1);
+		controller.mouseMovedTo(5, 1);
+		controller.mouseMovedTo(0, 1);
+		controller.leftMouseButtonUp();
+		controller.undoLastAction();
+		captureCurrentRefreshCount();
+
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(2, 1), p(1, 1), p(0, 1));
+	}
+
+	@Test
 	public void pressingEscape_DisablesCurrentSelection() {
 		// TODO make new methods for key events
 	}
 
 	@Test
-	public void cursorKeysMoveSelection() {
+	public void cursorKeysMoveSelectionByOne() {
 		// TODO left/right/up/down move selection by 1 pixel
+		// TODO have special methods for moving, do not call them after the keys
 	}
 }

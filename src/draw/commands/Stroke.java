@@ -12,10 +12,11 @@ import draw.Tool;
 import draw.ToolController;
 import draw.UndoableCommand;
 
-public class PenStroke implements UndoableCommand {
+public class Stroke implements UndoableCommand {
 
 	private Color strokeColor;
 	private List<Pixel> pixels = new ArrayList<Pixel>();
+	private Tool tool;
 
 	private class Pixel {
 		private int x, y, oldColor;
@@ -27,7 +28,8 @@ public class PenStroke implements UndoableCommand {
 		}
 	}
 
-	public PenStroke(Color strokeColor) {
+	public Stroke(Tool tool, Color strokeColor) {
+		this.tool = tool;
 		this.strokeColor = strokeColor;
 	}
 
@@ -52,6 +54,16 @@ public class PenStroke implements UndoableCommand {
 		}
 	}
 
+	/**
+	 * Sets the points of this stroke to be this one line. They can be undone
+	 * and redone which will restore the pixels on the line.
+	 */
+	public void setLine(BufferedImage image, int fromX, int fromY, int toX,
+			int toY) {
+		pixels.clear();
+		addLine(image, fromX, fromY, toX, toY);
+	}
+
 	private boolean insideImage(int x, int y, BufferedImage image) {
 		return x >= 0 && y >= 0 && x < image.getWidth()
 				&& y < image.getHeight();
@@ -67,7 +79,7 @@ public class PenStroke implements UndoableCommand {
 			g.setColor(new Color(p.oldColor));
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
-		toolController.selectTool(Tool.Pen);
+		toolController.selectTool(tool);
 	}
 
 	public void doTo(ImageKeeper image, ToolController toolController) {
@@ -76,6 +88,6 @@ public class PenStroke implements UndoableCommand {
 			g.setColor(strokeColor);
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
-		toolController.selectTool(Tool.Pen);
+		toolController.selectTool(tool);
 	}
 }
