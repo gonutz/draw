@@ -36,10 +36,11 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	public void zoomIn() {
-		if (zoomFactor < 32) {
-			zoomFactor *= 2;
-			refresh();
-		}
+		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
+				.clone();
+		int centerX = visible.x + visible.width / 2;
+		int centerY = visible.y + visible.height / 2;
+		zoomIn(visible, centerX, centerY);
 	}
 
 	public void zoomIn(java.awt.Rectangle visible, int x, int y) {
@@ -53,10 +54,11 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	public void zoomOut() {
-		if (zoomFactor > 1) {
-			zoomFactor /= 2;
-			refresh();
-		}
+		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
+				.clone();
+		int centerX = visible.x + visible.width / 2;
+		int centerY = visible.y + visible.height / 2;
+		zoomOut(visible, centerX, centerY);
 	}
 
 	public void zoomOut(java.awt.Rectangle visible, int x, int y) {
