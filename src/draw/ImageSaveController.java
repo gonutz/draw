@@ -6,6 +6,7 @@ public class ImageSaveController {
 	private ImageProvider imageProvider;
 	private ImageSaver saver;
 	private ErrorDisplay errorDisplay;
+	private String previousFileName;
 
 	public ImageSaveController(SaveFileDialog saveDialog,
 			ImageProvider imageProvider, ImageSaver saver,
@@ -17,7 +18,10 @@ public class ImageSaveController {
 	}
 
 	public void save() {
-		saveAsNewFile();
+		if (previousFileName == null)
+			saveAsNewFile();
+		else
+			saveAs(previousFileName);
 	}
 
 	public void saveAsNewFile() {
@@ -28,8 +32,13 @@ public class ImageSaveController {
 	private void saveAs(String path) {
 		try {
 			saver.save(imageProvider.getImage(), path);
+			previousFileName = path;
 		} catch (ImageSaver.SaveFailedException e) {
 			errorDisplay.showError(e.getMessage());
 		}
+	}
+
+	public void newImageWasCreated() {
+		previousFileName = null;
 	}
 }

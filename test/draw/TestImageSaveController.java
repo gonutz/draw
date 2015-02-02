@@ -122,6 +122,33 @@ public class TestImageSaveController {
 
 	@Test
 	public void savingTheSecondTime_UsesPreviousFileName() {
-		// TODO
+		saveAs("file");
+		dialog.fileNameWasAsked = false;
+		saver.fileName = null;
+
+		controller.save();
+
+		assertFalse(dialog.fileNameWasAsked);
+		assertEquals("file", saver.fileName);
+	}
+
+	private void saveAs(String name) {
+		dialog.userAccepts = true;
+		dialog.fileName = name;
+		controller.save();
+	}
+
+	@Test
+	public void afterNewImage_SaveAsksForFileAgain() {
+		saveAs("file");
+		dialog.fileNameWasAsked = false;
+		dialog.fileName = "new file";
+		saver.fileName = null;
+
+		controller.newImageWasCreated();
+		controller.save();
+
+		assertTrue(dialog.fileNameWasAsked);
+		assertEquals("new file", saver.fileName);
 	}
 }

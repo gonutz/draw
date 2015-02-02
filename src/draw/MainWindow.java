@@ -188,6 +188,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 						if (dim.wasAccepted()) {
 							drawAreaController.newImage(dim.getCanvasWidth(),
 									dim.getCanvasHeight());
+							imageSaveController.newImageWasCreated();
 						}
 					}
 				});
