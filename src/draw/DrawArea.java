@@ -113,7 +113,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 			g.drawRect(selection.left() * zoomFactor, selection.top()
 					* zoomFactor, selection.width() * zoomFactor - 1,
 					selection.height() * zoomFactor - 1);
-			g.setColor(new Color(0x100000FF, true));
+			g.setColor(new Color(0x200000FF, true));
 			g.fillRect(selection.left() * zoomFactor + 1, selection.top()
 					* zoomFactor + 1, selection.width() * zoomFactor - 2,
 					selection.height() * zoomFactor - 2);
