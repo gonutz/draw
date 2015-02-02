@@ -26,13 +26,16 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private Rectangle selection;
 	private int zoomFactor = 1;
 
-	public DrawArea(PositionView positionView) {
-		this.positionView = positionView;
+	public DrawArea() {
 		initialize();
 	}
 
 	public void setController(DrawAreaController controller) {
 		this.controller = controller;
+	}
+
+	public void setPositionView(PositionView positionView) {
+		this.positionView = positionView;
 	}
 
 	public void zoomIn() {

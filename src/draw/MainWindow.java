@@ -415,7 +415,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 		JScrollPane paintAreaScroller = new JScrollPane();
 
 		mainFrame.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
-		drawArea = new DrawArea(this);
+		drawArea = new DrawArea();
+		drawArea.setPositionView(this);
 		paintAreaScroller.setViewportView(drawArea);
 		paintAreaScroller.addMouseWheelListener(drawArea);
 	}
