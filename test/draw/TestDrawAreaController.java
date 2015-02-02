@@ -1067,6 +1067,8 @@ public class TestDrawAreaController {
 		controller.rightMouseButtonDown(2, 2);
 		controller.leftMouseButtonUp();
 		controller.rightMouseButtonUp();
+		controller.undoLastAction();
+		controller.redoPreviousAction();
 		controller.redoPreviousAction();
 
 		assertRefreshesSinceLastCapture(3);

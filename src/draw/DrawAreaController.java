@@ -180,14 +180,15 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private void undoCurrentLineStroke() {
 		line.stroke.undoTo(this, toolController);
+		state = State.Idle;
 	}
 
 	private void startLineStroke(int x, int y, int button) {
 		line.startX = x;
 		line.startY = y;
-		state = State.DrawingLine;
 		line.stroke = new Stroke(Tool.Line, getDrawColorForMouseButton(button));
 		line.stroke.addLine(image, x, y, x, y);
+		state = State.DrawingLine;
 	}
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
@@ -258,7 +259,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			updateSelection(selection.rect);
 			break;
 		case DrawingLine:
-			undoCurrentLineStroke();
+			line.stroke.undoTo(this, toolController);
 			line.stroke.setLine(image, line.startX, line.startY, x, y);
 			view.refresh();
 			break;
