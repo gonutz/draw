@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.awt.image.BufferedImage;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestImageSaveController {
@@ -35,13 +36,13 @@ public class TestImageSaveController {
 	}
 
 	private class MockImageSaver implements ImageSaver {
-		private BufferedImage image;
+		private BufferedImage savedImage;
 		private String fileName;
 		private ImageSaver.SaveFailedException throwException;
 
 		@Override
 		public void save(BufferedImage image, String fileName) {
-			this.image = image;
+			this.savedImage = image;
 			this.fileName = fileName;
 			if (throwException != null)
 				throw throwException;
@@ -57,56 +58,70 @@ public class TestImageSaveController {
 		}
 	}
 
+	@Before
+	public void setup() {
+		dialog = new MockSaveFileDialog();
+		saver = new MockImageSaver();
+		errorDisplay = new SpyErrorDisplay();
+		imageProvider = new StubImageProvider();
+		imageProvider.image = new BufferedImage(10, 5,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		controller = new ImageSaveController(dialog, imageProvider, saver,
+				errorDisplay);
+	}
+
+	private MockSaveFileDialog dialog;
+	private StubImageProvider imageProvider;
+	private MockImageSaver saver;
+	private SpyErrorDisplay errorDisplay;
+	private ImageSaveController controller;
+
 	@Test
 	public void savingNewImage_AsksUserForFileName() {
-		MockSaveFileDialog dialog = new MockSaveFileDialog();
 		dialog.userAccepts = false;
-		ImageSaveController c = new ImageSaveController(dialog, null, null,
-				null);
-
-		c.saveAsNewFile();
-
+		controller.saveAsNewFile();
 		assertTrue(dialog.fileNameWasAsked);
 	}
 
 	@Test
 	public void userSavingToNewImage_GetsImageAndSavesIt() {
-		MockSaveFileDialog dialog = new MockSaveFileDialog();
 		dialog.userAccepts = true;
 		dialog.fileName = "some file";
-		StubImageProvider imageProvider = new StubImageProvider();
-		imageProvider.image = new BufferedImage(10, 5,
-				BufferedImage.TYPE_4BYTE_ABGR);
-		MockImageSaver saver = new MockImageSaver();
-		ImageSaveController c = new ImageSaveController(dialog, imageProvider,
-				saver, null);
 
-		c.saveAsNewFile();
+		controller.saveAsNewFile();
 
 		assertTrue(dialog.fileNameWasAsked);
 		assertEquals("some file", saver.fileName);
-		assertSame(imageProvider.image, saver.image);
+		assertSame(imageProvider.image, saver.savedImage);
 	}
 
 	@Test
 	public void ifSavingNewImageFails_UserIsPresentedWithErrorMessage() {
-		MockSaveFileDialog dialog = new MockSaveFileDialog();
 		dialog.userAccepts = true;
-		StubImageProvider imageProvider = new StubImageProvider();
-		imageProvider.image = new BufferedImage(10, 5,
-				BufferedImage.TYPE_4BYTE_ABGR);
-		MockImageSaver saver = new MockImageSaver();
 		saver.throwException = new ImageSaver.SaveFailedException(
 				"this is the message");
-		SpyErrorDisplay errorDisplay = new SpyErrorDisplay();
-		ImageSaveController c = new ImageSaveController(dialog, imageProvider,
-				saver, errorDisplay);
 
-		c.saveAsNewFile();
+		controller.saveAsNewFile();
 
 		assertTrue(dialog.fileNameWasAsked);
-		assertSame(imageProvider.image, saver.image);
+		assertSame(imageProvider.image, saver.savedImage);
 		assertEquals("this is the message", errorDisplay.errorMessage);
 	}
 
+	@Test
+	public void savingForTheFirstTime_BehavesLikeSavingAsNewFile() {
+		dialog.userAccepts = true;
+		dialog.fileName = "first time save";
+
+		controller.save();
+
+		assertTrue(dialog.fileNameWasAsked);
+		assertEquals("first time save", saver.fileName);
+		assertSame(imageProvider.image, saver.savedImage);
+	}
+
+	@Test
+	public void savingTheSecondTime_UsesPreviousFileName() {
+		// TODO
+	}
 }

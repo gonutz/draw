@@ -17,8 +17,7 @@ public class ImageSaveController {
 	}
 
 	public void save() {
-		// TODO Auto-generated method stub
-
+		saveAsNewFile();
 	}
 
 	public void saveAsNewFile() {
