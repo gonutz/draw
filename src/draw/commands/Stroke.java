@@ -10,7 +10,6 @@ import draw.Bresenham;
 import draw.ImageKeeper;
 import draw.Tool;
 import draw.ToolController;
-import draw.UndoableCommand;
 
 public class Stroke implements UndoableCommand {
 

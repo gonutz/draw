@@ -10,7 +10,6 @@ import draw.Rectangle;
 import draw.SelectionKeeper;
 import draw.Tool;
 import draw.ToolController;
-import draw.UndoableCommand;
 
 public class SelectionMovement implements UndoableCommand {
 

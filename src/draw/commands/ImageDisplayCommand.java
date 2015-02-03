@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import draw.ImageKeeper;
 import draw.ImageUtils;
 import draw.ToolController;
-import draw.UndoableCommand;
 
 public class ImageDisplayCommand implements UndoableCommand {
 

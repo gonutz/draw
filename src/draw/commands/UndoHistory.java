@@ -1,7 +1,10 @@
-package draw;
+package draw.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import draw.ImageKeeper;
+import draw.ToolController;
 
 public class UndoHistory {
 

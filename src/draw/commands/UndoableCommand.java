@@ -1,4 +1,7 @@
-package draw;
+package draw.commands;
+
+import draw.ImageKeeper;
+import draw.ToolController;
 
 public interface UndoableCommand {
 

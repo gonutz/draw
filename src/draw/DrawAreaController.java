@@ -7,6 +7,7 @@ import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
 import draw.commands.Stroke;
 import draw.commands.SelectionMovement;
+import draw.commands.UndoHistory;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper,
 		SelectionKeeper, ToolChangeObserver, ImageDisplay {
