@@ -79,12 +79,12 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,
 						INITIAL_CANVAS_HEIGHT);
 				SwingFileDialog dialog = new SwingFileDialog();
-				window.imageSaveController = new ImageSaveController(
-						dialog, window.drawAreaController,
-						new ImageToFileSaver(), window);
-				window.imageLoadController = new ImageLoadController(
-						dialog, new ImageFromFileLoader(),
-						window.drawAreaController, window);
+				window.imageSaveController = new ImageSaveController(dialog,
+						window.drawAreaController, new ImageToFileSaver(),
+						window);
+				window.imageLoadController = new ImageLoadController(dialog,
+						new ImageFromFileLoader(), window.drawAreaController,
+						window);
 			}
 		});
 	}

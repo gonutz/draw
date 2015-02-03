@@ -3,6 +3,7 @@ package draw;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
 import draw.commands.Stroke;
 import draw.commands.SelectionMovement;
@@ -99,6 +100,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	public void undoLastAction() {
 		refreshed = false;
+		setSelection(null);
 		if (history.undoTo(this, toolController) && !refreshed)
 			view.refresh();
 		selection.movement = null;
@@ -283,7 +285,9 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	@Override
 	public void showLoadedImage(BufferedImage loaded) {
-		image = ImageUtils.copyImage(loaded);
+		history.addCommand(new ImageDisplayCommand(image, loaded));
+		image = loaded;
+		setSelection(null);
 		view.refresh();
 	}
 }

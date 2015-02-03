@@ -1088,13 +1088,65 @@ public class TestDrawAreaController {
 
 	@Test
 	public void loadedImageIsDisplayed() {
-		BufferedImage image = new BufferedImage(3, 4,
-				BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage image = newImageOfSize(3, 4);
 		captureCurrentRefreshCount();
 
 		controller.showLoadedImage(image);
 
 		assertRefreshesSinceLastCapture(1);
 		assertImageSize(3, 4);
+	}
+
+	private BufferedImage newImageOfSize(int w, int h) {
+		return new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+	}
+
+	@Test
+	public void loadingImageCanBeUndone() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 2);
+		controller.showLoadedImage(newImageOfSize(3, 4));
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 2));
+	}
+
+	@Test
+	public void loadingImageCanBeRedone() {
+		new20x10imageWithSelectionTool();
+		final int width = 5;
+		final int height = 3;
+		controller.showLoadedImage(newImageOfSize(width, height));
+		controller.undoLastAction();
+		captureCurrentRefreshCount();
+
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertImageSize(width, height);
+	}
+
+	@Test
+	public void loadingImageDeselectsCurrentSelection() {
+		new20x10imageWithSelectionTool();
+		selectRect(0, 0, 5, 5);
+
+		controller.showLoadedImage(newImageOfSize(4, 5));
+
+		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void undoingLoadingImage_DisablesCurrentSelection() {
+		new20x10imageWithSelectionTool();
+		controller.showLoadedImage(newImageOfSize(3, 4));
+		selectRect(0, 0, 2, 2);
+
+		controller.undoLastAction();
+
+		assertNoSelectionIsMade();
 	}
 }
