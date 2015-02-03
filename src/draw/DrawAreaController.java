@@ -282,9 +282,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	@Override
-	public void showLoadedImage(BufferedImage image) {
-		// TODO Auto-generated method stub
-		System.out.println("image loaded " + image.getWidth() + " "
-				+ image.getHeight());
+	public void showLoadedImage(BufferedImage loaded) {
+		image = ImageUtils.copyImage(loaded);
+		view.refresh();
 	}
 }

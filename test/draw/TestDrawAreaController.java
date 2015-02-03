@@ -771,11 +771,11 @@ public class TestDrawAreaController {
 	public void movingSelection_ReplacesOriginalWithBackgroundColor() {
 		new20x10imageWithSelectionTool();
 
-		// move background from = to X
+		// move background from = to x
 		// ...... => ......
 		// .OOO.. => .OOO..
-		// .OOO.. => .OXXX.
-		// ...... => ..XXX.
+		// .OOO.. => .Oxxx.
+		// ...... => ..xxx.
 		// ...... => ......
 		selectRect(1, 1, 3, 2);
 		drawSettings.backgroundColor = Color.black;
@@ -1084,5 +1084,17 @@ public class TestDrawAreaController {
 	public void cursorKeysMoveSelectionByOne() {
 		// TODO left/right/up/down move selection by 1 pixel
 		// TODO have special methods for moving, do not call them after the keys
+	}
+
+	@Test
+	public void loadedImageIsDisplayed() {
+		BufferedImage image = new BufferedImage(3, 4,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		captureCurrentRefreshCount();
+
+		controller.showLoadedImage(image);
+
+		assertRefreshesSinceLastCapture(1);
+		assertImageSize(3, 4);
 	}
 }
