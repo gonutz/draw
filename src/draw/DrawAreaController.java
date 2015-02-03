@@ -8,7 +8,7 @@ import draw.commands.Stroke;
 import draw.commands.SelectionMovement;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper,
-		SelectionKeeper, ToolChangeObserver {
+		SelectionKeeper, ToolChangeObserver, ImageDisplay {
 
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
@@ -279,5 +279,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void toolChangedTo(Tool tool) {
 		if (selection.rect != null)
 			updateSelection(null);
+	}
+
+	@Override
+	public void showLoadedImage(BufferedImage image) {
+		// TODO Auto-generated method stub
+		System.out.println("image loaded " + image.getWidth() + " "
+				+ image.getHeight());
 	}
 }

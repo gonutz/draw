@@ -48,6 +48,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 	private DrawArea drawArea;
 	private DrawAreaController drawAreaController;
 	private ImageSaveController imageSaveController;
+	private ImageLoadController imageLoadController;
 	private JLabel positionLabel;
 
 	public static void main(String[] args) {
@@ -77,9 +78,13 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 						.setObserver(window.drawAreaController);
 				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,
 						INITIAL_CANVAS_HEIGHT);
+				SwingFileDialog dialog = new SwingFileDialog();
 				window.imageSaveController = new ImageSaveController(
-						new SwingSaveFileDialog(), window.drawAreaController,
+						dialog, window.drawAreaController,
 						new ImageToFileSaver(), window);
+				window.imageLoadController = new ImageLoadController(
+						dialog, new ImageFromFileLoader(),
+						window.drawAreaController, window);
 			}
 		});
 	}
@@ -199,6 +204,11 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 		fileMenu.add(newImage);
 
 		JMenuItem openImage = new JMenuItem("Open");
+		openImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				imageLoadController.load();
+			}
+		});
 		openImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
 				InputEvent.CTRL_MASK));
 		fileMenu.add(openImage);

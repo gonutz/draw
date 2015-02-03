@@ -15,13 +15,13 @@ public class TestImageSaveController {
 		public String fileName;
 
 		@Override
-		public boolean askUserForFileName() {
+		public boolean askUserForSaveFileName() {
 			fileNameWasAsked = true;
 			return userAccepts;
 		}
 
 		@Override
-		public String getFileName() {
+		public String getSaveFileName() {
 			return fileName;
 		}
 	}

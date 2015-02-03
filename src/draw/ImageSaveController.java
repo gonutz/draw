@@ -25,8 +25,8 @@ public class ImageSaveController {
 	}
 
 	public void saveAsNewFile() {
-		if (saveDialog.askUserForFileName())
-			saveAs(saveDialog.getFileName());
+		if (saveDialog.askUserForSaveFileName())
+			saveAs(saveDialog.getSaveFileName());
 	}
 
 	private void saveAs(String path) {

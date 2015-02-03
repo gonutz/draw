@@ -16,13 +16,13 @@ public class ImageLoadController {
 	}
 
 	public void load() {
-		if (openDialog.askUserForFileName())
-			loadImage(openDialog.getFileName());
+		if (openDialog.askUserForOpenFileName())
+			loadImage(openDialog.getOpenFileName());
 	}
 
 	private void loadImage(String fileName) {
 		try {
-			imageDisplay.showLoadedImage(loader.load(openDialog.getFileName()));
+			imageDisplay.showLoadedImage(loader.load(openDialog.getOpenFileName()));
 		} catch (ImageLoader.LoadFailedException e) {
 			errorDisplay.showError(e.getMessage());
 		}

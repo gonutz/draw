@@ -8,11 +8,11 @@ public interface OpenFileDialog {
 	 *         the operation. Only if the user confirms, getFileName returns a
 	 *         valid file name.
 	 */
-	boolean askUserForFileName();
+	boolean askUserForOpenFileName();
 
 	/**
 	 * @return If the user accepted the last file action, this contains the
 	 *         chosen file name.
 	 */
-	String getFileName();
+	String getOpenFileName();
 }

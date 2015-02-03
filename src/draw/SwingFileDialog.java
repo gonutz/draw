@@ -8,11 +8,11 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class SwingSaveFileDialog implements SaveFileDialog {
+public class SwingFileDialog implements SaveFileDialog, OpenFileDialog {
 
 	private JFileChooser chooser;
 
-	public SwingSaveFileDialog() {
+	public SwingFileDialog() {
 		chooser = new JFileChooser();
 		FileFilter imageFilter = new FileNameExtensionFilter(
 				"Portable Network Graphics (PNG)", "png");
@@ -22,9 +22,9 @@ public class SwingSaveFileDialog implements SaveFileDialog {
 	}
 
 	@Override
-	public boolean askUserForFileName() {
+	public boolean askUserForSaveFileName() {
 		boolean accepted = chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION;
-		if (accepted && fileExists(getFileName()))
+		if (accepted && fileExists(getSaveFileName()))
 			accepted = askIfUserWantsToOverwriteFile();
 		return accepted;
 	}
@@ -43,7 +43,7 @@ public class SwingSaveFileDialog implements SaveFileDialog {
 	}
 
 	@Override
-	public String getFileName() {
+	public String getSaveFileName() {
 		return ensurePngExtension(chooser.getSelectedFile().getAbsolutePath());
 	}
 
@@ -51,6 +51,16 @@ public class SwingSaveFileDialog implements SaveFileDialog {
 		if (path.endsWith(".png"))
 			return path;
 		return path + ".png";
+	}
+
+	@Override
+	public boolean askUserForOpenFileName() {
+		return chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION;
+	}
+
+	@Override
+	public String getOpenFileName() {
+		return ensurePngExtension(chooser.getSelectedFile().getAbsolutePath());
 	}
 
 }

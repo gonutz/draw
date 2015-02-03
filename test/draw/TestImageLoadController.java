@@ -18,13 +18,13 @@ public class TestImageLoadController {
 		boolean userWasAked;
 
 		@Override
-		public boolean askUserForFileName() {
+		public boolean askUserForOpenFileName() {
 			userWasAked = true;
 			return userAccepts;
 		}
 
 		@Override
-		public String getFileName() {
+		public String getOpenFileName() {
 			return fileName;
 		}
 	}
