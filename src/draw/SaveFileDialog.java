@@ -5,8 +5,8 @@ public interface SaveFileDialog {
 	 * Presents the user with a dialog to choose a new file name.
 	 * 
 	 * @return true if the user accepts the new file name, false if the user
-	 *         aborts the operation. Only if the user accepts will getFileName
-	 *         return a valid file name.
+	 *         aborts the operation. Only if the user confirms, getFileName
+	 *         returns a valid file name.
 	 */
 	boolean askUserForFileName();
 
