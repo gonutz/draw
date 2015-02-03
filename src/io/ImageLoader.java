@@ -1,4 +1,4 @@
-package draw;
+package io;
 
 import java.awt.image.BufferedImage;
 

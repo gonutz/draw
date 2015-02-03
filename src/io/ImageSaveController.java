@@ -1,4 +1,8 @@
-package draw;
+package io;
+
+import draw.CurrentFileNameObserver;
+import draw.ErrorDisplay;
+import draw.ImageProvider;
 
 public class ImageSaveController implements ImageLoadObserver {
 

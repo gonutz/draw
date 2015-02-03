@@ -1,6 +1,10 @@
 package draw;
 
 import static org.junit.Assert.*;
+import io.ImageLoadController;
+import io.ImageLoadObserver;
+import io.ImageLoader;
+import io.OpenFileDialog;
 
 import java.awt.image.BufferedImage;
 

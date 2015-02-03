@@ -1,6 +1,9 @@
 package draw;
 
 import static org.junit.Assert.*;
+import io.ImageSaveController;
+import io.ImageSaver;
+import io.SaveFileDialog;
 
 import java.awt.image.BufferedImage;
 

@@ -1,4 +1,7 @@
-package draw;
+package io;
+
+import draw.ErrorDisplay;
+import draw.ImageDisplay;
 
 public class ImageLoadController {
 
