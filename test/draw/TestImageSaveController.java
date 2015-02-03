@@ -58,6 +58,15 @@ public class TestImageSaveController {
 		}
 	}
 
+	private class SpyCurrentFileNameObserver implements CurrentFileNameObserver {
+		private String fileName;
+
+		@Override
+		public void currentFileNameChangedTo(String fileName) {
+			this.fileName = fileName;
+		}
+	}
+
 	@Before
 	public void setup() {
 		dialog = new MockSaveFileDialog();
@@ -68,6 +77,8 @@ public class TestImageSaveController {
 				BufferedImage.TYPE_4BYTE_ABGR);
 		controller = new ImageSaveController(dialog, imageProvider, saver,
 				errorDisplay);
+		observer = new SpyCurrentFileNameObserver();
+		controller.setCurrentFileNameObserver(observer);
 	}
 
 	private MockSaveFileDialog dialog;
@@ -75,6 +86,7 @@ public class TestImageSaveController {
 	private MockImageSaver saver;
 	private SpyErrorDisplay errorDisplay;
 	private ImageSaveController controller;
+	private SpyCurrentFileNameObserver observer;
 
 	@Test
 	public void savingNewImage_AsksUserForFileName() {
@@ -150,5 +162,39 @@ public class TestImageSaveController {
 
 		assertTrue(dialog.fileNameWasAsked);
 		assertEquals("new file", saver.fileName);
+	}
+
+	@Test
+	public void afterLoadingImage_FileNameIsUsedForSaving() {
+		controller.imageWasLoaded("path");
+		controller.save();
+		assertEquals("path", saver.fileName);
+	}
+
+	@Test
+	public void savingFileNotifiesObserverOfCurrentFileName() {
+		dialog.userAccepts = true;
+		dialog.fileName = "file path";
+
+		controller.save();
+
+		assertEquals("file path", observer.fileName);
+	}
+
+	@Test
+	public void newImageNotifiesObserverThatNoFileNameIsCurrent() {
+		dialog.userAccepts = true;
+		dialog.fileName = "some file";
+		controller.save();
+
+		controller.newImageWasCreated();
+
+		assertNull(observer.fileName);
+	}
+
+	@Test
+	public void loadingImageNotifiesObserverOfCurrentFileName() {
+		controller.imageWasLoaded("filename");
+		assertEquals("filename", observer.fileName);
 	}
 }

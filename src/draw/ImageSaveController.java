@@ -1,12 +1,13 @@
 package draw;
 
-public class ImageSaveController {
+public class ImageSaveController implements ImageLoadObserver {
 
 	private SaveFileDialog saveDialog;
 	private ImageProvider imageProvider;
 	private ImageSaver saver;
 	private ErrorDisplay errorDisplay;
 	private String previousFileName;
+	private CurrentFileNameObserver observer;
 
 	public ImageSaveController(SaveFileDialog saveDialog,
 			ImageProvider imageProvider, ImageSaver saver,
@@ -32,13 +33,27 @@ public class ImageSaveController {
 	private void saveAs(String path) {
 		try {
 			saver.save(imageProvider.getImage(), path);
-			previousFileName = path;
+			setPreviousFileName(path);
 		} catch (ImageSaver.SaveFailedException e) {
 			errorDisplay.showError(e.getMessage());
 		}
 	}
 
+	private void setPreviousFileName(String path) {
+		previousFileName = path;
+		observer.currentFileNameChangedTo(path);
+	}
+
 	public void newImageWasCreated() {
-		previousFileName = null;
+		setPreviousFileName(null);
+	}
+
+	@Override
+	public void imageWasLoaded(String fileName) {
+		setPreviousFileName(fileName);
+	}
+
+	public void setCurrentFileNameObserver(CurrentFileNameObserver observer) {
+		this.observer = observer;
 	}
 }

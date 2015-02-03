@@ -28,9 +28,11 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
 import javax.swing.JLabel;
+
 import java.awt.Font;
 
-public class MainWindow implements ToolView, ErrorDisplay, PositionView {
+public class MainWindow implements ToolView, ErrorDisplay, PositionView,
+		CurrentFileNameObserver {
 
 	private static final int INITIAL_CANVAS_WIDTH = 640;
 	private static final int INITIAL_CANVAS_HEIGHT = 480;
@@ -82,9 +84,12 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 				window.imageSaveController = new ImageSaveController(dialog,
 						window.drawAreaController, new ImageToFileSaver(),
 						window);
+				window.imageSaveController.setCurrentFileNameObserver(window);
 				window.imageLoadController = new ImageLoadController(dialog,
 						new ImageFromFileLoader(), window.drawAreaController,
 						window);
+				window.imageLoadController
+						.setObserver(window.imageSaveController);
 			}
 		});
 	}
@@ -446,5 +451,13 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView {
 	@Override
 	public void setPosition(int x, int y) {
 		positionLabel.setText("x: " + x + "  y: " + y);
+	}
+
+	@Override
+	public void currentFileNameChangedTo(String fileName) {
+		if (fileName == null)
+			mainFrame.setTitle("Draw");
+		else
+			mainFrame.setTitle("Draw - " + fileName);
 	}
 }

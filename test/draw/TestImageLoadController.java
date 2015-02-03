@@ -1,9 +1,6 @@
 package draw;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.awt.image.BufferedImage;
 
@@ -65,14 +62,25 @@ public class TestImageLoadController {
 		}
 	}
 
+	class SpyImageLoadObserver implements ImageLoadObserver {
+		private String fileName;
+
+		@Override
+		public void imageWasLoaded(String fileName) {
+			this.fileName = fileName;
+		}
+	}
+
 	@Before
 	public void setup() {
 		openDialog = new SpyOpenDialog();
 		loader = new SpyImageLoader();
 		imageDisplay = new SpyImageDisplay();
 		errorDisplay = new SpyErrorDisplay();
+		observer = new SpyImageLoadObserver();
 		controller = new ImageLoadController(openDialog, loader, imageDisplay,
 				errorDisplay);
+		controller.setObserver(observer);
 	}
 
 	private SpyOpenDialog openDialog;
@@ -80,6 +88,7 @@ public class TestImageLoadController {
 	private SpyImageDisplay imageDisplay;
 	private SpyErrorDisplay errorDisplay;
 	private ImageLoadController controller;
+	private SpyImageLoadObserver observer;
 
 	@Test
 	public void userProvidedFileNameIsLoaded() {
@@ -118,5 +127,15 @@ public class TestImageLoadController {
 
 		assertFalse(imageDisplay.imageShown);
 		assertEquals("message", errorDisplay.errorMessage);
+	}
+
+	@Test
+	public void afterLoding_ObserverIsNotified() {
+		openDialog.userAccepts = true;
+		openDialog.fileName = "file name";
+
+		controller.load();
+
+		assertEquals("file name", observer.fileName);
 	}
 }

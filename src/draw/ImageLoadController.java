@@ -6,6 +6,7 @@ public class ImageLoadController {
 	private ImageLoader loader;
 	private ImageDisplay imageDisplay;
 	private ErrorDisplay errorDisplay;
+	private ImageLoadObserver observer;
 
 	public ImageLoadController(OpenFileDialog openDialog, ImageLoader loader,
 			ImageDisplay imageDisplay, ErrorDisplay errorDisplay) {
@@ -22,9 +23,15 @@ public class ImageLoadController {
 
 	private void loadImage(String fileName) {
 		try {
-			imageDisplay.showLoadedImage(loader.load(openDialog.getOpenFileName()));
+			imageDisplay.showLoadedImage(loader.load(openDialog
+					.getOpenFileName()));
+			observer.imageWasLoaded(fileName);
 		} catch (ImageLoader.LoadFailedException e) {
 			errorDisplay.showError(e.getMessage());
 		}
+	}
+
+	public void setObserver(ImageLoadObserver observer) {
+		this.observer = observer;
 	}
 }
