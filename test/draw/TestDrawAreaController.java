@@ -3,6 +3,7 @@ package draw;
 import static org.junit.Assert.*;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -14,12 +15,6 @@ public class TestDrawAreaController {
 
 	private static final int BLACK = 0xFF000000;
 	private static final int WHITE = 0xFFFFFFFF;
-
-	private SpyView view;
-	private DrawAreaController controller;
-	private StubDrawSettings drawSettings;
-	private ToolViewController toolController;
-	private int previousRefreshs;
 
 	private class SpyView implements DrawAreaView {
 		private int refreshCount;
@@ -54,6 +49,20 @@ public class TestDrawAreaController {
 		}
 	}
 
+	private class MockClipboard implements Clipboard {
+		private BufferedImage image;
+
+		@Override
+		public void storeImage(BufferedImage image) {
+			this.image = image;
+		}
+
+		@Override
+		public BufferedImage getImage() {
+			return image;
+		}
+	}
+
 	@Before
 	public void setup() {
 		view = new SpyView();
@@ -63,7 +72,16 @@ public class TestDrawAreaController {
 		toolController = new ToolViewController(new DummyToolView());
 		controller.setToolController(toolController);
 		toolController.setObserver(controller);
+		clipboard = new MockClipboard();
+		controller.setClipboard(clipboard);
 	}
+
+	private SpyView view;
+	private StubDrawSettings drawSettings;
+	private ToolViewController toolController;
+	private DrawAreaController controller;
+	private MockClipboard clipboard;
+	private int previousRefreshs;
 
 	@Test
 	public void newImage_CreatesBufferedImageWithBackgroundColor() {
@@ -84,24 +102,32 @@ public class TestDrawAreaController {
 		}
 	}
 
+	private void assertImageSize(BufferedImage image, int width, int height) {
+		assertEquals("width", width, image.getWidth());
+		assertEquals("height", height, image.getHeight());
+	}
+
 	private void assertImageSize(int width, int height) {
-		assertEquals(width, controller.getImage().getWidth());
-		assertEquals(height, controller.getImage().getHeight());
+		assertImageSize(controller.getImage(), width, height);
+	}
+
+	private void assertPixelsAreSet(BufferedImage image, int foreground,
+			int background, Point... set) {
+		HashSet<Point> setPixels = new HashSet<Point>();
+		for (Point p : set)
+			setPixels.add(p);
+		for (int x = 0; x < image.getWidth(); x++)
+			for (int y = 0; y < image.getHeight(); y++) {
+				int expected = background;
+				if (setPixels.contains(p(x, y)))
+					expected = foreground;
+				assertEquals(x + " " + y, expected, image.getRGB(x, y));
+			}
 	}
 
 	private void assertPixelsAreSet(int foreground, int background,
 			Point... set) {
-		HashSet<Point> setPixels = new HashSet<Point>();
-		for (Point p : set)
-			setPixels.add(p);
-		BufferedImage img = controller.getImage();
-		for (int x = 0; x < img.getWidth(); x++)
-			for (int y = 0; y < img.getHeight(); y++) {
-				int expected = background;
-				if (setPixels.contains(p(x, y)))
-					expected = foreground;
-				assertEquals(x + " " + y, expected, img.getRGB(x, y));
-			}
+		assertPixelsAreSet(controller.getImage(), foreground, background, set);
 	}
 
 	private Point p(int x, int y) {
@@ -1077,13 +1103,52 @@ public class TestDrawAreaController {
 
 	@Test
 	public void pressingEscape_DisablesCurrentSelection() {
-		// TODO make new methods for key events
+		new20x10imageWithSelectionTool();
+		selectRect(2, 2, 4, 4);
+		captureCurrentRefreshCount();
+
+		controller.escape();
+
+		assertRefreshesSinceLastCapture(1);
+		assertNoSelectionIsMade();
 	}
 
 	@Test
-	public void cursorKeysMoveSelectionByOne() {
-		// TODO left/right/up/down move selection by 1 pixel
-		// TODO have special methods for moving, do not call them after the keys
+	public void pressingEscape_WithNoSelection_DoesNothing() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.escape();
+
+		assertRefreshesSinceLastCapture(0);
+	}
+
+	@Test
+	public void selectionCanBeMovedByGivenDistance() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+		selectRect(0, 0, 2, 2);
+		captureCurrentRefreshCount();
+
+		controller.move(1, 2);
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(2, 3));
+	}
+
+	@Test
+	public void withNoSelection_MovingDoesNothing() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.move(-1, -2);
+
+		assertRefreshesSinceLastCapture(0);
+	}
+
+	@Test
+	public void selectingAllSelectsWholeImage() {
+		// TODO select all
 	}
 
 	@Test
@@ -1148,5 +1213,75 @@ public class TestDrawAreaController {
 		controller.undoLastAction();
 
 		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void copyingSelectionSetsItInTheClipboard() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 2);
+		selectRect(2, 3, 0, 0);
+
+		controller.copy();
+
+		assertImageSize(clipboard.image, 3, 4);
+		assertPixelsAreSet(clipboard.image, BLACK, WHITE, p(1, 2));
+	}
+
+	@Test
+	public void copyDoesNothingIfNoSelectionIsActive() {
+		new20x10imageWithSelectionTool();
+		controller.copy();
+		assertNull(clipboard.image);
+	}
+
+	@Test
+	public void pasteCopiesClipboardImageToTopLeftCorner() {
+		clipboard.image = newBlackWhiteImageWithPixels(3, 4, p(0, 0), p(0, 2));
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.paste();
+
+		assertRefreshesSinceLastCapture(1);
+		assertSelection(0, 0, 2, 3);
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(0, 2));
+	}
+
+	private BufferedImage newBlackWhiteImageWithPixels(int width, int height,
+			Point... pixels) {
+		BufferedImage image = newImageOfSize(width, height);
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setBackground(Color.white);
+		g.clearRect(0, 0, width, height);
+		g.setColor(Color.black);
+		for (Point p : pixels)
+			g.drawLine(p.x, p.y, p.x, p.y);
+		return image;
+	}
+
+	@Test
+	public void ifNoImageIsInClipboard_NothingIsPasted() {
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.paste();
+
+		assertRefreshesSinceLastCapture(0);
+	}
+
+	@Test
+	public void pastedImagesCanBeMoved() {
+		clipboard.image = newBlackWhiteImageWithPixels(3, 3, p(1, 1));
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.paste();
+		dragLeftMouse(from(1, 1), to(4, 1));
+		controller.paste();
+		dragLeftMouse(from(1, 1), to(5, 5));
+
+		assertRefreshesSinceLastCapture(4);
+		assertSelection(4, 4, 6, 6);
+		assertPixelsAreSet(BLACK, WHITE, p(4, 1), p(5, 5));
 	}
 }

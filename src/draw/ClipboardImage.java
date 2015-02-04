@@ -14,11 +14,10 @@ public class ClipboardImage implements Transferable {
 
 	public Object getTransferData(DataFlavor flavor)
 			throws UnsupportedFlavorException {
-		if (isDataFlavorSupported(flavor)) {
+		if (isDataFlavorSupported(flavor))
 			return image;
-		} else {
+		else
 			throw new UnsupportedFlavorException(flavor);
-		}
 	}
 
 	public boolean isDataFlavorSupported(DataFlavor flavor) {

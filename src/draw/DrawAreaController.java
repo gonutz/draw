@@ -1,12 +1,13 @@
 package draw;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
-import draw.commands.Stroke;
 import draw.commands.SelectionMovement;
+import draw.commands.Stroke;
 import draw.commands.UndoHistory;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper,
@@ -15,6 +16,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private DrawAreaView view;
 	private DrawSettings drawSettings;
 	private ToolController toolController;
+	private Clipboard clipboard;
 	private BufferedImage image;
 	private UndoHistory history = new UndoHistory();
 	private Mouse lastMouse = new Mouse();
@@ -54,8 +56,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			return rect.contains(x, y);
 		}
 
-		public void startMoving() {
+		public void startMovingWithMouse() {
 			state = State.MovingSelection;
+			createNewMovementIfNecessary();
+		}
+
+		private void createNewMovementIfNecessary() {
 			if (movement == null) {
 				movement = new SelectionMovement(image, rect,
 						drawSettings.getBackgroundColor(),
@@ -71,6 +77,10 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		public void startSelectionAt(int x, int y) {
 			state = State.Selecting;
 			rect = new Rectangle(x, y, x, y);
+		}
+
+		public boolean isActive() {
+			return rect != null;
 		}
 	}
 
@@ -89,6 +99,10 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	public void setToolController(ToolController toolController) {
 		this.toolController = toolController;
+	}
+
+	public void setClipboard(Clipboard clipboard) {
+		this.clipboard = clipboard;
 	}
 
 	public BufferedImage getImage() {
@@ -196,7 +210,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
 		if (selection.contains(x, y))
-			selection.startMoving();
+			selection.startMovingWithMouse();
 		else {
 			selection.stopMovement();
 			if (isInsideImage(x, y))
@@ -280,7 +294,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	@Override
 	public void toolChangedTo(Tool tool) {
-		if (selection.rect != null)
+		if (selection.isActive())
 			updateSelection(null);
 	}
 
@@ -291,4 +305,42 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		setSelection(null);
 		view.refresh();
 	}
+
+	public void copy() {
+		if (selection.isActive())
+			clipboard.storeImage(image.getSubimage(selection.rect.left(),
+					selection.rect.top(), selection.rect.width(),
+					selection.rect.height()));
+	}
+
+	public void paste() {
+		BufferedImage toCopy = clipboard.getImage();
+		if (toCopy != null) {
+			Graphics g = image.getGraphics();
+			g.drawImage(toCopy, 0, 0, null);
+			setSelection(new Rectangle(0, 0, toCopy.getWidth() - 1,
+					toCopy.getHeight() - 1));
+			view.refresh();
+		}
+	}
+
+	public void escape() {
+		if (selection.isActive())
+			updateSelection(null);
+	}
+
+	public void delete() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void move(int dx, int dy) {
+		if (selection.isActive()) {
+			selection.createNewMovementIfNecessary();
+			selection.movement.moveBy(dx, dy);
+			selection.movement.drawCompositeTo(image.getGraphics());
+			updateSelection(selection.rect);
+		}
+	}
+
 }

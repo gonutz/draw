@@ -82,6 +82,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				window.drawAreaController.setDrawSettings(paletteController);
 				window.drawAreaController
 						.setToolController(window.toolViewController);
+				window.drawAreaController.setClipboard(new SystemClipboard());
 				window.toolViewController
 						.setObserver(window.drawAreaController);
 				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,
@@ -138,6 +139,27 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				break;
 			case 'c':
 				toolViewController.selectTool(Tool.ColorPicker);
+				break;
+			}
+		if (e.getID() == KeyEvent.KEY_PRESSED)
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_ESCAPE:
+				drawAreaController.escape();
+				break;
+			case KeyEvent.VK_DELETE:
+				drawAreaController.delete();
+				break;
+			case KeyEvent.VK_LEFT:
+				drawAreaController.move(-1, 0);
+				break;
+			case KeyEvent.VK_RIGHT:
+				drawAreaController.move(1, 0);
+				break;
+			case KeyEvent.VK_UP:
+				drawAreaController.move(0, -1);
+				break;
+			case KeyEvent.VK_DOWN:
+				drawAreaController.move(0, 1);
 				break;
 			}
 	}
@@ -267,6 +289,26 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
 				InputEvent.CTRL_MASK));
 		editMenu.add(redo);
+
+		JMenuItem mntmCopy = new JMenuItem("Copy");
+		mntmCopy.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.copy();
+			}
+		});
+		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+				InputEvent.CTRL_MASK));
+		editMenu.add(mntmCopy);
+
+		JMenuItem mntmPaste = new JMenuItem("Paste");
+		mntmPaste.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.paste();
+			}
+		});
+		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+				InputEvent.CTRL_MASK));
+		editMenu.add(mntmPaste);
 
 		JMenu canvasMenu = new JMenu("Canvas");
 		canvasMenu.setMnemonic('C');
