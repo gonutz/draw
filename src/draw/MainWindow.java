@@ -123,6 +123,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	}
 
 	private void globalKeyEvent(KeyEvent e) {
+		if (!mainFrame.isFocused())
+			return;
 		int offset = 0;
 		if (e.isShiftDown())
 			offset = 10;
