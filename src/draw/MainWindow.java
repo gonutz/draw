@@ -44,11 +44,11 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 
 	private JFrame mainFrame;
 	private JButton rectangleSelection;
-	private JButton penSelection;
-	private JButton fillSelection;
-	private JButton colorPickSelection;
-	private JButton lineSelection;
-	private JButton eraseSelection;
+	private JButton pen;
+	private JButton fill;
+	private JButton colorPicker;
+	private JButton line;
+	private JButton eraser;
 	private ToolViewController toolViewController;
 	private CurrentColors currentColors;
 	private ColorPalette colorPalette;
@@ -249,8 +249,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	}
 
 	private void deselectAllTools() {
-		JButton[] tools = { rectangleSelection, penSelection, eraseSelection,
-				colorPickSelection, lineSelection, fillSelection };
+		JButton[] tools = { rectangleSelection, pen, eraser, colorPicker, line,
+				fill };
 		for (JButton button : tools)
 			button.setBackground(Color.white);
 	}
@@ -260,15 +260,15 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		case RectangleSelection:
 			return rectangleSelection;
 		case ColorPicker:
-			return colorPickSelection;
+			return colorPicker;
 		case Eraser:
-			return eraseSelection;
+			return eraser;
 		case Fill:
-			return fillSelection;
+			return fill;
 		case Line:
-			return lineSelection;
+			return line;
 		case Pen:
-			return penSelection;
+			return pen;
 		}
 		return null;
 	}
@@ -454,90 +454,90 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		gbc_rectangleSelection.gridy = 0;
 		toolSelectionContainer.add(rectangleSelection, gbc_rectangleSelection);
 
-		penSelection = new JButton("");
-		penSelection.setFocusable(false);
-		penSelection.addActionListener(new ActionListener() {
+		pen = new JButton("");
+		pen.setFocusable(false);
+		pen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Pen);
 			}
 		});
-		penSelection.setToolTipText("Pen (P)");
-		penSelection.setIcon(new ImageIcon("./rsc/pen.png"));
-		penSelection.setBorder(null);
-		penSelection.setBackground(Color.WHITE);
-		GridBagConstraints gbc_penSelection = new GridBagConstraints();
-		gbc_penSelection.insets = new Insets(0, 0, 5, 0);
-		gbc_penSelection.anchor = GridBagConstraints.NORTHWEST;
-		gbc_penSelection.gridx = 0;
-		gbc_penSelection.gridy = 1;
-		toolSelectionContainer.add(penSelection, gbc_penSelection);
+		pen.setToolTipText("Pen (P)");
+		pen.setIcon(new ImageIcon("./rsc/pen.png"));
+		pen.setBorder(null);
+		pen.setBackground(Color.WHITE);
+		GridBagConstraints gbc_pen = new GridBagConstraints();
+		gbc_pen.insets = new Insets(0, 0, 5, 0);
+		gbc_pen.anchor = GridBagConstraints.NORTHWEST;
+		gbc_pen.gridx = 0;
+		gbc_pen.gridy = 1;
+		toolSelectionContainer.add(pen, gbc_pen);
 
-		fillSelection = new JButton("");
-		fillSelection.setFocusable(false);
-		fillSelection.addActionListener(new ActionListener() {
+		fill = new JButton("");
+		fill.setFocusable(false);
+		fill.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Fill);
 			}
 		});
-		fillSelection.setToolTipText("Fill (F)");
-		fillSelection.setIcon(new ImageIcon("./rsc/fill.png"));
-		fillSelection.setBorder(null);
-		fillSelection.setBackground(Color.WHITE);
-		GridBagConstraints gbc_fillSelection = new GridBagConstraints();
-		gbc_fillSelection.insets = new Insets(0, 0, 5, 5);
-		gbc_fillSelection.gridx = 0;
-		gbc_fillSelection.gridy = 2;
-		toolSelectionContainer.add(fillSelection, gbc_fillSelection);
+		fill.setToolTipText("Fill (F)");
+		fill.setIcon(new ImageIcon("./rsc/fill.png"));
+		fill.setBorder(null);
+		fill.setBackground(Color.WHITE);
+		GridBagConstraints gbc_fill = new GridBagConstraints();
+		gbc_fill.insets = new Insets(0, 0, 5, 5);
+		gbc_fill.gridx = 0;
+		gbc_fill.gridy = 2;
+		toolSelectionContainer.add(fill, gbc_fill);
 
-		colorPickSelection = new JButton("");
-		colorPickSelection.setFocusable(false);
-		colorPickSelection.addActionListener(new ActionListener() {
+		colorPicker = new JButton("");
+		colorPicker.setFocusable(false);
+		colorPicker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.ColorPicker);
 			}
 		});
-		colorPickSelection.setIcon(new ImageIcon("./rsc/pick.png"));
-		colorPickSelection.setToolTipText("Color Selection (C)");
-		colorPickSelection.setBorder(null);
-		colorPickSelection.setBackground(Color.WHITE);
-		GridBagConstraints gbc_colorPickSelection = new GridBagConstraints();
-		gbc_colorPickSelection.insets = new Insets(0, 0, 5, 0);
-		gbc_colorPickSelection.gridx = 1;
-		gbc_colorPickSelection.gridy = 0;
-		toolSelectionContainer.add(colorPickSelection, gbc_colorPickSelection);
+		colorPicker.setIcon(new ImageIcon("./rsc/pick.png"));
+		colorPicker.setToolTipText("Color Selection (C)");
+		colorPicker.setBorder(null);
+		colorPicker.setBackground(Color.WHITE);
+		GridBagConstraints gbc_colorPicker = new GridBagConstraints();
+		gbc_colorPicker.insets = new Insets(0, 0, 5, 0);
+		gbc_colorPicker.gridx = 1;
+		gbc_colorPicker.gridy = 0;
+		toolSelectionContainer.add(colorPicker, gbc_colorPicker);
 
-		lineSelection = new JButton("");
-		lineSelection.setFocusable(false);
-		lineSelection.addActionListener(new ActionListener() {
+		line = new JButton("");
+		line.setFocusable(false);
+		line.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Line);
 			}
 		});
-		lineSelection.setIcon(new ImageIcon("./rsc/line.png"));
-		lineSelection.setToolTipText("Line (L)");
-		lineSelection.setBorder(null);
-		lineSelection.setBackground(Color.WHITE);
-		GridBagConstraints gbc_lineSelection = new GridBagConstraints();
-		gbc_lineSelection.insets = new Insets(0, 0, 0, 5);
-		gbc_lineSelection.gridx = 1;
-		gbc_lineSelection.gridy = 1;
-		toolSelectionContainer.add(lineSelection, gbc_lineSelection);
+		line.setIcon(new ImageIcon("./rsc/line.png"));
+		line.setToolTipText("Line (L)");
+		line.setBorder(null);
+		line.setBackground(Color.WHITE);
+		GridBagConstraints gbc_line = new GridBagConstraints();
+		gbc_line.insets = new Insets(0, 0, 0, 5);
+		gbc_line.gridx = 1;
+		gbc_line.gridy = 1;
+		toolSelectionContainer.add(line, gbc_line);
 
-		eraseSelection = new JButton("");
-		eraseSelection.setFocusable(false);
-		eraseSelection.addActionListener(new ActionListener() {
+		eraser = new JButton("");
+		eraser.setFocusable(false);
+		eraser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				toolViewController.selectTool(Tool.Eraser);
 			}
 		});
-		eraseSelection.setIcon(new ImageIcon("./rsc/erase.png"));
-		eraseSelection.setToolTipText("Eraser (E)");
-		eraseSelection.setBorder(null);
-		eraseSelection.setBackground(Color.WHITE);
-		GridBagConstraints gbc_eraseSelection = new GridBagConstraints();
-		gbc_eraseSelection.gridx = 1;
-		gbc_eraseSelection.gridy = 2;
-		toolSelectionContainer.add(eraseSelection, gbc_eraseSelection);
+		eraser.setIcon(new ImageIcon("./rsc/erase.png"));
+		eraser.setToolTipText("Eraser (E)");
+		eraser.setBorder(null);
+		eraser.setBackground(Color.WHITE);
+		GridBagConstraints gbc_eraser = new GridBagConstraints();
+		gbc_eraser.gridx = 1;
+		gbc_eraser.gridy = 2;
+		toolSelectionContainer.add(eraser, gbc_eraser);
 
 		JPanel colorContainer = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) colorContainer.getLayout();
