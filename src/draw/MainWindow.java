@@ -10,6 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,6 +26,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -33,9 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
-import javax.swing.JLabel;
-
-import java.awt.Font;
 
 public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		CurrentFileNameObserver {
@@ -53,6 +52,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	private ToolViewController toolViewController;
 	private CurrentColors currentColors;
 	private ColorPalette colorPalette;
+	private ColorPaletteViewController paletteController;
 	private DrawArea drawArea;
 	private DrawAreaController drawAreaController;
 	private ImageSaveController imageSaveController;
@@ -61,6 +61,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
@@ -73,13 +74,15 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 
 			private void wireUpControllers(MainWindow window) {
 				window.toolViewController = new ToolViewController(window);
-				ColorPaletteViewController paletteController = new ColorPaletteViewController(
+				window.paletteController = new ColorPaletteViewController(
 						window.colorPalette, window.currentColors);
-				window.colorPalette.setAndActivateController(paletteController);
+				window.colorPalette
+						.setAndActivateController(window.paletteController);
 				window.drawAreaController = new DrawAreaController(
 						window.drawArea);
 				window.drawArea.setController(window.drawAreaController);
-				window.drawAreaController.setDrawSettings(paletteController);
+				window.drawAreaController
+						.setDrawSettings(window.paletteController);
 				window.drawAreaController
 						.setToolController(window.toolViewController);
 				window.drawAreaController.setClipboard(new SystemClipboard());
@@ -120,6 +123,9 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	}
 
 	private void globalKeyEvent(KeyEvent e) {
+		int offset = 0;
+		if (e.isShiftDown())
+			offset = 10;
 		if (e.getID() == KeyEvent.KEY_TYPED)
 			switch (e.getKeyChar()) {
 			case 's':
@@ -160,6 +166,76 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				break;
 			case KeyEvent.VK_DOWN:
 				drawAreaController.move(0, 1);
+				break;
+			case KeyEvent.VK_1:
+			case KeyEvent.VK_NUMPAD1:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(0 + offset);
+				else
+					paletteController.selectForegroundColor(0 + offset);
+				break;
+			case KeyEvent.VK_2:
+			case KeyEvent.VK_NUMPAD2:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(1 + offset);
+				else
+					paletteController.selectForegroundColor(1 + offset);
+				break;
+			case KeyEvent.VK_3:
+			case KeyEvent.VK_NUMPAD3:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(2 + offset);
+				else
+					paletteController.selectForegroundColor(2 + offset);
+				break;
+			case KeyEvent.VK_4:
+			case KeyEvent.VK_NUMPAD4:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(3 + offset);
+				else
+					paletteController.selectForegroundColor(3 + offset);
+				break;
+			case KeyEvent.VK_5:
+			case KeyEvent.VK_NUMPAD5:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(4 + offset);
+				else
+					paletteController.selectForegroundColor(4 + offset);
+				break;
+			case KeyEvent.VK_6:
+			case KeyEvent.VK_NUMPAD6:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(5 + offset);
+				else
+					paletteController.selectForegroundColor(5 + offset);
+				break;
+			case KeyEvent.VK_7:
+			case KeyEvent.VK_NUMPAD7:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(6 + offset);
+				else
+					paletteController.selectForegroundColor(6 + offset);
+				break;
+			case KeyEvent.VK_8:
+			case KeyEvent.VK_NUMPAD8:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(7 + offset);
+				else
+					paletteController.selectForegroundColor(7 + offset);
+				break;
+			case KeyEvent.VK_9:
+			case KeyEvent.VK_NUMPAD9:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(8 + offset);
+				else
+					paletteController.selectForegroundColor(8 + offset);
+				break;
+			case KeyEvent.VK_0:
+			case KeyEvent.VK_NUMPAD0:
+				if (e.isControlDown())
+					paletteController.selectBackgroundColor(9 + offset);
+				else
+					paletteController.selectForegroundColor(9 + offset);
 				break;
 			}
 	}

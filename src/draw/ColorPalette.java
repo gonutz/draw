@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JColorChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ColorPalette extends JPanel implements ColorPaletteView {
@@ -17,10 +18,16 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 
 	public ColorPalette() {
 		setBorder(null);
-		setLayout(new GridLayout(2, 10, 1, 1));
-		this.setPreferredSize(new Dimension(309, 61));
+		setLayout(new GridLayout(3, 10, 1, 1));
+		this.setPreferredSize(new Dimension(309, 92));
+		fillInNumberLabels();
 		fillWithColorBoxes();
 		setClickListenersOnBoxes();
+	}
+
+	private void fillInNumberLabels() {
+		for (int i = 0; i < 10; i++)
+			this.add(new JLabel("" + ((i + 1) % 10), JLabel.CENTER));
 	}
 
 	private void fillWithColorBoxes() {
@@ -37,13 +44,11 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 			colorBoxes[i].addMouseListener(new MouseListener() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if (e.getClickCount() == 1) {
-						if (e.getButton() == MouseEvent.BUTTON1)
-							controller.selectForegroundColor(index);
-						else if (e.getButton() == MouseEvent.BUTTON3)
-							controller.selectBackgroundColor(index);
-					} else if (e.getClickCount() == 2
-							&& e.getButton() == MouseEvent.BUTTON1) {
+					if (isLeftClick(e))
+						controller.selectForegroundColor(index);
+					if (isRightClick(e))
+						controller.selectBackgroundColor(index);
+					if (isLeftDoubleClick(e)) {
 						Color newColor = JColorChooser.showDialog(
 								ColorPalette.this, "Select new color",
 								colorBoxes[index].getBackground());
@@ -52,12 +57,27 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 					}
 				}
 
-				@Override
-				public void mouseEntered(MouseEvent arg0) {
+				private boolean isLeftClick(MouseEvent e) {
+					return e.getClickCount() == 1
+							&& e.getButton() == MouseEvent.BUTTON1;
+				}
+
+				private boolean isRightClick(MouseEvent e) {
+					return e.getClickCount() == 1
+							&& e.getButton() == MouseEvent.BUTTON3;
+				}
+
+				private boolean isLeftDoubleClick(MouseEvent e) {
+					return e.getClickCount() == 2
+							&& e.getButton() == MouseEvent.BUTTON1;
 				}
 
 				@Override
-				public void mouseExited(MouseEvent arg0) {
+				public void mouseEntered(MouseEvent e) {
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
 				}
 
 				@Override
@@ -69,7 +89,7 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 				}
 
 				@Override
-				public void mouseReleased(MouseEvent arg0) {
+				public void mouseReleased(MouseEvent e) {
 				}
 			});
 		}
