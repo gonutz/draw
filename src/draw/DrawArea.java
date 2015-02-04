@@ -50,9 +50,9 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		if (zoomFactor < 32) {
 			visible.x = 2 * x - (x - visible.x);
 			visible.y = 2 * y - (y - visible.y);
-			scrollRectToVisible(visible);
 			zoomFactor *= 2;
 			refresh();
+			scrollRectToVisible(visible);
 		}
 	}
 
