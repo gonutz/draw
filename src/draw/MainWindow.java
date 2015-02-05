@@ -388,6 +388,16 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				InputEvent.CTRL_MASK));
 		editMenu.add(mntmPaste);
 
+		JMenuItem mntmSelectAll = new JMenuItem("Select All");
+		mntmSelectAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.selectAll();
+			}
+		});
+		mntmSelectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
+				InputEvent.CTRL_MASK));
+		editMenu.add(mntmSelectAll);
+
 		JMenu canvasMenu = new JMenu("Canvas");
 		canvasMenu.setMnemonic('C');
 		menuBar.add(canvasMenu);

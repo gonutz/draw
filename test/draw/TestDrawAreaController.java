@@ -1148,7 +1148,13 @@ public class TestDrawAreaController {
 
 	@Test
 	public void selectingAllSelectsWholeImage() {
-		// TODO select all
+		new20x10imageWithPenColor(BLACK);
+		captureCurrentRefreshCount();
+
+		controller.selectAll();
+
+		assertSelection(0, 0, 19, 9);
+		assertEquals(Tool.RectangleSelection, toolController.getSelectedTool());
 	}
 
 	@Test

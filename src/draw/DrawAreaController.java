@@ -318,6 +318,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (toCopy != null) {
 			Graphics g = image.getGraphics();
 			g.drawImage(toCopy, 0, 0, null);
+			selection.movement = null;
 			setSelection(new Rectangle(0, 0, toCopy.getWidth() - 1,
 					toCopy.getHeight() - 1));
 			view.refresh();
@@ -341,6 +342,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
 		}
+	}
+
+	public void selectAll() {
+		toolController.selectTool(Tool.RectangleSelection);
+		updateSelection(new Rectangle(0, 0, image.getWidth() - 1,
+				image.getHeight() - 1));
 	}
 
 }
