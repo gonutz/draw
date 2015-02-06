@@ -1,5 +1,7 @@
 package draw;
 
+import java.awt.image.BufferedImage;
+
 public interface DrawAreaView {
 
 	/**
@@ -14,5 +16,12 @@ public interface DrawAreaView {
 	 * selection.
 	 */
 	void setSelection(Rectangle selection);
+
+	/**
+	 * Sets an image that is to be drawn on top of the current image, it floats
+	 * above the image. The area to draw it in is the currently set selection
+	 * area so the image must match the size of that.
+	 */
+	void setFloatingImage(BufferedImage image);
 
 }

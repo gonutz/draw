@@ -25,6 +25,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private PositionView positionView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
+	private BufferedImage floatingImage;
 
 	public DrawArea() {
 		initialize();
@@ -89,10 +90,16 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	@Override
+	public void setFloatingImage(BufferedImage image) {
+		floatingImage = image;
+	}
+
+	@Override
 	public void paint(Graphics graphics) {
 		Graphics2D g = (Graphics2D) graphics;
 		clearBackground(g);
 		drawImage(g);
+		drawFloatingImage(g);
 		paintSelection(g);
 	}
 
@@ -106,6 +113,12 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 			BufferedImage img = controller.getImage();
 			g.drawImage(img, 0, 0, img.getWidth() * zoomFactor, img.getHeight()
 					* zoomFactor, null);
+		}
+	}
+
+	private void drawFloatingImage(Graphics2D g) {
+		if (floatingImage != null) {
+			g.drawImage(floatingImage, selection.left(), selection.top(), null);
 		}
 	}
 

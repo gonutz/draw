@@ -25,6 +25,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private State state = State.Idle;
 	private boolean refreshed;
 	private Line line = new Line();
+	private boolean hasFloatingImage;
+	private BufferedImage floatingImage;
 
 	private class Line {
 		int startX, startY;
@@ -212,6 +214,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (selection.contains(x, y))
 			selection.startMovingWithMouse();
 		else {
+			if (hasFloatingImage)
+				pasteFloatingImage();
 			selection.stopMovement();
 			if (isInsideImage(x, y))
 				selection.startSelectionAt(x, y);
@@ -221,6 +225,17 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private boolean isInsideImage(int x, int y) {
 		return x >= 0 && x < image.getWidth() && y >= 0
 				&& y < image.getHeight();
+	}
+
+	private void pasteFloatingImage() {
+		Graphics g = image.getGraphics();
+		g.drawImage(floatingImage, selection.rect.left(), selection.rect.top(),
+				null);
+		// test this by pasting, selecting area again, moving. should move
+		// underlying dot (which is to be set in the first place)
+		// hasFloatingImage=false;//TODO test this
+		view.setFloatingImage(null);
+		view.refresh();
 	}
 
 	public void leftMouseButtonUp() {
@@ -272,7 +287,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			int dx = x - lastMouse.x;
 			int dy = y - lastMouse.y;
 			selection.movement.moveBy(dx, dy);
-			selection.movement.drawCompositeTo(image.getGraphics());
+			if (!hasFloatingImage)
+				selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
 			break;
 		case DrawingLine:
@@ -316,12 +332,18 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void paste() {
 		BufferedImage toCopy = clipboard.getImage();
 		if (toCopy != null) {
-			Graphics g = image.getGraphics();
-			g.drawImage(toCopy, 0, 0, null);
-			selection.movement = null;
+			refreshed = false;
+			if (hasFloatingImage)
+				pasteFloatingImage();
+			toolController.selectTool(Tool.RectangleSelection);
+			floatingImage = ImageUtils.copyImage(toCopy);
+			view.setFloatingImage(floatingImage);
 			setSelection(new Rectangle(0, 0, toCopy.getWidth() - 1,
 					toCopy.getHeight() - 1));
-			view.refresh();
+			selection.movement = null;
+			hasFloatingImage = true;
+			if (!refreshed)
+				view.refresh();
 		}
 	}
 
@@ -339,7 +361,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (selection.isActive()) {
 			selection.createNewMovementIfNecessary();
 			selection.movement.moveBy(dx, dy);
-			selection.movement.drawCompositeTo(image.getGraphics());
+			if (!hasFloatingImage)
+				selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
 		}
 	}
