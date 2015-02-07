@@ -23,10 +23,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Selection selection = new Selection();
 	private Pen pen = new Pen();
 	private State state = State.Idle;
-	private boolean refreshed;
 	private Line line = new Line();
 	private boolean hasFloatingImage;
 	private BufferedImage floatingImage;
+	private boolean viewDirty;
+	private boolean updatingTool;
 
 	private class Line {
 		int startX, startY;
@@ -116,17 +117,17 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void undoLastAction() {
-		refreshed = false;
 		setSelection(null);
-		if (history.undoTo(this, toolController) && !refreshed)
+		if (history.undoTo(this, toolController))
 			view.refresh();
 		selection.movement = null;
 	}
 
 	public void redoPreviousAction() {
-		refreshed = false;
-		if (history.redoTo(this, toolController) && !refreshed)
+		updatingTool = true;
+		if (history.redoTo(this, toolController))
 			view.refresh();
+		updatingTool = false;
 	}
 
 	public void newImage(int width, int height) {
@@ -161,6 +162,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton)
 			mouseDownWithRectangleSelectionTool(x, y);
 		lastMouse.setCursor(x, y);
+		refreshViewIfNecessary();
 	}
 
 	private void mouseDownWithPenSelected(int x, int y, int button) {
@@ -169,7 +171,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			undoCurrentPenStroke();
 		else
 			startNewPenStroke(x, y);
-		view.refresh();
+		setViewDirty();
 	}
 
 	private Color getDrawColorForMouseButton(int button) {
@@ -194,7 +196,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			undoCurrentLineStroke();
 		else
 			startLineStroke(x, y, button);
-		view.refresh();
+		setViewDirty();
 	}
 
 	private void undoCurrentLineStroke() {
@@ -233,9 +235,19 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 				null);
 		// test this by pasting, selecting area again, moving. should move
 		// underlying dot (which is to be set in the first place)
-		// hasFloatingImage=false;//TODO test this
+		// hasFloatingImage = false; //TODO test this
 		view.setFloatingImage(null);
-		view.refresh();
+		setViewDirty();
+	}
+
+	private void setViewDirty() {
+		viewDirty = true;
+	}
+
+	private void refreshViewIfNecessary() {
+		if (viewDirty)
+			view.refresh();
+		viewDirty = false;
 	}
 
 	public void leftMouseButtonUp() {
@@ -257,6 +269,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (state == State.DrawingLine)
 			history.addCommand(line.stroke);
 		state = State.Idle;
+		refreshViewIfNecessary();
 	}
 
 	public void setSelection(Rectangle rect) {
@@ -267,7 +280,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void updateSelection(Rectangle rect) {
 		setSelection(rect);
 		view.refresh();
-		refreshed = true;
 	}
 
 	public void mouseMovedTo(int x, int y) {
@@ -276,7 +288,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			break;
 		case PenDown:
 			pen.stroke.addLine(image, lastMouse.x, lastMouse.y, x, y);
-			view.refresh();
+			setViewDirty();
 			break;
 		case Selecting:
 			selection.rect.x2 = clampToImageX(x);
@@ -294,10 +306,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		case DrawingLine:
 			line.stroke.undoTo(this, toolController);
 			line.stroke.setLine(image, line.startX, line.startY, x, y);
-			view.refresh();
+			setViewDirty();
 			break;
 		}
 		lastMouse.setCursor(x, y);
+		refreshViewIfNecessary();
 	}
 
 	private int clampToImageY(int y) {
@@ -310,8 +323,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	@Override
 	public void toolChangedTo(Tool tool) {
-		if (selection.isActive())
-			updateSelection(null);
+		if (selection.isActive()) {
+			if (updatingTool)
+				setSelection(null);
+			else
+				updateSelection(null);
+		}
 	}
 
 	@Override
@@ -332,18 +349,19 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void paste() {
 		BufferedImage toCopy = clipboard.getImage();
 		if (toCopy != null) {
-			refreshed = false;
 			if (hasFloatingImage)
 				pasteFloatingImage();
+			updatingTool = true;
 			toolController.selectTool(Tool.RectangleSelection);
+			updatingTool = false;
 			floatingImage = ImageUtils.copyImage(toCopy);
 			view.setFloatingImage(floatingImage);
 			setSelection(new Rectangle(0, 0, toCopy.getWidth() - 1,
 					toCopy.getHeight() - 1));
 			selection.movement = null;
 			hasFloatingImage = true;
-			if (!refreshed)
-				view.refresh();
+			setViewDirty();
+			refreshViewIfNecessary();
 		}
 	}
 

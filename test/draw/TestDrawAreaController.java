@@ -862,12 +862,14 @@ public class TestDrawAreaController {
 	public void undoneSelectionCanBeMovedAgain() {
 		new20x10imageWithPenColor(BLACK);
 		drawPenDot(1, 1);
+		captureCurrentRefreshCount();
 
 		selectRect(0, 0, 2, 2);
 		dragLeftMouse(from(1, 1), to(6, 6));
 		controller.undoLastAction();
 		dragLeftMouse(from(1, 1), to(6, 1));
 
+		assertRefreshesSinceLastCapture(4);
 		assertPixelsAreSet(BLACK, WHITE, p(6, 1));
 		assertSelection(5, 0, 7, 2);
 	}
@@ -959,9 +961,11 @@ public class TestDrawAreaController {
 		drawPenDot(1, 1);
 		controller.undoLastAction();
 		toolController.selectTool(null);
+		captureCurrentRefreshCount();
 
 		controller.redoPreviousAction();
 
+		assertRefreshesSinceLastCapture(1);
 		assertEquals(Tool.Pen, toolController.getSelectedTool());
 	}
 
