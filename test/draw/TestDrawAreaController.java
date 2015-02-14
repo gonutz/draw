@@ -19,7 +19,8 @@ public class TestDrawAreaController {
 	private class SpyView implements DrawAreaView {
 		private int refreshCount;
 		private Rectangle selecetion;
-		private BufferedImage floating;
+		private int top;
+		private int left;
 
 		public void refresh() {
 			refreshCount++;
@@ -29,9 +30,13 @@ public class TestDrawAreaController {
 			this.selecetion = selection;
 		}
 
-		public void setFloatingImage(BufferedImage image) {
-			floating = image;
+		public Point getVisibleTopLeftCorner() {
+			Point p = new Point();
+			p.x = left;
+			p.y = top;
+			return p;
 		}
+
 	}
 
 	private class StubDrawSettings implements DrawSettings {
@@ -1250,16 +1255,18 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void pastedImageFloatsInTheTopLeftCorner() {
+	public void imageGetsPaintedToLeftCornerInView() {
 		clipboard.image = newBlackWhiteImageWithPixels(3, 4, p(0, 2));
 		new20x10imageWithSelectionTool();
+		view.top = 1;
+		view.left = 2;
 		captureCurrentRefreshCount();
 
 		controller.paste();
 
 		assertRefreshesSinceLastCapture(1);
-		assertSelection(0, 0, 2, 3);
-		assertPixelsAreSet(view.floating, BLACK, WHITE, p(0, 2));
+		assertSelection(2, 1, 4, 4);
+		assertPixelsAreSet(BLACK, WHITE, p(2, 3));
 	}
 
 	private BufferedImage newBlackWhiteImageWithPixels(int width, int height,
@@ -1275,21 +1282,6 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void deselectingPastedImageDropsItWhereItWasMoved() {
-		clipboard.image = newBlackWhiteImageWithPixels(2, 3, p(1, 2));
-		new20x10imageWithSelectionTool();
-		captureCurrentRefreshCount();
-
-		controller.paste();
-		dragLeftMouse(from(1, 2), to(3, 4));
-		controller.leftMouseButtonDown(9, 9);
-
-		assertRefreshesSinceLastCapture(3);
-		assertPixelsAreSet(BLACK, WHITE, p(3, 4));
-		assertNull(view.floating);
-	}
-
-	@Test
 	public void ifNoImageIsInClipboard_NothingIsPasted() {
 		new20x10imageWithSelectionTool();
 		captureCurrentRefreshCount();
@@ -1300,9 +1292,25 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void deselectingPastedImageDropsItWhereItWasMoved() {
+		clipboard.image = newBlackWhiteImageWithPixels(2, 3, p(1, 2));
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.paste();
+		dragLeftMouse(from(1, 2), to(3, 4));
+		controller.leftMouseButtonDown(9, 9); // disable selection
+		controller.leftMouseButtonUp();
+
+		assertRefreshesSinceLastCapture(3);
+		assertPixelsAreSet(BLACK, WHITE, p(3, 4));
+		assertNoSelectionIsMade();
+	}
+
+	@Test
 	public void pastingImageActivatesSelectionTool() {
 		clipboard.image = newImageOfSize(1, 1);
-		toolController.selectTool(Tool.Pen);
+		new20x10imageWithPenColor(BLACK);
 
 		controller.paste();
 
@@ -1310,7 +1318,7 @@ public class TestDrawAreaController {
 	}
 
 	@Test
-	public void pastedImageIsAboveTheRest() {
+	public void movingPastedImage_LeavesTheRestAsIs() {
 		clipboard.image = newBlackWhiteImageWithPixels(3, 3, p(1, 1));
 		new20x10imageWithPenColor(BLACK);
 		drawPenDot(0, 1);
@@ -1320,7 +1328,7 @@ public class TestDrawAreaController {
 		dragLeftMouse(from(1, 1), to(4, 1));
 
 		assertRefreshesSinceLastCapture(2);
-		assertPixelsAreSet(BLACK, WHITE, p(0, 1));
+		assertPixelsAreSet(BLACK, WHITE, p(0, 1), p(4, 1));
 	}
 
 	@Test
@@ -1334,20 +1342,35 @@ public class TestDrawAreaController {
 		controller.paste();
 
 		assertRefreshesSinceLastCapture(3);
-		assertPixelsAreSet(BLACK, WHITE, p(3, 4));
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1), p(3, 4));
 	}
 
 	@Test
-	public void pastedImageCanBeMoved() {
-		clipboard.image = newBlackWhiteImageWithPixels(3, 3);
-		new20x10imageWithPenColor(BLACK);
-		drawPenDot(0, 0);
+	public void pastingCanBeUndone() {
+		clipboard.image = newBlackWhiteImageWithPixels(3, 3, p(1, 1));
+		new20x10imageWithSelectionTool();
 		captureCurrentRefreshCount();
 
 		controller.paste();
-		controller.move(1, 0);
+		controller.undoLastAction();
 
 		assertRefreshesSinceLastCapture(2);
-		assertPixelsAreSet(BLACK, WHITE, p(0, 0));
+		assertNoSelectionIsMade();
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void pastingCanBeRedone() {
+		clipboard.image = newBlackWhiteImageWithPixels(3, 3, p(1, 1));
+		new20x10imageWithSelectionTool();
+		captureCurrentRefreshCount();
+
+		controller.paste();
+		controller.undoLastAction();
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(3);
+		assertSelection(0, 0, 2, 2);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1));
 	}
 }

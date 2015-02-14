@@ -44,10 +44,8 @@ public class UndoHistory {
 	/**
 	 * Re-does the last thing undone if there is one.
 	 * 
-	 * @param toolController
-	 * 
-	 * @return true if something was re-done and false if not (if nothing was
-	 *         undone).
+	 * @return true if something was re-done and false if not (if nothing has
+	 *         been previously undone).
 	 */
 	public boolean redoTo(ImageKeeper image, ToolController toolController) {
 		if (nothingToRedo())

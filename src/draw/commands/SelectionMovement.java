@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import draw.ImageKeeper;
+import draw.ImageUtils;
 import draw.Rectangle;
 import draw.SelectionKeeper;
 import draw.Tool;
@@ -23,19 +24,27 @@ public class SelectionMovement implements UndoableCommand {
 	public SelectionMovement(BufferedImage image, Rectangle selection,
 			Color background, SelectionKeeper selectionKeeper) {
 		this.selectionKeeper = selectionKeeper;
-		backgroundColor = background;
+		this.backgroundColor = background;
 		this.original = selection.copy();
 		this.selection = selection.copy();
-		copyImageWithSelectionSetToBackgroundColor(image);
+		this.background = ImageUtils.copyImage(image);
+		setSelectedAreaInBackgroundTo(backgroundColor);
 		copySelectedImageArea(image);
 	}
 
-	private void copyImageWithSelectionSetToBackgroundColor(BufferedImage image) {
-		background = new BufferedImage(image.getWidth(), image.getHeight(),
-				image.getType());
+	public SelectionMovement(BufferedImage image, Rectangle selection,
+			BufferedImage foreground, SelectionKeeper selectionKeeper) {
+		this.selectionKeeper = selectionKeeper;
+		this.backgroundColor = null;
+		this.original = selection.copy();
+		this.selection = selection.copy();
+		this.background = ImageUtils.copyImage(image);
+		this.foreground = ImageUtils.copyImage(foreground);
+	}
+
+	private void setSelectedAreaInBackgroundTo(Color color) {
 		Graphics2D g = (Graphics2D) background.getGraphics();
-		g.drawImage(image, 0, 0, null);
-		g.setBackground(backgroundColor);
+		g.setBackground(color);
 		g.clearRect(selection.left(), selection.top(), selection.width(),
 				selection.height());
 	}

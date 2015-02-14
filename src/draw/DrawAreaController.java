@@ -1,14 +1,15 @@
 package draw;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import draw.DrawAreaView.Point;
 import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
 import draw.commands.SelectionMovement;
 import draw.commands.Stroke;
 import draw.commands.UndoHistory;
+import draw.commands.UndoableCommand;
 
 public class DrawAreaController implements ImageProvider, ImageKeeper,
 		SelectionKeeper, ToolChangeObserver, ImageDisplay {
@@ -24,8 +25,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Pen pen = new Pen();
 	private State state = State.Idle;
 	private Line line = new Line();
-	private boolean hasFloatingImage;
-	private BufferedImage floatingImage;
 	private boolean viewDirty;
 	private boolean updatingTool;
 
@@ -50,8 +49,9 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private class Selection {
-		Rectangle rect;
-		SelectionMovement movement;
+		private Rectangle rect;
+		private SelectionMovement movement;
+		private boolean movementAddedToHistory;
 
 		public boolean contains(int x, int y) {
 			if (rect == null)
@@ -69,7 +69,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 				movement = new SelectionMovement(image, rect,
 						drawSettings.getBackgroundColor(),
 						DrawAreaController.this);
-				history.addCommand(selection.movement);
+				movementAddedToHistory = false;
 			}
 		}
 
@@ -84,6 +84,14 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 		public boolean isActive() {
 			return rect != null;
+		}
+
+		public void moveBy(int dx, int dy) {
+			movement.moveBy(dx, dy);
+			if (!movementAddedToHistory) {
+				history.addCommand(movement);
+				movementAddedToHistory = true;
+			}
 		}
 	}
 
@@ -120,7 +128,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		setSelection(null);
 		if (history.undoTo(this, toolController))
 			view.refresh();
-		selection.movement = null;
+		selection.stopMovement();
 	}
 
 	public void redoPreviousAction() {
@@ -216,8 +224,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (selection.contains(x, y))
 			selection.startMovingWithMouse();
 		else {
-			if (hasFloatingImage)
-				pasteFloatingImage();
 			selection.stopMovement();
 			if (isInsideImage(x, y))
 				selection.startSelectionAt(x, y);
@@ -227,17 +233,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private boolean isInsideImage(int x, int y) {
 		return x >= 0 && x < image.getWidth() && y >= 0
 				&& y < image.getHeight();
-	}
-
-	private void pasteFloatingImage() {
-		Graphics g = image.getGraphics();
-		g.drawImage(floatingImage, selection.rect.left(), selection.rect.top(),
-				null);
-		// test this by pasting, selecting area again, moving. should move
-		// underlying dot (which is to be set in the first place)
-		// hasFloatingImage = false; //TODO test this
-		view.setFloatingImage(null);
-		setViewDirty();
 	}
 
 	private void setViewDirty() {
@@ -298,9 +293,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		case MovingSelection:
 			int dx = x - lastMouse.x;
 			int dy = y - lastMouse.y;
-			selection.movement.moveBy(dx, dy);
-			if (!hasFloatingImage)
-				selection.movement.drawCompositeTo(image.getGraphics());
+			selection.moveBy(dx, dy);
+			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
 			break;
 		case DrawingLine:
@@ -347,21 +341,45 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void paste() {
-		BufferedImage toCopy = clipboard.getImage();
-		if (toCopy != null) {
-			if (hasFloatingImage)
-				pasteFloatingImage();
+		BufferedImage toPaste = clipboard.getImage();
+		if (toPaste != null) {
+			Point corner = view.getVisibleTopLeftCorner();
+			int x = corner.x;
+			int y = corner.y;
+			int w = toPaste.getWidth();
+			int h = toPaste.getHeight();
+			Rectangle newSelection = new Rectangle(x, y, x + w - 1, y + h - 1);
+			PasteCommand paste = new PasteCommand(toPaste, newSelection);
+			paste.doTo(this, toolController);
+			history.addCommand(paste);
+			view.refresh();
+		}
+	}
+
+	private class PasteCommand implements UndoableCommand {
+		BufferedImage background;
+		private BufferedImage toPaste;
+		private Rectangle newSelection;
+
+		public PasteCommand(BufferedImage toPaste, Rectangle selection) {
+			background = ImageUtils.copyImage(image);
+			this.toPaste = toPaste;
+			this.newSelection = selection;
+		}
+
+		@Override
+		public void undoTo(ImageKeeper keeper, ToolController toolController) {
+			keeper.setImage(ImageUtils.copyImage(background));
+		}
+
+		@Override
+		public void doTo(ImageKeeper keeper, ToolController toolController) {
+			selection.movement = new SelectionMovement(image, newSelection,
+					toPaste, DrawAreaController.this);
 			updatingTool = true;
-			toolController.selectTool(Tool.RectangleSelection);
+			selection.movement.doTo(DrawAreaController.this, toolController);
 			updatingTool = false;
-			floatingImage = ImageUtils.copyImage(toCopy);
-			view.setFloatingImage(floatingImage);
-			setSelection(new Rectangle(0, 0, toCopy.getWidth() - 1,
-					toCopy.getHeight() - 1));
-			selection.movement = null;
-			hasFloatingImage = true;
-			setViewDirty();
-			refreshViewIfNecessary();
+			setSelection(newSelection);
 		}
 	}
 
@@ -378,9 +396,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void move(int dx, int dy) {
 		if (selection.isActive()) {
 			selection.createNewMovementIfNecessary();
-			selection.movement.moveBy(dx, dy);
-			if (!hasFloatingImage)
-				selection.movement.drawCompositeTo(image.getGraphics());
+			selection.moveBy(dx, dy);
+			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
 		}
 	}

@@ -8,14 +8,13 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
-
-import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseWheelEvent;
 
 public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		MouseWheelListener {
@@ -25,7 +24,6 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private PositionView positionView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
-	private BufferedImage floatingImage;
 
 	public DrawArea() {
 		initialize();
@@ -90,16 +88,10 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	@Override
-	public void setFloatingImage(BufferedImage image) {
-		floatingImage = image;
-	}
-
-	@Override
 	public void paint(Graphics graphics) {
 		Graphics2D g = (Graphics2D) graphics;
 		clearBackground(g);
 		drawImage(g);
-		drawFloatingImage(g);
 		paintSelection(g);
 	}
 
@@ -113,12 +105,6 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 			BufferedImage img = controller.getImage();
 			g.drawImage(img, 0, 0, img.getWidth() * zoomFactor, img.getHeight()
 					* zoomFactor, null);
-		}
-	}
-
-	private void drawFloatingImage(Graphics2D g) {
-		if (floatingImage != null) {
-			g.drawImage(floatingImage, selection.left(), selection.top(), null);
 		}
 	}
 
@@ -250,6 +236,15 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 				visible.y += dy;
 			scrollRectToVisible(visible);
 		}
+	}
+
+	@Override
+	public Point getVisibleTopLeftCorner() {
+		java.awt.Rectangle v = getVisibleRect();
+		Point p = new Point();
+		p.x = (v.x + zoomFactor - 1) / zoomFactor;
+		p.y = (v.y + zoomFactor - 1) / zoomFactor;
+		return p;
 	}
 
 }
