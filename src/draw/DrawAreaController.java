@@ -1,6 +1,7 @@
 package draw;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import draw.DrawAreaView.Point;
@@ -169,6 +170,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			mouseDownWithLineSelected(x, y, button);
 		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton)
 			mouseDownWithRectangleSelectionTool(x, y);
+		if (tool == Tool.Fill)
+			fillWith(getDrawColorForMouseButton(button));
 		lastMouse.setCursor(x, y);
 		refreshViewIfNecessary();
 	}
@@ -233,6 +236,13 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private boolean isInsideImage(int x, int y) {
 		return x >= 0 && x < image.getWidth() && y >= 0
 				&& y < image.getHeight();
+	}
+
+	private void fillWith(Color color) {
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setBackground(color);
+		g.clearRect(0, 0, image.getWidth(), image.getHeight());
+		view.refresh();
 	}
 
 	private void setViewDirty() {

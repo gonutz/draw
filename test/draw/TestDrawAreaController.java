@@ -1373,4 +1373,50 @@ public class TestDrawAreaController {
 		assertSelection(0, 0, 2, 2);
 		assertPixelsAreSet(BLACK, WHITE, p(1, 1));
 	}
+
+	private void new20x10imageWithFillTool() {
+		drawSettings.foregroundColor = Color.black;
+		drawSettings.backgroundColor = Color.white;
+		toolController.selectTool(Tool.Fill);
+		controller.newImage(20, 10);
+	}
+
+	@Test
+	public void fillingWhiteImageWithBlack_FillsAll() {
+		new20x10imageWithFillTool();
+		captureCurrentRefreshCount();
+
+		controller.leftMouseButtonDown(0, 0);
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(WHITE, BLACK);
+	}
+
+	@Test
+	public void fillingWithRightClick_UsesBackgroudColor() {
+		new20x10imageWithFillTool();
+		final int color = 0xFF556677;
+		drawSettings.backgroundColor = new Color(color, true);
+
+		controller.rightMouseButtonDown(10, 2);
+
+		assertPixelsAreSet(BLACK, color);
+	}
+
+	@Test
+	public void fillOnlyPaintsSameColorPixelsIn4Neighborhoods() {
+		// .=white, x=black
+		// x.x.
+		// ...x
+		// x.x.
+		createTestImageWithPixels(4, 3, p(0, 0), p(2, 0), p(3, 1), p(0, 2),
+				p(2, 2));
+
+		// TODO
+	}
+
+	private void createTestImageWithPixels(int width, int height,
+			Point... pixels) {
+		// TODO
+	}
 }
