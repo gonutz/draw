@@ -1,10 +1,10 @@
 package draw;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import draw.DrawAreaView.Point;
+import draw.commands.FillCommand;
 import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
 import draw.commands.SelectionMovement;
@@ -171,7 +171,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (tool == Tool.RectangleSelection && button == Mouse.LeftButton)
 			mouseDownWithRectangleSelectionTool(x, y);
 		if (tool == Tool.Fill)
-			fillWith(getDrawColorForMouseButton(button));
+			fillWith(x, y, getDrawColorForMouseButton(button));
 		lastMouse.setCursor(x, y);
 		refreshViewIfNecessary();
 	}
@@ -238,10 +238,10 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 				&& y < image.getHeight();
 	}
 
-	private void fillWith(Color color) {
-		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setBackground(color);
-		g.clearRect(0, 0, image.getWidth(), image.getHeight());
+	private void fillWith(int x, int y, Color color) {
+		FillCommand fill = new FillCommand(x, y, color);
+		fill.doTo(this, toolController);
+		history.addCommand(fill);
 		view.refresh();
 	}
 

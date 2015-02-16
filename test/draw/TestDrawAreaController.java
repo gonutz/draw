@@ -1374,16 +1374,16 @@ public class TestDrawAreaController {
 		assertPixelsAreSet(BLACK, WHITE, p(1, 1));
 	}
 
-	private void new20x10imageWithFillTool() {
+	private void new8x3imageWithFillTool() {
 		drawSettings.foregroundColor = Color.black;
 		drawSettings.backgroundColor = Color.white;
 		toolController.selectTool(Tool.Fill);
-		controller.newImage(20, 10);
+		controller.newImage(8, 3);
 	}
 
 	@Test
 	public void fillingWhiteImageWithBlack_FillsAll() {
-		new20x10imageWithFillTool();
+		new8x3imageWithFillTool();
 		captureCurrentRefreshCount();
 
 		controller.leftMouseButtonDown(0, 0);
@@ -1394,29 +1394,64 @@ public class TestDrawAreaController {
 
 	@Test
 	public void fillingWithRightClick_UsesBackgroudColor() {
-		new20x10imageWithFillTool();
+		new8x3imageWithFillTool();
 		final int color = 0xFF556677;
 		drawSettings.backgroundColor = new Color(color, true);
 
-		controller.rightMouseButtonDown(10, 2);
+		controller.rightMouseButtonDown(5, 2);
 
 		assertPixelsAreSet(BLACK, color);
 	}
 
 	@Test
-	public void fillOnlyPaintsSameColorPixelsIn4Neighborhoods() {
-		// .=white, x=black
-		// x.x.
-		// ...x
-		// x.x.
-		createTestImageWithPixels(4, 3, p(0, 0), p(2, 0), p(3, 1), p(0, 2),
-				p(2, 2));
+	public void fillingCanBeUndone() {
+		new8x3imageWithFillTool();
+		controller.leftMouseButtonDown(0, 0);
+		captureCurrentRefreshCount();
 
-		// TODO
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE);
 	}
 
-	private void createTestImageWithPixels(int width, int height,
-			Point... pixels) {
-		// TODO
+	@Test
+	public void fillCanBeRedone() {
+		new8x3imageWithFillTool();
+		controller.leftMouseButtonDown(0, 0);
+		controller.undoLastAction();
+		captureCurrentRefreshCount();
+
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(WHITE, BLACK);
+	}
+
+	@Test
+	public void undoingFill_SelectsFillTool() {
+		new8x3imageWithFillTool();
+		controller.leftMouseButtonDown(0, 0);
+		toolController.selectTool(Tool.Pen);
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertEquals(Tool.Fill, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void redoingFill_SelectsFillTool() {
+		new8x3imageWithFillTool();
+		controller.leftMouseButtonDown(0, 0);
+		controller.undoLastAction();
+		toolController.selectTool(Tool.Pen);
+		captureCurrentRefreshCount();
+
+		controller.redoPreviousAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertEquals(Tool.Fill, toolController.getSelectedTool());
 	}
 }
