@@ -19,6 +19,8 @@ public class FillCommand implements UndoableCommand {
 	private int x;
 	private int y;
 	private boolean scanLinesAreKnown = false;
+	// The lines are stored as consecutive three-tuples of (left,right,y)
+	// coordinates meaning a line from x left to x right (including) on y.
 	private List<Integer> filledLines = new ArrayList<Integer>();
 
 	public FillCommand(int x, int y, Color fillColor) {
