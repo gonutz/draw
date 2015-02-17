@@ -18,6 +18,7 @@ public class FillCommand implements UndoableCommand {
 	private int[] color = new int[4];
 	private int x;
 	private int y;
+	private boolean scanLinesAreKnown = false;
 	private List<Integer> filledLines = new ArrayList<Integer>();
 
 	public FillCommand(int x, int y, Color fillColor) {
@@ -29,30 +30,40 @@ public class FillCommand implements UndoableCommand {
 
 	@Override
 	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		BufferedImage image = keeper.getImage();
+		fillScanLinesWithColor(keeper.getImage(), oldColor);
+		toolController.selectTool(Tool.Fill);
+	}
+
+	private void fillScanLinesWithColor(BufferedImage image, int[] fillWith) {
 		WritableRaster raster = image.getRaster();
 		for (int i = 0; i < filledLines.size(); i += 3) {
 			int left = filledLines.get(i + 0);
 			int right = filledLines.get(i + 1);
 			int y = filledLines.get(i + 2);
 			for (int x = left; x <= right; x++)
-				raster.setPixel(x, y, oldColor);
+				raster.setPixel(x, y, fillWith);
 		}
-		toolController.selectTool(Tool.Fill);
 	}
 
 	@Override
 	public void doTo(ImageKeeper keeper, ToolController toolController) {
 		BufferedImage image = keeper.getImage();
-		WritableRaster raster = image.getRaster();
-		oldColor = raster.getPixel(x, y, new int[4]);
-		if (isFillColor(oldColor))
-			return;
-		fillScanLines(raster, x, y, raster.getBounds());
+		if (!scanLinesAreKnown)
+			findAndFillScanLinesToFill(image);
+		else
+			fillScanLinesWithColor(image, fillColor);
 		toolController.selectTool(Tool.Fill);
 	}
 
-	private void fillScanLines(WritableRaster raster, int x, int y,
+	private void findAndFillScanLinesToFill(BufferedImage image) {
+		WritableRaster raster = image.getRaster();
+		oldColor = raster.getPixel(x, y, new int[4]);
+		if (!isFillColor(oldColor))
+			fillAndStoreScanLines(raster, x, y, raster.getBounds());
+		scanLinesAreKnown = true;
+	}
+
+	private void fillAndStoreScanLines(WritableRaster raster, int x, int y,
 			Rectangle bounds) {
 		int left = findLeftBorder(raster, x, y);
 		int right = findRightBorder(raster, x, y, bounds);
@@ -86,14 +97,16 @@ public class FillCommand implements UndoableCommand {
 			int left, int right) {
 		if (y > 0)
 			for (int i = left; i <= right; i++)
-				fillScanLines(raster, i, y - 1, bounds);
+				if (isOldColor(raster.getPixel(i, y - 1, color)))
+					fillAndStoreScanLines(raster, i, y - 1, bounds);
 	}
 
 	private void fillBelowLine(WritableRaster raster, int y, Rectangle bounds,
 			int left, int right) {
 		if (y < bounds.height - 1)
 			for (int i = left; i <= right; i++)
-				fillScanLines(raster, i, y + 1, bounds);
+				if (isOldColor(raster.getPixel(i, y + 1, color)))
+					fillAndStoreScanLines(raster, i, y + 1, bounds);
 	}
 
 	private boolean isFillColor(int[] pixel) {
