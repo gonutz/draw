@@ -39,7 +39,7 @@ public class TestDrawAreaController {
 
 	}
 
-	private class StubDrawSettings implements DrawSettings {
+	private class MockDrawSettings implements DrawSettings {
 		private Color foregroundColor;
 		private Color backgroundColor;
 
@@ -51,6 +51,16 @@ public class TestDrawAreaController {
 		@Override
 		public Color getBackgroundColor() {
 			return backgroundColor;
+		}
+
+		@Override
+		public void setForegroundColor(Color color) {
+			foregroundColor = color;
+		}
+
+		@Override
+		public void setBackgroundColor(Color color) {
+			backgroundColor = color;
 		}
 	}
 
@@ -77,7 +87,7 @@ public class TestDrawAreaController {
 	public void setup() {
 		view = new SpyView();
 		controller = new DrawAreaController(view);
-		drawSettings = new StubDrawSettings();
+		drawSettings = new MockDrawSettings();
 		controller.setDrawSettings(drawSettings);
 		toolController = new ToolViewController(new DummyToolView());
 		controller.setToolController(toolController);
@@ -87,7 +97,7 @@ public class TestDrawAreaController {
 	}
 
 	private SpyView view;
-	private StubDrawSettings drawSettings;
+	private MockDrawSettings drawSettings;
 	private ToolViewController toolController;
 	private DrawAreaController controller;
 	private MockClipboard clipboard;
@@ -1453,5 +1463,31 @@ public class TestDrawAreaController {
 
 		assertRefreshesSinceLastCapture(1);
 		assertEquals(Tool.Fill, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void pickingWithLeftMouse_ChangesForegroundColor() {
+		int color = 0xFF112233;
+		new20x10imageWithPenColor(color);
+		drawPenDot(5, 5);
+		toolController.selectTool(Tool.ColorPicker);
+		drawSettings.foregroundColor = Color.black;
+
+		controller.leftMouseButtonDown(5, 5);
+
+		assertEquals(new Color(color, true), drawSettings.foregroundColor);
+	}
+
+	@Test
+	public void pickingWithRightMouse_ChangesBackgroundColor() {
+		int color = 0xFF112233;
+		new20x10imageWithPenColor(color);
+		drawPenDot(2, 3);
+		toolController.selectTool(Tool.ColorPicker);
+		drawSettings.backgroundColor = Color.black;
+
+		controller.rightMouseButtonDown(2, 3);
+
+		assertEquals(new Color(color, true), drawSettings.backgroundColor);
 	}
 }

@@ -172,6 +172,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			mouseDownWithRectangleSelectionTool(x, y);
 		if (tool == Tool.Fill)
 			fillWith(x, y, getDrawColorForMouseButton(button));
+		if (tool == Tool.ColorPicker)
+			pickColor(x, y, button);
 		lastMouse.setCursor(x, y);
 		refreshViewIfNecessary();
 	}
@@ -243,6 +245,14 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		fill.doTo(this, toolController);
 		history.addCommand(fill);
 		view.refresh();
+	}
+
+	private void pickColor(int x, int y, int mouseButton) {
+		Color color = new Color(image.getRGB(x, y), true);
+		if (mouseButton == Mouse.LeftButton)
+			drawSettings.setForegroundColor(color);
+		else
+			drawSettings.setBackgroundColor(color);
 	}
 
 	private void setViewDirty() {

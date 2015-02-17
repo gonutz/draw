@@ -54,4 +54,16 @@ public class ColorPaletteViewController implements DrawSettings {
 	public Color getForegroundColor() {
 		return foregroundColor;
 	}
+
+	@Override
+	public void setForegroundColor(Color color) {
+		foregroundColor = color;
+		current.setForegroundColor(color);
+	}
+
+	@Override
+	public void setBackgroundColor(Color color) {
+		backgroundColor = color;
+		current.setBackgroundColor(color);
+	}
 }

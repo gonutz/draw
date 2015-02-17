@@ -8,4 +8,8 @@ public interface DrawSettings {
 
 	Color getBackgroundColor();
 
+	void setForegroundColor(Color color);
+
+	void setBackgroundColor(Color color);
+
 }
