@@ -123,6 +123,7 @@ public class DimensionChooser extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				accepted = false;
 				DimensionChooser.this.setVisible(false);
 			}
 		});
@@ -144,17 +145,26 @@ public class DimensionChooser extends JDialog {
 
 	@Override
 	public void setVisible(boolean b) {
-		boolean widthOk = ensureTextIsNumber(width);
-		boolean heightOK = ensureTextIsNumber(height);
+		boolean widthOk = ensureTextIsValidNumber(width);
+		boolean heightOK = ensureTextIsValidNumber(height);
 		if (widthOk && heightOK) {
 			super.setVisible(b);
 			width.requestFocus();
 		}
 	}
 
-	private boolean ensureTextIsNumber(JTextField text) {
+	private boolean ensureTextIsValidNumber(JTextField text) {
 		try {
-			Integer.parseInt(text.getText());
+			int n = Integer.parseInt(text.getText());
+			final int maxSize = 5000;
+			if (n < 1) {
+				text.setText("1");
+				return false;
+			}
+			if (n > maxSize) {
+				text.setText("" + maxSize);
+				return false;
+			}
 			return true;
 		} catch (NumberFormatException e) {
 			text.setText("100");
