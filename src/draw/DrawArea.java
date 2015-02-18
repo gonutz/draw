@@ -24,6 +24,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private PositionView positionView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
+	private int mouseX, mouseY;
 
 	public DrawArea() {
 		initialize();
@@ -130,13 +131,13 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				mouseX = e.getX() / zoomFactor;
+				mouseY = e.getY() / zoomFactor;
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					controller.leftMouseButtonDown(e.getX() / zoomFactor,
-							e.getY() / zoomFactor);
+					controller.leftMouseButtonDown(mouseX, mouseY);
 				}
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					controller.rightMouseButtonDown(e.getX() / zoomFactor,
-							e.getY() / zoomFactor);
+					controller.rightMouseButtonDown(mouseX, mouseY);
 				}
 			}
 
@@ -158,18 +159,18 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				int x = e.getX() / zoomFactor;
-				int y = e.getY() / zoomFactor;
-				controller.mouseMovedTo(x, y);
-				positionView.setPosition(x, y);
+				mouseX = e.getX() / zoomFactor;
+				mouseY = e.getY() / zoomFactor;
+				controller.mouseMovedTo(mouseX, mouseY);
+				positionView.setPosition(mouseX, mouseY);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				int x = e.getX() / zoomFactor;
-				int y = e.getY() / zoomFactor;
-				controller.mouseMovedTo(x, y);
-				positionView.setPosition(x, y);
+				mouseX = e.getX() / zoomFactor;
+				mouseY = e.getY() / zoomFactor;
+				controller.mouseMovedTo(mouseX, mouseY);
+				positionView.setPosition(mouseX, mouseY);
 			}
 		});
 		addMouseWheelListener(this);
@@ -219,9 +220,9 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		int dy = visible.height / 5;
 		if (e.isControlDown()) {
 			if (e.getWheelRotation() < 0)
-				zoomIn(visible, e.getX(), e.getY());
+				zoomIn(visible, mouseX * zoomFactor, mouseY * zoomFactor);
 			if (e.getWheelRotation() > 0)
-				zoomOut(visible, e.getX(), e.getY());
+				zoomOut(visible, mouseX * zoomFactor, mouseY * zoomFactor);
 			positionView.setNoPosition();
 		} else if (e.isShiftDown() || e.isAltDown()) {
 			if (e.getWheelRotation() < 0)
