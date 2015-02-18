@@ -37,7 +37,7 @@ import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
 
 public class MainWindow implements ToolView, ErrorDisplay, PositionView,
-		CurrentFileNameObserver {
+		CurrentFileNameObserver, ZoomView {
 
 	private static final int INITIAL_CANVAS_WIDTH = 640;
 	private static final int INITIAL_CANVAS_HEIGHT = 480;
@@ -58,6 +58,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	private ImageSaveController imageSaveController;
 	private ImageLoadController imageLoadController;
 	private JLabel positionLabel;
+	private JLabel zoomLabel;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -553,7 +554,16 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		FlowLayout flowLayout = (FlowLayout) colorContainer.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		flowLayout.setHgap(20);
-		mainFrame.getContentPane().add(colorContainer, BorderLayout.SOUTH);
+
+		JPanel colorAndStatusContainer = new JPanel(new BorderLayout());
+		colorAndStatusContainer.add(colorContainer, BorderLayout.WEST);
+
+		zoomLabel = new JLabel("Zoom 100% ");
+		zoomLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		colorAndStatusContainer.add(zoomLabel, BorderLayout.EAST);
+
+		mainFrame.getContentPane().add(colorAndStatusContainer,
+				BorderLayout.SOUTH);
 
 		currentColors = new CurrentColors();
 		colorContainer.add(currentColors);
@@ -569,6 +579,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		mainFrame.getContentPane().add(paintAreaScroller, BorderLayout.CENTER);
 		drawArea = new DrawArea();
 		drawArea.setPositionView(this);
+		drawArea.setZoomView(this);
 		paintAreaScroller.setViewportView(drawArea);
 		paintAreaScroller.addMouseWheelListener(drawArea);
 	}
@@ -595,5 +606,10 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			mainFrame.setTitle("Draw");
 		else
 			mainFrame.setTitle("Draw - " + fileName);
+	}
+
+	@Override
+	public void setZoomFactor(int zoomFactor) {
+		zoomLabel.setText("Zoom " + zoomFactor * 100 + "% ");
 	}
 }

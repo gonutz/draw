@@ -22,6 +22,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private static final long serialVersionUID = 1L;
 	private DrawAreaController controller;
 	private PositionView positionView;
+	private ZoomView zoomView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
 	private int mouseX, mouseY;
@@ -38,6 +39,10 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		this.positionView = positionView;
 	}
 
+	public void setZoomView(ZoomView zoomView) {
+		this.zoomView = zoomView;
+	}
+
 	public void zoomIn() {
 		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
 				.clone();
@@ -50,10 +55,15 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		if (zoomFactor < 32) {
 			visible.x = 2 * x - (x - visible.x);
 			visible.y = 2 * y - (y - visible.y);
-			zoomFactor *= 2;
+			setZoomFactor(zoomFactor * 2);
 			refresh();
 			scrollRectToVisible(visible);
 		}
+	}
+
+	private void setZoomFactor(int zoom) {
+		this.zoomFactor = zoom;
+		zoomView.setZoomFactor(zoom);
 	}
 
 	public void zoomOut() {
@@ -69,7 +79,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 			visible.x = x / 2 - (x - visible.x);
 			visible.y = y / 2 - (y - visible.y);
 			scrollRectToVisible(visible);
-			zoomFactor /= 2;
+			setZoomFactor(zoomFactor / 2);
 			refresh();
 		}
 	}
