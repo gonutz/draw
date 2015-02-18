@@ -3,6 +3,8 @@ package draw;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -15,6 +17,7 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 	private static final long serialVersionUID = 1L;
 	private JPanel[] colorBoxes;
 	private ColorPaletteViewController controller;
+	private JColorChooser colorChooser = new JColorChooser();
 
 	public ColorPalette() {
 		setBorder(null);
@@ -48,12 +51,12 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 						controller.selectForegroundColor(index);
 					if (isRightClick(e))
 						controller.selectBackgroundColor(index);
-					if (isLeftDoubleClick(e)) {
-						Color newColor = JColorChooser.showDialog(
-								ColorPalette.this, "Select new color",
-								colorBoxes[index].getBackground());
-						if (newColor != null)
-							controller.setPaletteEntry(index, newColor);
+					if (isLeftOrRightDoubleClick(e)) {
+						colorChooser.setColor(colorBoxes[index].getBackground());
+						JColorChooser.createDialog(null, "Select new color",
+								true, colorChooser,
+								new ColorAcceptListener(index, e.getButton()),
+								null).setVisible(true);
 					}
 				}
 
@@ -67,9 +70,10 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 							&& e.getButton() == MouseEvent.BUTTON3;
 				}
 
-				private boolean isLeftDoubleClick(MouseEvent e) {
+				private boolean isLeftOrRightDoubleClick(MouseEvent e) {
 					return e.getClickCount() == 2
-							&& e.getButton() == MouseEvent.BUTTON1;
+							&& (e.getButton() == MouseEvent.BUTTON1 || e
+									.getButton() == MouseEvent.BUTTON3);
 				}
 
 				@Override
@@ -92,6 +96,30 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 				public void mouseReleased(MouseEvent e) {
 				}
 			});
+		}
+	}
+
+	private class ColorAcceptListener implements ActionListener {
+		int index;
+		int button;
+
+		public ColorAcceptListener(int index, int button) {
+			this.index = index;
+			this.button = button;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Color color = colorChooser.getColor();
+			controller.setPaletteEntry(index, color);
+			if (isLeftButton(button))
+				controller.setForegroundColor(color);
+			else
+				controller.setBackgroundColor(color);
+		}
+
+		private boolean isLeftButton(int button) {
+			return button == MouseEvent.BUTTON1;
 		}
 	}
 
