@@ -3,6 +3,9 @@ package draw;
 public class Bresenham {
 
 	public static int[] linePoints(int x, int y, int x2, int y2) {
+		if (x2 < x) {
+			return linePoints(x2, y2, x, y);
+		}
 		int w = x2 - x;
 		int h = y2 - y;
 		int lineLength = max(abs(w), abs(h)) + 1;

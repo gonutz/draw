@@ -37,25 +37,43 @@ public class TestBresenhamLine {
 	}
 
 	@Test
+	public void linesAreDrawnFromLeftToRight() {
+		assertLinePoints(from(0, 0), to(2, 0), p(0, 0), p(1, 0), p(2, 0));
+		assertLinePoints(from(2, 0), to(0, 0), p(0, 0), p(1, 0), p(2, 0));
+	}
+
+	@Test
+	public void verticalLines() {
+		assertLinePoints(from(2, 3), to(2, 5), p(2, 3), p(2, 4), p(2, 5));
+		assertLinePoints(from(2, 5), to(2, 3), p(2, 5), p(2, 4), p(2, 3));
+	}
+
+	@Test
 	public void adjacentPoints_FormTwoPointLine() {
 		assertLinePoints(from(0, 0), to(1, 1), p(0, 0), p(1, 1));
-		assertLinePoints(from(1, 2), to(0, 1), p(1, 2), p(0, 1));
+		assertLinePoints(from(1, 2), to(0, 1), p(0, 1), p(1, 2));
 	}
 
 	@Test
 	public void diagonalLines() {
 		assertLinePoints(from(0, 0), to(2, 2), p(0, 0), p(1, 1), p(2, 2));
 		assertLinePoints(from(0, 2), to(2, 0), p(0, 2), p(1, 1), p(2, 0));
-		assertLinePoints(from(4, 5), to(2, 3), p(4, 5), p(3, 4), p(2, 3));
-		assertLinePoints(from(10, 20), to(7, 17), p(10, 20), p(9, 19),
-				p(8, 18), p(7, 17));
+		assertLinePoints(from(4, 5), to(2, 3), p(2, 3), p(3, 4), p(4, 5));
+		assertLinePoints(from(10, 20), to(7, 17), p(7, 17), p(8, 18), p(9, 19),
+				p(10, 20));
 	}
 
 	@Test
 	public void nonDiagonalLines() {
 		assertLinePoints(from(0, 0), to(3, 1), p(0, 0), p(1, 0), p(2, 1),
 				p(3, 1));
-		assertLinePoints(from(3, 1), to(0, 0), p(3, 1), p(2, 1), p(1, 0),
-				p(0, 0));
+		assertLinePoints(from(3, 1), to(0, 0), p(0, 0), p(1, 0), p(2, 1),
+				p(3, 1));
+	}
+
+	@Test
+	public void lineHasSamePixel_NoMatterOnWhatEndItStarts() {
+		assertLinePoints(from(0, 0), to(2, 1), p(0, 0), p(1, 1), p(2, 1));
+		assertLinePoints(from(2, 1), to(0, 0), p(0, 0), p(1, 1), p(2, 1));
 	}
 }
