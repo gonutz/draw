@@ -457,7 +457,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		rectangleSelection.setToolTipText("Select Rectangle (S)");
 		rectangleSelection.setBackground(Color.WHITE);
 		rectangleSelection.setBorder(null);
-		rectangleSelection.setIcon(new ImageIcon("./rsc/rect_select.png"));
+		rectangleSelection.setIcon(new ImageIcon(getClass().getResource(
+				"/rsc/rect_select.png")));
 		GridBagConstraints gbc_rectangleSelection = new GridBagConstraints();
 		gbc_rectangleSelection.anchor = GridBagConstraints.NORTHWEST;
 		gbc_rectangleSelection.insets = new Insets(0, 0, 5, 5);
@@ -473,7 +474,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			}
 		});
 		pen.setToolTipText("Pen (P)");
-		pen.setIcon(new ImageIcon("./rsc/pen.png"));
+		pen.setIcon(new ImageIcon(getClass().getResource("/rsc/pen.png")));
 		pen.setBorder(null);
 		pen.setBackground(Color.WHITE);
 		GridBagConstraints gbc_pen = new GridBagConstraints();
@@ -491,7 +492,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			}
 		});
 		fill.setToolTipText("Fill (F)");
-		fill.setIcon(new ImageIcon("./rsc/fill.png"));
+		fill.setIcon(new ImageIcon(getClass().getResource("/rsc/fill.png")));
 		fill.setBorder(null);
 		fill.setBackground(Color.WHITE);
 		GridBagConstraints gbc_fill = new GridBagConstraints();
@@ -507,7 +508,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				toolViewController.selectTool(Tool.ColorPicker);
 			}
 		});
-		colorPicker.setIcon(new ImageIcon("./rsc/pick.png"));
+		colorPicker.setIcon(new ImageIcon(getClass().getResource(
+				"/rsc/pick.png")));
 		colorPicker.setToolTipText("Color Selection (C)");
 		colorPicker.setBorder(null);
 		colorPicker.setBackground(Color.WHITE);
@@ -524,7 +526,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				toolViewController.selectTool(Tool.Line);
 			}
 		});
-		line.setIcon(new ImageIcon("./rsc/line.png"));
+		line.setIcon(new ImageIcon(getClass().getResource("/rsc/line.png")));
 		line.setToolTipText("Line (L)");
 		line.setBorder(null);
 		line.setBackground(Color.WHITE);
@@ -541,7 +543,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				toolViewController.selectTool(Tool.Eraser);
 			}
 		});
-		eraser.setIcon(new ImageIcon("./rsc/erase.png"));
+		eraser.setIcon(new ImageIcon(getClass().getResource("/rsc/erase.png")));
 		eraser.setToolTipText("Eraser (E)");
 		eraser.setBorder(null);
 		eraser.setBackground(Color.WHITE);
