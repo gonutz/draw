@@ -12,7 +12,7 @@ import draw.SelectionKeeper;
 import draw.Tool;
 import draw.ToolController;
 
-public class SelectionMovement implements UndoableCommand {
+public class SelectionMoveCommand implements UndoableCommand {
 
 	private Color backgroundColor;
 	private Rectangle original;
@@ -21,7 +21,7 @@ public class SelectionMovement implements UndoableCommand {
 	private BufferedImage background;
 	private SelectionKeeper selectionKeeper;
 
-	public SelectionMovement(BufferedImage image, Rectangle selection,
+	public SelectionMoveCommand(BufferedImage image, Rectangle selection,
 			Color background, SelectionKeeper selectionKeeper) {
 		this.selectionKeeper = selectionKeeper;
 		this.backgroundColor = background;
@@ -32,7 +32,7 @@ public class SelectionMovement implements UndoableCommand {
 		copySelectedImageArea(image);
 	}
 
-	public SelectionMovement(BufferedImage image, Rectangle selection,
+	public SelectionMoveCommand(BufferedImage image, Rectangle selection,
 			BufferedImage foreground, SelectionKeeper selectionKeeper) {
 		this.selectionKeeper = selectionKeeper;
 		this.backgroundColor = null;

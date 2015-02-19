@@ -8,8 +8,8 @@ import draw.commands.DeleteSelectionCommand;
 import draw.commands.FillCommand;
 import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
-import draw.commands.SelectionMovement;
-import draw.commands.Stroke;
+import draw.commands.SelectionMoveCommand;
+import draw.commands.StrokeCommand;
 import draw.commands.UndoHistory;
 import draw.commands.UndoableCommand;
 
@@ -33,7 +33,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private class Line {
 		int startX, startY;
-		Stroke stroke;
+		StrokeCommand stroke;
 	}
 
 	private enum State {
@@ -53,7 +53,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private class Selection {
 		private Rectangle rect;
-		private SelectionMovement movement;
+		private SelectionMoveCommand movement;
 		private boolean movementAddedToHistory;
 
 		public boolean contains(int x, int y) {
@@ -69,7 +69,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 		private void createNewMovementIfNecessary() {
 			if (movement == null) {
-				movement = new SelectionMovement(image, rect,
+				movement = new SelectionMoveCommand(image, rect,
 						drawSettings.getBackgroundColor(),
 						DrawAreaController.this);
 				movementAddedToHistory = false;
@@ -99,7 +99,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private class Pen {
-		Stroke stroke;
+		StrokeCommand stroke;
 		Color color;
 	}
 
@@ -201,7 +201,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void startNewPenStroke(int x, int y) {
-		pen.stroke = new Stroke(Tool.Pen, pen.color);
+		pen.stroke = new StrokeCommand(Tool.Pen, pen.color);
 		pen.stroke.addLine(image, x, y, x, y);
 		state = State.PenDown;
 	}
@@ -222,7 +222,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void startLineStroke(int x, int y, int button) {
 		line.startX = x;
 		line.startY = y;
-		line.stroke = new Stroke(Tool.Line, getDrawColorForMouseButton(button));
+		line.stroke = new StrokeCommand(Tool.Line,
+				getDrawColorForMouseButton(button));
 		line.stroke.addLine(image, x, y, x, y);
 		state = State.DrawingLine;
 	}
@@ -399,7 +400,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 		@Override
 		public void doTo(ImageKeeper keeper, ToolController toolController) {
-			selection.movement = new SelectionMovement(image, newSelection,
+			selection.movement = new SelectionMoveCommand(image, newSelection,
 					toPaste, DrawAreaController.this);
 			updatingTool = true;
 			selection.movement.doTo(DrawAreaController.this, toolController);

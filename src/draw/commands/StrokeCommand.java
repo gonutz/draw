@@ -11,7 +11,7 @@ import draw.ImageKeeper;
 import draw.Tool;
 import draw.ToolController;
 
-public class Stroke implements UndoableCommand {
+public class StrokeCommand implements UndoableCommand {
 
 	private Color strokeColor;
 	private List<Pixel> pixels = new ArrayList<Pixel>();
@@ -27,7 +27,7 @@ public class Stroke implements UndoableCommand {
 		}
 	}
 
-	public Stroke(Tool tool, Color strokeColor) {
+	public StrokeCommand(Tool tool, Color strokeColor) {
 		this.tool = tool;
 		this.strokeColor = strokeColor;
 	}
