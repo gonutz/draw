@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import draw.DrawAreaView.Point;
+import draw.commands.DeleteSelectionCommand;
 import draw.commands.FillCommand;
 import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
@@ -413,8 +414,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void delete() {
-		// TODO Auto-generated method stub
-
+		DeleteSelectionCommand delete = new DeleteSelectionCommand(image,
+				selection.rect, drawSettings.getBackgroundColor(), this);
+		delete.doTo(this, toolController);
+		history.addCommand(delete);
+		view.refresh();
 	}
 
 	public void move(int dx, int dy) {

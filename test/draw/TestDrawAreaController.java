@@ -1512,4 +1512,35 @@ public class TestDrawAreaController {
 
 		assertEquals(Tool.Pen, toolController.getSelectedTool());
 	}
+
+	@Test
+	public void deletingSelection_SetsItToBackgroundColor() {
+		new20x10imageWithSelectionTool();
+		final int color = 0xF4112233;
+		drawSettings.backgroundColor = new Color(color, true);
+		selectRect(2, 3, 4, 4);
+		captureCurrentRefreshCount();
+
+		controller.delete();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(color, WHITE, p(2, 3), p(3, 3), p(4, 3), p(2, 4),
+				p(3, 4), p(4, 4));
+		assertNoSelectionIsMade();
+	}
+
+	@Test
+	public void undoingDelete_BringsBackImage_AndRestoresSelection() {
+		new20x10imageWithSelectionTool();
+		drawSettings.backgroundColor = Color.black;
+		selectRect(2, 3, 4, 4);
+		controller.delete();
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE);
+		assertSelection(2, 3, 4, 4);
+	}
 }
