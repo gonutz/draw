@@ -28,6 +28,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Line line = new Line();
 	private boolean viewDirty;
 	private boolean updatingTool;
+	private Tool lastNonColorPickerTool;
 
 	private class Line {
 		int startX, startY;
@@ -253,6 +254,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			drawSettings.setForegroundColor(color);
 		else
 			drawSettings.setBackgroundColor(color);
+		toolController.selectTool(lastNonColorPickerTool);
 	}
 
 	private void setViewDirty() {
@@ -343,6 +345,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			else
 				updateSelection(null);
 		}
+		if (tool != Tool.ColorPicker)
+			lastNonColorPickerTool = tool;
 	}
 
 	@Override

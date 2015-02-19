@@ -1490,4 +1490,26 @@ public class TestDrawAreaController {
 
 		assertEquals(new Color(color, true), drawSettings.backgroundColor);
 	}
+
+	@Test
+	public void afterPickingColor_PreviousToolIsSelected() {
+		new8x3imageWithFillTool();
+		toolController.selectTool(Tool.ColorPicker);
+
+		controller.leftMouseButtonDown(0, 0);
+
+		assertEquals(Tool.Fill, toolController.getSelectedTool());
+	}
+
+	@Test
+	public void afterPickingColor_PreviousNonColorPickerToolIsSelected() {
+		new8x3imageWithFillTool();
+		toolController.selectTool(Tool.Pen);
+		toolController.selectTool(Tool.ColorPicker);
+		toolController.selectTool(Tool.ColorPicker);
+
+		controller.leftMouseButtonDown(0, 0);
+
+		assertEquals(Tool.Pen, toolController.getSelectedTool());
+	}
 }
