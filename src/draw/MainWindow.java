@@ -49,6 +49,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	private JButton colorPicker;
 	private JButton line;
 	private JButton eraser;
+	private JButton colorChanger;
 	private ToolViewController toolViewController;
 	private CurrentColors currentColors;
 	private ColorPalette colorPalette;
@@ -149,6 +150,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			case 'c':
 				toolViewController.selectTool(Tool.ColorPicker);
 				break;
+			case 'g':
+				toolViewController.selectTool(Tool.GLobalColorChanger);
 			}
 		if (e.getID() == KeyEvent.KEY_PRESSED)
 			switch (e.getKeyCode()) {
@@ -251,7 +254,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 
 	private void deselectAllTools() {
 		JButton[] tools = { rectangleSelection, pen, eraser, colorPicker, line,
-				fill };
+				fill, colorChanger };
 		for (JButton button : tools)
 			button.setBackground(Color.white);
 	}
@@ -270,6 +273,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			return line;
 		case Pen:
 			return pen;
+		case GLobalColorChanger:
+			return colorChanger;
 		}
 		return null;
 	}
@@ -294,14 +299,13 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		menuBar.add(fileMenu);
 
 		JMenuItem newImage = new JMenuItem("New");
-		final DimensionChooser dim = new DimensionChooser(INITIAL_CANVAS_WIDTH,
-				INITIAL_CANVAS_HEIGHT);
+		final DimensionChooser dim = new DimensionChooser();
 		newImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						dim.setVisible(true);
+						dim.showDialog(drawAreaController.getImage());
 						if (dim.wasAccepted()) {
 							drawAreaController.newImage(dim.getCanvasWidth(),
 									dim.getCanvasHeight());
@@ -416,7 +420,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		JMenuItem resizeCanvas = new JMenuItem("Resize");
 		resizeCanvas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dim.setVisible(true);
+				dim.showDialog(drawAreaController.getImage());
 				if (dim.wasAccepted())
 					drawAreaController.resizeImageTo(dim.getCanvasWidth(),
 							dim.getCanvasHeight());
@@ -458,11 +462,11 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				BorderLayout.WEST);
 		GridBagLayout gbl_toolSelectionContainer = new GridBagLayout();
 		gbl_toolSelectionContainer.columnWidths = new int[] { 32, 32, 0 };
-		gbl_toolSelectionContainer.rowHeights = new int[] { 32, 0, 0, 0 };
+		gbl_toolSelectionContainer.rowHeights = new int[] { 32, 0, 0, 0, 0 };
 		gbl_toolSelectionContainer.columnWeights = new double[] { 0.0, 0.0,
 				Double.MIN_VALUE };
 		gbl_toolSelectionContainer.rowWeights = new double[] { 0.0, 0.0, 0.0,
-				Double.MIN_VALUE };
+				0.0, Double.MIN_VALUE };
 		toolSelectionContainer.setLayout(gbl_toolSelectionContainer);
 
 		rectangleSelection = new JButton("");
@@ -496,7 +500,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		pen.setBorder(null);
 		pen.setBackground(Color.WHITE);
 		GridBagConstraints gbc_pen = new GridBagConstraints();
-		gbc_pen.insets = new Insets(0, 0, 5, 0);
+		gbc_pen.insets = new Insets(0, 0, 5, 5);
 		gbc_pen.anchor = GridBagConstraints.NORTHWEST;
 		gbc_pen.gridx = 0;
 		gbc_pen.gridy = 1;
@@ -549,7 +553,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		line.setBorder(null);
 		line.setBackground(Color.WHITE);
 		GridBagConstraints gbc_line = new GridBagConstraints();
-		gbc_line.insets = new Insets(0, 0, 0, 5);
+		gbc_line.insets = new Insets(0, 0, 5, 0);
 		gbc_line.gridx = 1;
 		gbc_line.gridy = 1;
 		toolSelectionContainer.add(line, gbc_line);
@@ -566,9 +570,23 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		eraser.setBorder(null);
 		eraser.setBackground(Color.WHITE);
 		GridBagConstraints gbc_eraser = new GridBagConstraints();
+		gbc_eraser.insets = new Insets(0, 0, 5, 0);
 		gbc_eraser.gridx = 1;
 		gbc_eraser.gridy = 2;
 		toolSelectionContainer.add(eraser, gbc_eraser);
+
+		colorChanger = new JButton("");
+		colorChanger.setIcon(new ImageIcon(getClass().getResource(
+				"/rsc/change_color.png")));
+		colorChanger.setToolTipText("Globally Change Color (G)");
+		colorChanger.setFocusable(false);
+		colorChanger.setBorder(null);
+		colorChanger.setBackground(Color.WHITE);
+		GridBagConstraints gbc_colorChanger = new GridBagConstraints();
+		gbc_colorChanger.insets = new Insets(0, 0, 0, 5);
+		gbc_colorChanger.gridx = 0;
+		gbc_colorChanger.gridy = 3;
+		toolSelectionContainer.add(colorChanger, gbc_colorChanger);
 
 		JPanel colorContainer = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) colorContainer.getLayout();

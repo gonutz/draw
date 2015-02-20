@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -40,7 +41,7 @@ public class DimensionChooser extends JDialog {
 		return Integer.parseInt(height.getText());
 	}
 
-	public DimensionChooser(int initialWidth, int initialHeight) {
+	public DimensionChooser() {
 		setModal(true);
 		setTitle("Canvas Size");
 		setBounds(100, 100, 453, 121);
@@ -54,7 +55,6 @@ public class DimensionChooser extends JDialog {
 		}
 		{
 			width = new JTextField();
-			width.setText("" + initialWidth);
 			width.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusGained(FocusEvent e) {
@@ -74,7 +74,6 @@ public class DimensionChooser extends JDialog {
 		}
 		{
 			height = new JTextField();
-			height.setText("" + initialHeight);
 			height.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusGained(FocusEvent e) {
@@ -144,11 +143,11 @@ public class DimensionChooser extends JDialog {
 	}
 
 	@Override
-	public void setVisible(boolean b) {
+	public void setVisible(boolean visible) {
 		boolean widthOk = ensureTextIsValidNumber(width);
 		boolean heightOK = ensureTextIsValidNumber(height);
 		if (widthOk && heightOK) {
-			super.setVisible(b);
+			super.setVisible(visible);
 			width.requestFocus();
 		}
 	}
@@ -170,5 +169,11 @@ public class DimensionChooser extends JDialog {
 			text.setText("100");
 			return false;
 		}
+	}
+
+	public void showDialog(BufferedImage image) {
+		width.setText("" + image.getWidth());
+		height.setText("" + image.getHeight());
+		setVisible(true);
 	}
 }
