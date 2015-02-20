@@ -61,7 +61,7 @@ public class SelectionMoveCommand implements UndoableCommand {
 
 	public void moveBy(int dx, int dy) {
 		selection.moveBy(dx, dy);
-		selectionKeeper.setSelection(selection);
+		selectionKeeper.setSelection(selection.copy());
 	}
 
 	public void drawCompositeTo(Graphics g) {
@@ -76,13 +76,13 @@ public class SelectionMoveCommand implements UndoableCommand {
 	@Override
 	public void undoTo(ImageKeeper keeper, ToolController toolController) {
 		toolController.selectTool(Tool.RectangleSelection);
-		setImageAndSelectionTo(keeper, original);
+		setImageAndSelectionTo(keeper, original.copy());
 	}
 
 	@Override
 	public void doTo(ImageKeeper keeper, ToolController toolController) {
 		toolController.selectTool(Tool.RectangleSelection);
-		setImageAndSelectionTo(keeper, selection);
+		setImageAndSelectionTo(keeper, selection.copy());
 	}
 
 	private void setImageAndSelectionTo(ImageKeeper keeper, Rectangle area) {

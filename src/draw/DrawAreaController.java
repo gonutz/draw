@@ -359,6 +359,21 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		view.refresh();
 	}
 
+	public void delete() {
+		if (selection.isActive()) {
+			DeleteSelectionCommand delete = new DeleteSelectionCommand(image,
+					selection.rect, drawSettings.getBackgroundColor(), this);
+			delete.doTo(this, toolController);
+			history.addCommand(delete);
+			view.refresh();
+		}
+	}
+
+	public void cut() {
+		copy();
+		delete();
+	}
+
 	public void copy() {
 		if (selection.isActive())
 			clipboard.storeImage(image.getSubimage(selection.rect.left(),
@@ -400,8 +415,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 		@Override
 		public void doTo(ImageKeeper keeper, ToolController toolController) {
-			selection.movement = new SelectionMoveCommand(image, newSelection,
-					toPaste, DrawAreaController.this);
+			selection.movement = new SelectionMoveCommand(image,
+					newSelection.copy(), toPaste, DrawAreaController.this);
 			updatingTool = true;
 			selection.movement.doTo(DrawAreaController.this, toolController);
 			updatingTool = false;
@@ -412,14 +427,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void escape() {
 		if (selection.isActive())
 			updateSelection(null);
-	}
-
-	public void delete() {
-		DeleteSelectionCommand delete = new DeleteSelectionCommand(image,
-				selection.rect, drawSettings.getBackgroundColor(), this);
-		delete.doTo(this, toolController);
-		history.addCommand(delete);
-		view.refresh();
 	}
 
 	public void move(int dx, int dy) {
@@ -436,5 +443,4 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		updateSelection(new Rectangle(0, 0, image.getWidth() - 1,
 				image.getHeight() - 1));
 	}
-
 }

@@ -385,6 +385,16 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				drawAreaController.paste();
 			}
 		});
+
+		JMenuItem mntmCut = new JMenuItem("Cut");
+		mntmCut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.cut();
+			}
+		});
+		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+				InputEvent.CTRL_MASK));
+		editMenu.add(mntmCut);
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
 				InputEvent.CTRL_MASK));
 		editMenu.add(mntmPaste);

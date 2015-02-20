@@ -74,7 +74,7 @@ public class TestDrawAreaController {
 
 		@Override
 		public void storeImage(BufferedImage image) {
-			this.image = image;
+			this.image = ImageUtils.copyImage(image);
 		}
 
 		@Override
@@ -1542,5 +1542,57 @@ public class TestDrawAreaController {
 		assertRefreshesSinceLastCapture(1);
 		assertPixelsAreSet(BLACK, WHITE);
 		assertSelection(2, 3, 4, 4);
+	}
+
+	@Test
+	public void deletingWithNoSelection_DoesNothing() {
+		controller.delete();
+	}
+
+	@Test
+	public void redoneMovedPastedArea_CanBeMovedAgain() {
+		// this test is a bug fix
+		new20x10imageWithSelectionTool();
+		selectRect(0, 0, 2, 2);
+		controller.copy();
+		controller.paste();
+		dragLeftMouse(from(0, 0), to(5, 5)); // move the pasted area
+		assertSelection(5, 5, 7, 7);
+		controller.undoLastAction(); // move it back
+		controller.undoLastAction(); // delete pasted area
+		controller.redoPreviousAction(); // bring area back
+		controller.redoPreviousAction(); // move it again
+		assertSelection(5, 5, 7, 7);
+
+		dragLeftMouse(from(5, 5), to(6, 6));
+
+		assertSelection(6, 6, 8, 8);
+	}
+
+	@Test
+	public void cut_deletesSelectedArea() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+		selectRect(0, 0, 2, 2);
+		captureCurrentRefreshCount();
+
+		controller.cut();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void cutArea_CanBePasted() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 1);
+		selectRect(0, 0, 2, 2);
+		captureCurrentRefreshCount();
+
+		controller.cut();
+		controller.paste();
+
+		assertRefreshesSinceLastCapture(2);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 1));
 	}
 }
