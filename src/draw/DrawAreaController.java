@@ -8,6 +8,7 @@ import draw.commands.DeleteSelectionCommand;
 import draw.commands.FillCommand;
 import draw.commands.ImageDisplayCommand;
 import draw.commands.NewImageCommand;
+import draw.commands.ResizeCommand;
 import draw.commands.SelectionMoveCommand;
 import draw.commands.StrokeCommand;
 import draw.commands.UndoHistory;
@@ -442,5 +443,15 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		toolController.selectTool(Tool.RectangleSelection);
 		updateSelection(new Rectangle(0, 0, image.getWidth() - 1,
 				image.getHeight() - 1));
+	}
+
+	public void resizeImageTo(int width, int height) {
+		if (width != image.getWidth() || height != image.getHeight()) {
+			ResizeCommand resize = new ResizeCommand(width, height,
+					drawSettings.getBackgroundColor());
+			resize.doTo(this, toolController);
+			history.addCommand(resize);
+			view.refresh();
+		}
 	}
 }

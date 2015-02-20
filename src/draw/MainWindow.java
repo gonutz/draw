@@ -414,6 +414,14 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		menuBar.add(canvasMenu);
 
 		JMenuItem resizeCanvas = new JMenuItem("Resize");
+		resizeCanvas.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dim.setVisible(true);
+				if (dim.wasAccepted())
+					drawAreaController.resizeImageTo(dim.getCanvasWidth(),
+							dim.getCanvasHeight());
+			}
+		});
 		resizeCanvas.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 				InputEvent.CTRL_MASK));
 		canvasMenu.add(resizeCanvas);
