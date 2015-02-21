@@ -307,7 +307,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		case Idle:
 			break;
 		case PenDown:
-			pen.stroke.addLine(image, lastMousePosition.x, lastMousePosition.y, x, y);
+			pen.stroke.addLine(image, lastMousePosition.x, lastMousePosition.y,
+					x, y);
 			setViewDirty();
 			break;
 		case Selecting:

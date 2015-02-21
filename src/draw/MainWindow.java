@@ -22,6 +22,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -38,9 +39,6 @@ import javax.swing.border.BevelBorder;
 
 public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		CurrentFileNameObserver, ZoomView {
-
-	private static final int INITIAL_CANVAS_WIDTH = 640;
-	private static final int INITIAL_CANVAS_HEIGHT = 480;
 
 	private JFrame mainFrame;
 	private JButton rectangleSelection;
@@ -60,6 +58,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 	private ImageLoadController imageLoadController;
 	private JLabel positionLabel;
 	private JLabel zoomLabel;
+	private Settings settings;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -75,6 +74,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			}
 
 			private void wireUpControllers(MainWindow window) {
+				window.settings = new JavaPreferences();
 				window.toolViewController = new ToolViewController(window);
 				window.paletteController = new ColorPaletteViewController(
 						window.colorPalette, window.currentColors);
@@ -90,8 +90,6 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				window.drawAreaController.setClipboard(new SystemClipboard());
 				window.toolViewController
 						.setObserver(window.drawAreaController);
-				window.drawAreaController.newImage(INITIAL_CANVAS_WIDTH,
-						INITIAL_CANVAS_HEIGHT);
 				SwingFileDialog dialog = new SwingFileDialog();
 				window.imageSaveController = new ImageSaveController(dialog,
 						window.drawAreaController, new ImageToFileSaver(),
@@ -102,6 +100,15 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 						window);
 				window.imageLoadController
 						.setObserver(window.imageSaveController);
+				window.drawAreaController.newImage(
+						window.settings.getInt("canvas_width", 640),
+						window.settings.getInt("canvas_height", 480));
+				window.mainFrame.setSize(
+						window.settings.getInt("window_width", 800),
+						window.settings.getInt("window_height", 600));
+				window.mainFrame.setLocation(
+						window.settings.getInt("window_left", 0),
+						window.settings.getInt("window_top", 0));
 			}
 		});
 	}
@@ -285,6 +292,18 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 			@Override
 			public void windowOpened(WindowEvent e) {
 				toolViewController.viewActivated();
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				settings.setInt("window_width", mainFrame.getWidth());
+				settings.setInt("window_height", mainFrame.getHeight());
+				settings.setInt("window_left", mainFrame.getLocation().x);
+				settings.setInt("window_top", mainFrame.getLocation().y);
+				BufferedImage image = drawAreaController.getImage();
+				settings.setInt("canvas_width", image.getWidth());
+				settings.setInt("canvas_height", image.getHeight());
+				settings.save();
 			}
 		});
 		mainFrame.setTitle("Draw");
