@@ -23,7 +23,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private Clipboard clipboard;
 	private BufferedImage image;
 	private UndoHistory history = new UndoHistory();
-	private Mouse lastMouse = new Mouse();
+	private Mouse lastMousePosition = new Mouse();
 	private Selection selection = new Selection();
 	private Pen pen = new Pen();
 	private State state = State.Idle;
@@ -46,7 +46,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		static final int RightButton = 2;
 		int x, y;
 
-		public void setCursor(int x, int y) {
+		public void set(int x, int y) {
 			this.x = x;
 			this.y = y;
 		}
@@ -177,7 +177,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			fillWith(x, y, getDrawColorForMouseButton(button));
 		if (tool == Tool.ColorPicker)
 			pickColor(x, y, button);
-		lastMouse.setCursor(x, y);
+		lastMousePosition.set(x, y);
 		refreshViewIfNecessary();
 	}
 
@@ -281,8 +281,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void mouseUp() {
 		if (state == State.PenDown)
 			history.addCommand(pen.stroke);
-		if (state == State.Selecting && selection.rect.x == lastMouse.x
-				&& selection.rect.y == lastMouse.y) {
+		if (state == State.Selecting && selection.rect.x == lastMousePosition.x
+				&& selection.rect.y == lastMousePosition.y) {
 			selection.stopMovement();
 			updateSelection(null);
 		}
@@ -307,7 +307,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		case Idle:
 			break;
 		case PenDown:
-			pen.stroke.addLine(image, lastMouse.x, lastMouse.y, x, y);
+			pen.stroke.addLine(image, lastMousePosition.x, lastMousePosition.y, x, y);
 			setViewDirty();
 			break;
 		case Selecting:
@@ -316,8 +316,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			updateSelection(selection.rect);
 			break;
 		case MovingSelection:
-			int dx = x - lastMouse.x;
-			int dy = y - lastMouse.y;
+			int dx = x - lastMousePosition.x;
+			int dy = y - lastMousePosition.y;
 			selection.moveBy(dx, dy);
 			selection.movement.drawCompositeTo(image.getGraphics());
 			updateSelection(selection.rect);
@@ -328,7 +328,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			setViewDirty();
 			break;
 		}
-		lastMouse.setCursor(x, y);
+		lastMousePosition.set(x, y);
 		refreshViewIfNecessary();
 	}
 

@@ -1551,7 +1551,7 @@ public class TestDrawAreaController {
 
 	@Test
 	public void redoneMovedPastedArea_CanBeMovedAgain() {
-		// this test is a bug fix
+		// this is an actual bug in the program
 		new20x10imageWithSelectionTool();
 		selectRect(0, 0, 2, 2);
 		controller.copy();
@@ -1566,7 +1566,6 @@ public class TestDrawAreaController {
 
 		dragLeftMouse(from(5, 5), to(6, 6));
 
-		// TODO fix this bug
 		assertSelection(6, 6, 8, 8);
 	}
 
