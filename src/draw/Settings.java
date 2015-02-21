@@ -6,6 +6,10 @@ public interface Settings {
 
 	void setInt(String id, int value);
 
+	boolean getBoolean(String id, boolean defaultIfNotFound);
+
+	void setBoolean(String id, boolean value);
+
 	void save();
 
 }

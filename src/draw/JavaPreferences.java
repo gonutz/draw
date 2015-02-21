@@ -21,6 +21,16 @@ public class JavaPreferences implements Settings {
 	}
 
 	@Override
+	public boolean getBoolean(String id, boolean defaultIfNotFound) {
+		return prefs.getBoolean(id, defaultIfNotFound);
+	}
+
+	@Override
+	public void setBoolean(String id, boolean value) {
+		prefs.putBoolean(id, value);
+	}
+
+	@Override
 	public void save() {
 		// TODO Auto-generated method stub
 
