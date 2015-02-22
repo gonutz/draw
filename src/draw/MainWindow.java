@@ -92,7 +92,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				window.drawAreaController.setClipboard(new SystemClipboard());
 				window.toolViewController
 						.setObserver(window.drawAreaController);
-				SwingFileDialog dialog = new SwingFileDialog();
+				SwingFileDialog dialog = new SwingFileDialog(window.settings);
 				window.imageSaveController = new ImageSaveController(dialog,
 						window.drawAreaController, new ImageToFileSaver(),
 						window);

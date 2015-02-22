@@ -8,17 +8,31 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import draw.Settings;
+
 public class SwingFileDialog implements SaveFileDialog, OpenFileDialog {
 
 	private JFileChooser chooser;
+	private Settings settings;
 
-	public SwingFileDialog() {
+	public SwingFileDialog(Settings settings) {
+		this.settings = settings;
 		chooser = new JFileChooser();
 		FileFilter imageFilter = new FileNameExtensionFilter(
 				"Portable Network Graphics (PNG)", "png");
 		chooser.setAcceptAllFileFilterUsed(false);
 		chooser.setFileFilter(imageFilter);
 		chooser.setMultiSelectionEnabled(false);
+		loadInitialPathFromSettings();
+	}
+
+	private void loadInitialPathFromSettings() {
+		String path = settings.getString("file_path", "");
+		if (path != "") {
+			File filePath = new File(path);
+			if (filePath.exists())
+				chooser.setCurrentDirectory(filePath);
+		}
 	}
 
 	@Override
@@ -26,7 +40,13 @@ public class SwingFileDialog implements SaveFileDialog, OpenFileDialog {
 		boolean accepted = chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION;
 		if (accepted && fileExists(getSaveFileName()))
 			accepted = askIfUserWantsToOverwriteFile();
+		storeCurrentDirectoryInSettings();
 		return accepted;
+	}
+
+	private void storeCurrentDirectoryInSettings() {
+		settings.setString("file_path", chooser.getCurrentDirectory()
+				.getAbsolutePath());
 	}
 
 	private boolean fileExists(String fileName) {
@@ -55,7 +75,9 @@ public class SwingFileDialog implements SaveFileDialog, OpenFileDialog {
 
 	@Override
 	public boolean askUserForOpenFileName() {
-		return chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION;
+		int result = chooser.showOpenDialog(null);
+		storeCurrentDirectoryInSettings();
+		return result == JFileChooser.APPROVE_OPTION;
 	}
 
 	@Override

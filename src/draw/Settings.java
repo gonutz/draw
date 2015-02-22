@@ -10,6 +10,10 @@ public interface Settings {
 
 	void setBoolean(String id, boolean value);
 
+	String getString(String id, String defaultIfNotFound);
+
+	void setString(String id, String value);
+
 	void save();
 
 }

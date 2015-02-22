@@ -31,6 +31,16 @@ public class JavaPreferences implements Settings {
 	}
 
 	@Override
+	public String getString(String id, String defaultIfNotFound) {
+		return prefs.get(id, defaultIfNotFound);
+	}
+
+	@Override
+	public void setString(String id, String value) {
+		prefs.put(id, value);
+	}
+
+	@Override
 	public void save() {
 	}
 
