@@ -122,12 +122,14 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	private void drawImageBorder(Graphics2D g) {
-		BufferedImage img = controller.getImage();
-		int x = img.getWidth() * zoomFactor;
-		int y = img.getHeight() * zoomFactor;
-		g.setColor(Color.black);
-		g.drawLine(x, 0, x, y);
-		g.drawLine(0, y, x, y);
+		if (controller != null) {
+			BufferedImage img = controller.getImage();
+			int x = img.getWidth() * zoomFactor;
+			int y = img.getHeight() * zoomFactor;
+			g.setColor(Color.black);
+			g.drawLine(x, 0, x, y);
+			g.drawLine(0, y, x, y);
+		}
 	}
 
 	private void paintSelection(Graphics2D g) {
