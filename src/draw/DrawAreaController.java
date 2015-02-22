@@ -8,6 +8,7 @@ import draw.commands.DeleteSelectionCommand;
 import draw.commands.FillCommand;
 import draw.commands.ImageDisplayCommand;
 import draw.commands.MirrorHorizontallyCommand;
+import draw.commands.MirrorVerticallyCommand;
 import draw.commands.NewImageCommand;
 import draw.commands.ResizeCommand;
 import draw.commands.SelectionMoveCommand;
@@ -472,7 +473,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void mirrorVertically() {
-		// TODO Auto-generated method stub
-
+		if (selection.isActive()) {
+			MirrorVerticallyCommand mirror = new MirrorVerticallyCommand(
+					selection.rect, this);
+			mirror.doTo(this, toolController);
+			history.addCommand(mirror);
+		}
 	}
 }

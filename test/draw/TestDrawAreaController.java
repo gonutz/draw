@@ -1771,4 +1771,44 @@ public class TestDrawAreaController {
 		assertSelection(1, 2, 3, 4);
 	}
 
+	@Test
+	public void selectionCanBeMirroredVertically() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(0, 0);
+		drawPenDot(1, 0);
+		drawPenDot(2, 0);
+		selectRect(0, 0, 1, 2);
+		captureCurrentRefreshCount();
+
+		controller.mirrorVertically();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(0, 2), p(1, 2), p(2, 0));
+	}
+
+	@Test
+	public void withoutSelection_MirroringVertically_DoesNothing() {
+		new8x3imageWithFillTool();
+		captureCurrentRefreshCount();
+
+		controller.mirrorVertically();
+
+		assertRefreshesSinceLastCapture(0);
+	}
+
+	@Test
+	public void mirroringVertically_CanBeUndone() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(1, 0);
+		drawPenDot(2, 0);
+		selectRect(0, 0, 1, 3);
+		controller.mirrorVertically();
+		captureCurrentRefreshCount();
+
+		controller.undoLastAction();
+
+		assertRefreshesSinceLastCapture(1);
+		assertPixelsAreSet(BLACK, WHITE, p(1, 0), p(2, 0));
+	}
+
 }
