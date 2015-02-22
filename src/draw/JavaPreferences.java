@@ -32,8 +32,6 @@ public class JavaPreferences implements Settings {
 
 	@Override
 	public void save() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

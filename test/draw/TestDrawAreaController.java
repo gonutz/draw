@@ -1567,7 +1567,7 @@ public class TestDrawAreaController {
 		dragLeftMouse(from(5, 5), to(6, 6));
 
 		// TODO fix this bug
-		// assertSelection(6, 6, 8, 8);
+		assertSelection(6, 6, 8, 8);
 	}
 
 	@Test

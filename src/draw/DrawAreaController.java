@@ -427,7 +427,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 		@Override
 		public boolean hasAnyEffect() {
-			// TODO Auto-generated method stub
 			return true;
 		}
 	}
