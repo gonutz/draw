@@ -42,4 +42,9 @@ public class NewImageCommand implements UndoableCommand {
 		g.clearRect(0, 0, image.getWidth(), image.getHeight());
 	}
 
+	@Override
+	public boolean hasAnyEffect() {
+		return true;
+	}
+
 }

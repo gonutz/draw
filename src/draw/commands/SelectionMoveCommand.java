@@ -90,4 +90,10 @@ public class SelectionMoveCommand implements UndoableCommand {
 		drawAreaTo(g, area);
 		selectionKeeper.setSelection(area.copy());
 	}
+
+	@Override
+	public boolean hasAnyEffect() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

@@ -123,4 +123,10 @@ public class FillCommand implements UndoableCommand {
 		return c1[0] == c2[0] && c1[1] == c2[1] && c1[2] == c2[2]
 				&& c1[3] == c2[3];
 	}
+
+	@Override
+	public boolean hasAnyEffect() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

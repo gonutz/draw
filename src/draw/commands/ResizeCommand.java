@@ -38,4 +38,10 @@ public class ResizeCommand implements UndoableCommand {
 		keeper.setImage(copy);
 	}
 
+	@Override
+	public boolean hasAnyEffect() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

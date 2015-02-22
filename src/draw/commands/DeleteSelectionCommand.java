@@ -52,4 +52,10 @@ public class DeleteSelectionCommand implements UndoableCommand {
 		selector.setSelection(null);
 	}
 
+	@Override
+	public boolean hasAnyEffect() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

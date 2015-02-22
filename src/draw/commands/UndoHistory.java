@@ -32,8 +32,11 @@ public class UndoHistory {
 	public boolean undoTo(ImageKeeper image, ToolController c) {
 		if (nothingToUndo())
 			return false;
-		undoList.get(undoIndex).undoTo(image, c);
+		UndoableCommand toUndo = undoList.get(undoIndex);
+		toUndo.undoTo(image, c);
 		undoIndex--;
+		if (!toUndo.hasAnyEffect())
+			return undoTo(image, c);
 		return true;
 	}
 
@@ -47,11 +50,14 @@ public class UndoHistory {
 	 * @return true if something was re-done and false if not (if nothing has
 	 *         been previously undone).
 	 */
-	public boolean redoTo(ImageKeeper image, ToolController toolController) {
+	public boolean redoTo(ImageKeeper image, ToolController c) {
 		if (nothingToRedo())
 			return false;
 		undoIndex++;
-		undoList.get(undoIndex).doTo(image, toolController);
+		UndoableCommand toRedo = undoList.get(undoIndex);
+		toRedo.doTo(image, c);
+		if (!toRedo.hasAnyEffect())
+			return redoTo(image, c);
 		return true;
 	}
 

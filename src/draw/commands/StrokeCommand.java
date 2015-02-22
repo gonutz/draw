@@ -14,13 +14,13 @@ import draw.ToolController;
 public class StrokeCommand implements UndoableCommand {
 
 	private Color strokeColor;
-	private List<Pixel> pixels = new ArrayList<Pixel>();
+	private List<PixelChange> pixelChanges = new ArrayList<PixelChange>();
 	private Tool tool;
 
-	private class Pixel {
+	private class PixelChange {
 		private int x, y, oldColor;
 
-		public Pixel(int x, int y, int oldColor) {
+		public PixelChange(int x, int y, int oldColor) {
 			this.x = x;
 			this.y = y;
 			this.oldColor = oldColor;
@@ -59,7 +59,7 @@ public class StrokeCommand implements UndoableCommand {
 	 */
 	public void setLine(BufferedImage image, int fromX, int fromY, int toX,
 			int toY) {
-		pixels.clear();
+		pixelChanges.clear();
 		addLine(image, fromX, fromY, toX, toY);
 	}
 
@@ -69,12 +69,12 @@ public class StrokeCommand implements UndoableCommand {
 	}
 
 	public void addPixelChange(int x, int y, int oldColor) {
-		pixels.add(0, new Pixel(x, y, oldColor));
+		pixelChanges.add(0, new PixelChange(x, y, oldColor));
 	}
 
 	public void undoTo(ImageKeeper image, ToolController toolController) {
 		Graphics g = image.getImage().getGraphics();
-		for (Pixel p : pixels) {
+		for (PixelChange p : pixelChanges) {
 			g.setColor(new Color(p.oldColor));
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
@@ -83,10 +83,19 @@ public class StrokeCommand implements UndoableCommand {
 
 	public void doTo(ImageKeeper image, ToolController toolController) {
 		Graphics g = image.getImage().getGraphics();
-		for (Pixel p : pixels) {
+		for (PixelChange p : pixelChanges) {
 			g.setColor(strokeColor);
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
 		toolController.selectTool(tool);
+	}
+
+	@Override
+	public boolean hasAnyEffect() {
+		int strokeRGB = strokeColor.getRGB();
+		for (PixelChange p : pixelChanges)
+			if (p.oldColor != strokeRGB)
+				return true;
+		return false;
 	}
 }

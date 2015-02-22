@@ -26,4 +26,10 @@ public class ImageDisplayCommand implements UndoableCommand {
 		keeper.setImage(ImageUtils.copyImage(loaded));
 	}
 
+	@Override
+	public boolean hasAnyEffect() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

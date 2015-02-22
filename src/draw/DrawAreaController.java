@@ -424,6 +424,12 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			updatingTool = false;
 			setSelection(newSelection);
 		}
+
+		@Override
+		public boolean hasAnyEffect() {
+			// TODO Auto-generated method stub
+			return true;
+		}
 	}
 
 	public void escape() {
