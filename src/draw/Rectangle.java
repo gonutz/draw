@@ -70,4 +70,13 @@ public class Rectangle {
 	public Rectangle copy() {
 		return new Rectangle(x, y, x2, y2);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Rectangle) {
+			Rectangle r = (Rectangle) obj;
+			return x == r.x && y == r.y && x2 == r.x2 && y2 == r.y2;
+		}
+		return false;
+	}
 }

@@ -1655,8 +1655,8 @@ public class TestDrawAreaController {
 	public void penStroke_ThatDoesNotChangeAnyPixel_IsNotInHistory() {
 		new20x10imageWithPenColor(BLACK);
 		drawPenDot(0, 0); // one black dot
-		rightClickAt(1, 1); // white dot on white pixel
 
+		rightClickAt(1, 1); // white dot on white pixel
 		controller.undoLastAction();
 
 		assertPixelsAreSet(BLACK, WHITE);
@@ -1686,8 +1686,8 @@ public class TestDrawAreaController {
 	public void fillingWithSameColor_DoesNotAppearInHistory() {
 		new20x10imageWithPenColor(BLACK);
 		drawPenDot(0, 0);
-		toolController.selectTool(Tool.Fill);
 
+		toolController.selectTool(Tool.Fill);
 		rightClickAt(2, 2); // fill white area with white
 		controller.undoLastAction();
 
@@ -1700,6 +1700,19 @@ public class TestDrawAreaController {
 		drawPenDot(0, 0);
 
 		controller.resizeImageTo(20, 10);
+		controller.undoLastAction();
+
+		assertPixelsAreSet(BLACK, WHITE);
+	}
+
+	@Test
+	public void movingSelectionToSameSpot_DoesNotAppearInHistory() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(0, 0);
+
+		selectRect(0, 0, 3, 3);
+		dragLeftMouse(from(1, 1), to(5, 5));
+		dragLeftMouse(from(5, 5), to(1, 1));
 		controller.undoLastAction();
 
 		assertPixelsAreSet(BLACK, WHITE);

@@ -93,7 +93,6 @@ public class SelectionMoveCommand implements UndoableCommand {
 
 	@Override
 	public boolean hasAnyEffect() {
-		// TODO Auto-generated method stub
-		return true;
+		return !original.equals(selection);
 	}
 }
