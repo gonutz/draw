@@ -26,7 +26,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private ZoomView zoomView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
-	private int mouseX, mouseY;
+	private int mouseZoomX, mouseZoomY;
 
 	public DrawArea() {
 		initialize();
@@ -152,13 +152,13 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				mouseX = e.getX() / zoomFactor;
-				mouseY = e.getY() / zoomFactor;
+				mouseZoomX = e.getX() / zoomFactor;
+				mouseZoomY = e.getY() / zoomFactor;
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					controller.leftMouseButtonDown(mouseX, mouseY);
+					controller.leftMouseButtonDown(mouseZoomX, mouseZoomY);
 				}
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					controller.rightMouseButtonDown(mouseX, mouseY);
+					controller.rightMouseButtonDown(mouseZoomX, mouseZoomY);
 				}
 			}
 
@@ -180,18 +180,18 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				mouseX = e.getX() / zoomFactor;
-				mouseY = e.getY() / zoomFactor;
-				controller.mouseMovedTo(mouseX, mouseY);
-				positionView.setPosition(mouseX, mouseY);
+				mouseZoomX = e.getX() / zoomFactor;
+				mouseZoomY = e.getY() / zoomFactor;
+				controller.mouseMovedTo(mouseZoomX, mouseZoomY);
+				positionView.setPosition(mouseZoomX, mouseZoomY);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				mouseX = e.getX() / zoomFactor;
-				mouseY = e.getY() / zoomFactor;
-				controller.mouseMovedTo(mouseX, mouseY);
-				positionView.setPosition(mouseX, mouseY);
+				mouseZoomX = e.getX() / zoomFactor;
+				mouseZoomY = e.getY() / zoomFactor;
+				controller.mouseMovedTo(mouseZoomX, mouseZoomY);
+				positionView.setPosition(mouseZoomX, mouseZoomY);
 			}
 		});
 		addMouseWheelListener(this);
@@ -241,9 +241,11 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		int dy = visible.height / 5;
 		if (e.isControlDown()) {
 			if (e.getWheelRotation() < 0)
-				zoomIn(visible, mouseX * zoomFactor, mouseY * zoomFactor);
+				zoomIn(visible, mouseZoomX * zoomFactor, mouseZoomY
+						* zoomFactor);
 			if (e.getWheelRotation() > 0)
-				zoomOut(visible, mouseX * zoomFactor, mouseY * zoomFactor);
+				zoomOut(visible, mouseZoomX * zoomFactor, mouseZoomY
+						* zoomFactor);
 			positionView.setNoPosition();
 		} else if (e.isShiftDown() || e.isAltDown()) {
 			if (e.getWheelRotation() < 0)
