@@ -1693,4 +1693,15 @@ public class TestDrawAreaController {
 
 		assertPixelsAreSet(BLACK, WHITE);
 	}
+
+	@Test
+	public void resizingToSameSize_DoesNotAppearInHistory() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(0, 0);
+
+		controller.resizeImageTo(20, 10);
+		controller.undoLastAction();
+
+		assertPixelsAreSet(BLACK, WHITE);
+	}
 }
