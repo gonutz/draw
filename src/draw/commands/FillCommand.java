@@ -126,7 +126,6 @@ public class FillCommand implements UndoableCommand {
 
 	@Override
 	public boolean hasAnyEffect() {
-		// TODO Auto-generated method stub
-		return true;
+		return filledLines.size() > 0;
 	}
 }

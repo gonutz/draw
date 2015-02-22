@@ -1681,4 +1681,16 @@ public class TestDrawAreaController {
 
 		assertPixelsAreSet(BLACK, WHITE, p(0, 0), p(2, 2));
 	}
+
+	@Test
+	public void fillingWithSameColor_DoesNotAppearInHistory() {
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(0, 0);
+		toolController.selectTool(Tool.Fill);
+
+		rightClickAt(2, 2); // fill white area with white
+		controller.undoLastAction();
+
+		assertPixelsAreSet(BLACK, WHITE);
+	}
 }
