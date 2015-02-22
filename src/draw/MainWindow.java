@@ -410,6 +410,9 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				drawAreaController.copy();
 			}
 		});
+
+		editMenu.addSeparator();
+
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
 				InputEvent.CTRL_MASK));
 		editMenu.add(mntmCopy);
@@ -433,6 +436,8 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
 				InputEvent.CTRL_MASK));
 		editMenu.add(mntmPaste);
+
+		editMenu.addSeparator();
 
 		JMenuItem mntmSelectAll = new JMenuItem("Select All");
 		mntmSelectAll.addActionListener(new ActionListener() {
