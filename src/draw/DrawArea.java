@@ -20,6 +20,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
+	private static final int BORDER_WIDTH = 1;
 	private DrawAreaController controller;
 	private PositionView positionView;
 	private ZoomView zoomView;
@@ -87,8 +88,8 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	@Override
 	public void refresh() {
 		BufferedImage img = controller.getImage();
-		setPreferredSize(new Dimension(img.getWidth() * zoomFactor,
-				img.getHeight() * zoomFactor));
+		setPreferredSize(new Dimension(img.getWidth() * zoomFactor
+				+ BORDER_WIDTH, img.getHeight() * zoomFactor + BORDER_WIDTH));
 		revalidate();
 		repaint();
 	}
@@ -103,6 +104,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		Graphics2D g = (Graphics2D) graphics;
 		clearBackground(g);
 		drawImage(g);
+		drawImageBorder(g);
 		paintSelection(g);
 	}
 
@@ -117,6 +119,15 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 			g.drawImage(img, 0, 0, img.getWidth() * zoomFactor, img.getHeight()
 					* zoomFactor, null);
 		}
+	}
+
+	private void drawImageBorder(Graphics2D g) {
+		BufferedImage img = controller.getImage();
+		int x = img.getWidth() * zoomFactor;
+		int y = img.getHeight() * zoomFactor;
+		g.setColor(Color.black);
+		g.drawLine(x, 0, x, y);
+		g.drawLine(0, y, x, y);
 	}
 
 	private void paintSelection(Graphics2D g) {
