@@ -449,6 +449,26 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				InputEvent.CTRL_MASK));
 		editMenu.add(mntmSelectAll);
 
+		JMenuItem mntmMirrorHorizontally = new JMenuItem("Mirror Horizontally");
+		mntmMirrorHorizontally.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.mirrorHorizontally();
+			}
+		});
+		mntmMirrorHorizontally.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_H, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		editMenu.add(mntmMirrorHorizontally);
+
+		JMenuItem mntmMirrorVertically = new JMenuItem("Mirror Vertically");
+		mntmMirrorVertically.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawAreaController.mirrorVertically();
+			}
+		});
+		mntmMirrorVertically.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_V, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		editMenu.add(mntmMirrorVertically);
+
 		JMenu canvasMenu = new JMenu("Canvas");
 		canvasMenu.setMnemonic('C');
 		menuBar.add(canvasMenu);
