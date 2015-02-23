@@ -139,6 +139,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	public void redoPreviousAction() {
 		updatingTool = true;
+		selection.stopMovement();
 		if (history.redoTo(this, toolController))
 			view.refresh();
 		updatingTool = false;
