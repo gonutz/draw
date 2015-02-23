@@ -29,9 +29,15 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private ZoomView zoomView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
+	private Robot robot;
 
 	public DrawArea() {
 		initialize();
+
+		try {
+			robot = new Robot();
+		} catch (AWTException ignore) {
+		}
 	}
 
 	public void setController(DrawAreaController controller) {
@@ -87,13 +93,6 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	private void moveMouseTo(int panelOffsetX, int panelOffsetY) {
-		// TODO have robot created once at program start
-		Robot robot = null;
-		try {
-			robot = new Robot();
-		} catch (AWTException e1) {
-		}
-
 		if (robot != null) {
 			java.awt.Point p = this.getLocationOnScreen();
 			robot.mouseMove(p.x + panelOffsetX, p.y + panelOffsetY);
