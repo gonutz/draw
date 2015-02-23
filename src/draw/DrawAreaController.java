@@ -259,7 +259,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			drawSettings.setForegroundColor(color);
 		else
 			drawSettings.setBackgroundColor(color);
-		toolController.selectTool(lastNonColorPickerTool);
+		if (lastNonColorPickerTool != null)
+			toolController.selectTool(lastNonColorPickerTool);
 	}
 
 	private void setViewDirty() {

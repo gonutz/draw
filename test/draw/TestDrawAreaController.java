@@ -1514,6 +1514,16 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void ifNoOtherToolWasSelected_ColorPickerIsKeptAfterPicking() {
+		controller.newImage(10, 10);
+		toolController.selectTool(Tool.ColorPicker);
+
+		controller.leftMouseButtonDown(0, 0);
+
+		assertEquals(Tool.ColorPicker, toolController.getSelectedTool());
+	}
+
+	@Test
 	public void deletingSelection_SetsItToBackgroundColor() {
 		new20x10imageWithSelectionTool();
 		final int color = 0xF4112233;
