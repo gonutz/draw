@@ -1,10 +1,12 @@
 package draw;
 
+import java.awt.AWTException;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Robot;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -26,7 +28,6 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private ZoomView zoomView;
 	private Rectangle selection;
 	private int zoomFactor = 1;
-	private int mouseZoomX, mouseZoomY;
 
 	public DrawArea() {
 		initialize();
@@ -49,16 +50,33 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 				.clone();
 		int centerX = visible.x + visible.width / 2;
 		int centerY = visible.y + visible.height / 2;
-		zoomIn(visible, centerX, centerY);
+		zoomInAt(visible, centerX, centerY);
 	}
 
-	public void zoomIn(java.awt.Rectangle visible, int x, int y) {
+	public void zoomInAt(java.awt.Rectangle visible, int panelX, int panelY) {
 		if (zoomFactor < 32) {
-			visible.x = 2 * x - (x - visible.x);
-			visible.y = 2 * y - (y - visible.y);
+			int newX = 2 * panelX;
+			int newY = 2 * panelY;
+			visible.x = newX - (panelX - visible.x);
+			visible.y = newY - (panelY - visible.y);
 			setZoomFactor(zoomFactor * 2);
 			refresh();
 			scrollRectToVisible(visible);
+			moveMouseTo(newX, newY);
+		}
+	}
+
+	private void moveMouseTo(int panelOffsetX, int panelOffsetY) {
+		// TODO have robot created once at program start
+		Robot robot = null;
+		try {
+			robot = new Robot();
+		} catch (AWTException e1) {
+		}
+
+		if (robot != null) {
+			java.awt.Point p = this.getLocationOnScreen();
+			robot.mouseMove(p.x + panelOffsetX, p.y + panelOffsetY);
 		}
 	}
 
@@ -72,16 +90,19 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 				.clone();
 		int centerX = visible.x + visible.width / 2;
 		int centerY = visible.y + visible.height / 2;
-		zoomOut(visible, centerX, centerY);
+		zoomOutAt(visible, centerX, centerY);
 	}
 
-	public void zoomOut(java.awt.Rectangle visible, int x, int y) {
+	public void zoomOutAt(java.awt.Rectangle visible, int panelX, int panelY) {
 		if (zoomFactor > 1) {
-			visible.x = x / 2 - (x - visible.x);
-			visible.y = y / 2 - (y - visible.y);
+			int newX = panelX / 2;
+			int newY = panelY / 2;
+			visible.x = newX - (panelX - visible.x);
+			visible.y = newY - (panelY - visible.y);
 			scrollRectToVisible(visible);
 			setZoomFactor(zoomFactor / 2);
 			refresh();
+			moveMouseTo(newX, newY);
 		}
 	}
 
@@ -154,13 +175,13 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				mouseZoomX = e.getX() / zoomFactor;
-				mouseZoomY = e.getY() / zoomFactor;
+				int x = e.getX() / zoomFactor;
+				int y = e.getY() / zoomFactor;
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					controller.leftMouseButtonDown(mouseZoomX, mouseZoomY);
+					controller.leftMouseButtonDown(x, y);
 				}
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					controller.rightMouseButtonDown(mouseZoomX, mouseZoomY);
+					controller.rightMouseButtonDown(x, y);
 				}
 			}
 
@@ -182,18 +203,19 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				mouseZoomX = e.getX() / zoomFactor;
-				mouseZoomY = e.getY() / zoomFactor;
-				controller.mouseMovedTo(mouseZoomX, mouseZoomY);
-				positionView.setPosition(mouseZoomX, mouseZoomY);
+				moveMouseTo(e);
+			}
+
+			private void moveMouseTo(MouseEvent e) {
+				int x = e.getX() / zoomFactor;
+				int y = e.getY() / zoomFactor;
+				controller.mouseMovedTo(x, y);
+				positionView.setPosition(x, y);
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				mouseZoomX = e.getX() / zoomFactor;
-				mouseZoomY = e.getY() / zoomFactor;
-				controller.mouseMovedTo(mouseZoomX, mouseZoomY);
-				positionView.setPosition(mouseZoomX, mouseZoomY);
+				moveMouseTo(e);
 			}
 		});
 		addMouseWheelListener(this);
@@ -243,11 +265,9 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		int dy = visible.height / 5;
 		if (e.isControlDown()) {
 			if (e.getWheelRotation() < 0)
-				zoomIn(visible, mouseZoomX * zoomFactor, mouseZoomY
-						* zoomFactor);
+				zoomInAt(visible, e.getX(), e.getY());
 			if (e.getWheelRotation() > 0)
-				zoomOut(visible, mouseZoomX * zoomFactor, mouseZoomY
-						* zoomFactor);
+				zoomOutAt(visible, e.getX(), e.getY());
 			positionView.setNoPosition();
 		} else if (e.isShiftDown() || e.isAltDown()) {
 			if (e.getWheelRotation() < 0)
