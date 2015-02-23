@@ -21,6 +21,7 @@ import javax.swing.SwingConstants;
 public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		MouseWheelListener {
 
+	private static final int MAX_ZOOM_FACTOR = 32;
 	private static final long serialVersionUID = 1L;
 	private static final int BORDER_WIDTH = 1;
 	private DrawAreaController controller;
@@ -45,6 +46,25 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 		this.zoomView = zoomView;
 	}
 
+	/**
+	 * Adjusts the zoom so it is the biggest possible zoom (and multiple of two,
+	 * like in the other zoom functions) that fits inside the parent container.
+	 */
+	public void zoomToFit() {
+		BufferedImage image = controller.getImage();
+		int width = getParent().getWidth();
+		int height = getParent().getHeight();
+		int zoom = 2;
+		while (image.getWidth() * zoom < width
+				&& image.getHeight() * zoom < height && zoom <= MAX_ZOOM_FACTOR)
+			zoom *= 2;
+		zoom /= 2;
+		while (zoomFactor < zoom)
+			zoomIn();
+		while (zoomFactor > zoom)
+			zoomOut();
+	}
+
 	public void zoomIn() {
 		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
 				.clone();
@@ -54,7 +74,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	}
 
 	public void zoomInAt(java.awt.Rectangle visible, int panelX, int panelY) {
-		if (zoomFactor < 32) {
+		if (zoomFactor < MAX_ZOOM_FACTOR) {
 			int newX = 2 * panelX;
 			int newY = 2 * panelY;
 			visible.x = newX - (panelX - visible.x);

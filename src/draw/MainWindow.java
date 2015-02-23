@@ -509,6 +509,16 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		});
 		zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
 				InputEvent.CTRL_MASK));
+
+		JMenuItem mntmZoomToFit = new JMenuItem("Zoom To Fit");
+		mntmZoomToFit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawArea.zoomToFit();
+			}
+		});
+		mntmZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,
+				InputEvent.CTRL_MASK));
+		viewMenu.add(mntmZoomToFit);
 		mainFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel toolSelectionContainer = new JPanel();
