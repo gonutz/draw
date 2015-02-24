@@ -1560,6 +1560,18 @@ public class TestDrawAreaController {
 	}
 
 	@Test
+	public void deletingPastedSelection_RestoresImage() {
+		clipboard.image = newImageOfSize(3, 3);
+		new20x10imageWithPenColor(BLACK);
+		drawPenDot(0, 0);
+
+		controller.paste();
+		controller.delete();
+
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0));
+	}
+
+	@Test
 	public void redoneMovedPastedArea_CanBeMovedAgain() {
 		// this is an actual bug in the program
 		new20x10imageWithSelectionTool();

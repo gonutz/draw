@@ -24,9 +24,9 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private ToolController toolController;
 	private Clipboard clipboard;
 	private BufferedImage image;
-	private UndoHistory history = new UndoHistory();
 	private Mouse lastMousePosition = new Mouse();
-	private Selection selection = new Selection();
+	private UndoHistory history = new UndoHistory();
+	private Selection selection = new Selection(history);
 	private Pen pen = new Pen();
 	private State state = State.Idle;
 	private Line line = new Line();
@@ -51,53 +51,6 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		public void set(int x, int y) {
 			this.x = x;
 			this.y = y;
-		}
-	}
-
-	private class Selection {
-		private Rectangle rect;
-		private SelectionMoveCommand movement;
-		private boolean movementAddedToHistory;
-
-		public boolean contains(int x, int y) {
-			if (rect == null)
-				return false;
-			return rect.contains(x, y);
-		}
-
-		public void startMovingWithMouse() {
-			state = State.MovingSelection;
-			createNewMovementIfNecessary();
-		}
-
-		private void createNewMovementIfNecessary() {
-			if (movement == null) {
-				movement = new SelectionMoveCommand(image, rect,
-						drawSettings.getBackgroundColor(),
-						DrawAreaController.this);
-				movementAddedToHistory = false;
-			}
-		}
-
-		public void stopMovement() {
-			movement = null;
-		}
-
-		public void startSelectionAt(int x, int y) {
-			state = State.Selecting;
-			rect = new Rectangle(x, y, x, y);
-		}
-
-		public boolean isActive() {
-			return rect != null;
-		}
-
-		public void moveBy(int dx, int dy) {
-			movement.moveBy(dx, dy);
-			if (!movementAddedToHistory) {
-				history.addCommand(movement);
-				movementAddedToHistory = true;
-			}
 		}
 	}
 
@@ -233,12 +186,16 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void mouseDownWithRectangleSelectionTool(int x, int y) {
-		if (selection.contains(x, y))
-			selection.startMovingWithMouse();
-		else {
+		if (selection.contains(x, y)) {
+			selection.startMovingWithMouse(image,
+					drawSettings.getBackgroundColor(), this);
+			state = State.MovingSelection;
+		} else {
 			selection.stopMovement();
-			if (isInsideImage(x, y))
+			if (isInsideImage(x, y)) {
+				state = State.Selecting;
 				selection.startSelectionAt(x, y);
+			}
 		}
 	}
 
@@ -285,8 +242,9 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	private void mouseUp() {
 		if (state == State.PenDown)
 			history.addCommand(pen.stroke);
-		if (state == State.Selecting && selection.rect.x == lastMousePosition.x
-				&& selection.rect.y == lastMousePosition.y) {
+		if (state == State.Selecting
+				&& selection.getRect().x == lastMousePosition.x
+				&& selection.getRect().y == lastMousePosition.y) {
 			selection.stopMovement();
 			updateSelection(null);
 		}
@@ -297,7 +255,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void setSelection(Rectangle rect) {
-		selection.rect = rect;
+		selection.setRect(rect);
 		view.setSelection(rect);
 	}
 
@@ -316,16 +274,16 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			setViewDirty();
 			break;
 		case Selecting:
-			selection.rect.x2 = clampToImageX(x);
-			selection.rect.y2 = clampToImageY(y);
-			updateSelection(selection.rect);
+			selection.getRect().x2 = clampToImageX(x);
+			selection.getRect().y2 = clampToImageY(y);
+			updateSelection(selection.getRect());
 			break;
 		case MovingSelection:
 			int dx = x - lastMousePosition.x;
 			int dy = y - lastMousePosition.y;
 			selection.moveBy(dx, dy);
-			selection.movement.drawCompositeTo(image.getGraphics());
-			updateSelection(selection.rect);
+			selection.getMovement().drawCompositeTo(image.getGraphics());
+			updateSelection(selection.getRect());
 			break;
 		case DrawingLine:
 			line.stroke.undoTo(this, toolController);
@@ -368,7 +326,8 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void delete() {
 		if (selection.isActive()) {
 			DeleteSelectionCommand delete = new DeleteSelectionCommand(image,
-					selection.rect, drawSettings.getBackgroundColor(), this);
+					selection.getRect(), drawSettings.getBackgroundColor(),
+					this);
 			delete.doTo(this, toolController);
 			history.addCommand(delete);
 			view.refresh();
@@ -381,10 +340,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	public void copy() {
-		if (selection.isActive())
-			clipboard.storeImage(image.getSubimage(selection.rect.left(),
-					selection.rect.top(), selection.rect.width(),
-					selection.rect.height()));
+		if (selection.isActive()) {
+			Rectangle r = selection.getRect();
+			clipboard.storeImage(image.getSubimage(r.left(), r.top(),
+					r.width(), r.height()));
+		}
 	}
 
 	public void paste() {
@@ -421,10 +381,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 		@Override
 		public void doTo(ImageKeeper keeper, ToolController toolController) {
-			selection.movement = new SelectionMoveCommand(image,
-					newSelection.copy(), toPaste, DrawAreaController.this);
+			selection.setMovement(new SelectionMoveCommand(image, newSelection
+					.copy(), toPaste, DrawAreaController.this));
 			updatingTool = true;
-			selection.movement.doTo(DrawAreaController.this, toolController);
+			selection.getMovement().doTo(DrawAreaController.this,
+					toolController);
 			updatingTool = false;
 			setSelection(newSelection);
 		}
@@ -442,10 +403,11 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	public void move(int dx, int dy) {
 		if (selection.isActive()) {
-			selection.createNewMovementIfNecessary();
+			selection.startMovingWithMouse(image,
+					drawSettings.getBackgroundColor(), this);
 			selection.moveBy(dx, dy);
-			selection.movement.drawCompositeTo(image.getGraphics());
-			updateSelection(selection.rect);
+			selection.getMovement().drawCompositeTo(image.getGraphics());
+			updateSelection(selection.getRect());
 		}
 	}
 
@@ -468,7 +430,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void mirrorHorizontally() {
 		if (selection.isActive()) {
 			MirrorHorizontallyCommand mirror = new MirrorHorizontallyCommand(
-					selection.rect, this);
+					selection.getRect(), this);
 			mirror.doTo(this, toolController);
 			history.addCommand(mirror);
 		}
@@ -477,7 +439,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void mirrorVertically() {
 		if (selection.isActive()) {
 			MirrorVerticallyCommand mirror = new MirrorVerticallyCommand(
-					selection.rect, this);
+					selection.getRect(), this);
 			mirror.doTo(this, toolController);
 			history.addCommand(mirror);
 		}
