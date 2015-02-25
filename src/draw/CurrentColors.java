@@ -33,24 +33,12 @@ public class CurrentColors extends JPanel implements CurrentColorsView {
 
 	@Override
 	public void paint(Graphics g) {
-		fillBackgroundWithAlternatingColoredSquares(g);
+		ImageUtils
+				.fillWithAlternatingColoredSquares(g, getWidth(), getHeight());
 		paintBorder(g);
 		g.setColor(backgroundColor);
 		g.fillRect(23, 23, 30, 30);
 		g.setColor(foregroundColor);
 		g.fillRect(7, 7, 30, 30);
-	}
-
-	private void fillBackgroundWithAlternatingColoredSquares(Graphics g) {
-		final int size = 10;
-		for (int x = 0; x <= getWidth() / size; x++)
-			for (int y = 0; y <= getHeight() / size; y++) {
-				g.setColor(lightSquare(x, y) ? Color.white : Color.lightGray);
-				g.fillRect(x * size, y * size, size, size);
-			}
-	}
-
-	private boolean lightSquare(int x, int y) {
-		return (x + y) % 2 == 0;
 	}
 }

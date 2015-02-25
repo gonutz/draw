@@ -2,11 +2,13 @@ package draw;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
@@ -15,9 +17,21 @@ import javax.swing.JPanel;
 public class ColorPalette extends JPanel implements ColorPaletteView {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel[] colorBoxes;
+	private ColorBox[] colorBoxes;
 	private ColorPaletteViewController controller;
 	private JColorChooser colorChooser = new JColorChooser();
+	private BufferedImage colorBackground;
+
+	private class ColorBox extends JPanel {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			g.drawImage(colorBackground, 0, 0, null);
+			g.setColor(getBackground());
+			g.fillRect(0, 0, getWidth(), getHeight());
+		}
+	}
 
 	public ColorPalette() {
 		setBorder(null);
@@ -26,6 +40,7 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 		fillInNumberLabels();
 		fillWithColorBoxes();
 		setClickListenersOnBoxes();
+		createColorBackground();
 	}
 
 	private void fillInNumberLabels() {
@@ -34,9 +49,9 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 	}
 
 	private void fillWithColorBoxes() {
-		colorBoxes = new JPanel[20];
+		colorBoxes = new ColorBox[20];
 		for (int i = 0; i < 20; i++) {
-			colorBoxes[i] = new JPanel();
+			colorBoxes[i] = new ColorBox();
 			this.add(colorBoxes[i]);
 		}
 	}
@@ -121,6 +136,14 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 		private boolean isLeftButton(int button) {
 			return button == MouseEvent.BUTTON1;
 		}
+	}
+
+	private void createColorBackground() {
+		final int size = 30;
+		colorBackground = new BufferedImage(size, size,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics g = colorBackground.getGraphics();
+		ImageUtils.fillWithAlternatingColoredSquares(g, size, size);
 	}
 
 	@Override
