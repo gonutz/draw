@@ -69,6 +69,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				try {
 					MainWindow window = new MainWindow();
 					wireUpControllers(window);
+					loadLastSettings(window);
 					window.mainFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -105,20 +106,34 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 				window.drawAreaController.newImage(
 						window.settings.getInt("canvas_width", 640),
 						window.settings.getInt("canvas_height", 480));
-				int width = window.settings.getInt("window_width", 800);
-				Dimension screenSize = Toolkit.getDefaultToolkit()
-						.getScreenSize();
-				if (width > screenSize.width)
-					width = screenSize.width;
-				int height = window.settings.getInt("window_height", 600);
-				if (height > screenSize.height)
-					height = screenSize.height;
-				window.mainFrame.setSize(width, height);
-				window.mainFrame.setLocation(
-						window.settings.getInt("window_left", 0),
-						window.settings.getInt("window_top", 0));
+			}
+
+			private void loadLastSettings(MainWindow window) {
 				if (window.settings.getBoolean("maximized", false))
 					window.mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				else {
+					Dimension screenSize = Toolkit.getDefaultToolkit()
+							.getScreenSize();
+					int x = clampTo(window.settings.getInt("window_left", 0),
+							0, screenSize.width - 1);
+					int y = clampTo(window.settings.getInt("window_top", 0), 0,
+							screenSize.height - 1);
+					int width = Math.min(screenSize.width,
+							window.settings.getInt("window_width", 800));
+					int height = Math.min(screenSize.height,
+							window.settings.getInt("window_height", 600));
+
+					window.mainFrame.setLocation(x, y);
+					window.mainFrame.setSize(width, height);
+				}
+			}
+
+			private int clampTo(int value, int min, int max) {
+				if (value < min)
+					value = min;
+				if (value > max)
+					value = max;
+				return value;
 			}
 		});
 	}
@@ -642,6 +657,11 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		toolSelectionContainer.add(eraser, gbc_eraser);
 
 		colorChanger = new JButton("");
+		colorChanger.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				toolViewController.selectTool(Tool.GLobalColorChanger);
+			}
+		});
 		colorChanger.setIcon(new ImageIcon(getClass().getResource(
 				"/rsc/change_color.png")));
 		colorChanger.setToolTipText("Globally Change Color (G)");
