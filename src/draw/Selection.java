@@ -26,9 +26,6 @@ public class Selection {
 	public void startMovingWithMouse(BufferedImage image,
 			Color backgroundColor, DrawAreaController controller) {
 		if (movement == null) {
-			// before
-			// movement = new SelectionMoveCommand(image, rect,
-			// drawSettings.getBackgroundColor(), DrawAreaController.this);
 			movement = new SelectionMoveCommand(image, rect, backgroundColor,
 					controller);
 			movementAddedToHistory = false;
