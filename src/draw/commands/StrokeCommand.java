@@ -3,6 +3,7 @@ package draw.commands;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,15 +40,16 @@ public class StrokeCommand implements UndoableCommand {
 	 */
 	public void addLine(BufferedImage image, int fromX, int fromY, int toX,
 			int toY) {
-		Graphics g = image.getGraphics();
-		g.setColor(strokeColor);
+		WritableRaster r = image.getRaster();
+		int[] color = new int[] { strokeColor.getRed(), strokeColor.getGreen(),
+				strokeColor.getBlue(), strokeColor.getAlpha() };
 		int[] points = Bresenham.linePoints(fromX, fromY, toX, toY);
 		for (int i = 0; i < points.length; i += 2) {
 			int x = points[i];
 			int y = points[i + 1];
 			if (insideImage(x, y, image)) {
 				addPixelChange(x, y, image.getRGB(x, y));
-				g.drawLine(x, y, x, y);
+				r.setPixel(x, y, color);
 			}
 		}
 	}
