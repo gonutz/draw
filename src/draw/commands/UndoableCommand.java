@@ -1,13 +1,12 @@
 package draw.commands;
 
-import draw.ImageKeeper;
-import draw.ToolController;
+import draw.UndoContext;
 
 public interface UndoableCommand {
 
-	void undoTo(ImageKeeper keeper, ToolController toolController);
+	void undoTo(UndoContext keeper);
 
-	public void doTo(ImageKeeper keeper, ToolController toolController);
+	public void doTo(UndoContext keeper);
 
 	/**
 	 * @return true if the command changed the image in any way. Returns false

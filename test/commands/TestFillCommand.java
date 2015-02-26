@@ -1,6 +1,6 @@
 package commands;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,12 +8,11 @@ import java.awt.image.BufferedImage;
 
 import org.junit.Test;
 
-import draw.ImageKeeper;
 import draw.Tool;
-import draw.ToolController;
+import draw.UndoContext;
 import draw.commands.FillCommand;
 
-public class TestFillCommand implements ImageKeeper {
+public class TestFillCommand implements UndoContext {
 
 	private BufferedImage image;
 
@@ -25,6 +24,10 @@ public class TestFillCommand implements ImageKeeper {
 	@Override
 	public void setImage(BufferedImage image) {
 		this.image = image;
+	}
+
+	@Override
+	public void selectTool(Tool tool) {
 	}
 
 	private void newImage(String... pixels) {
@@ -59,15 +62,6 @@ public class TestFillCommand implements ImageKeeper {
 			}
 	}
 
-	private class DummyToolController implements ToolController {
-		public Tool getSelectedTool() {
-			return null;
-		}
-
-		public void selectTool(Tool tool) {
-		}
-	}
-
 	@Test
 	public void UniformColoredImage_IsCompletelyChanged() {
 		newImage(//
@@ -80,8 +74,7 @@ public class TestFillCommand implements ImageKeeper {
 	}
 
 	private void checkImageFilledAt(int x, int y, String... pixels) {
-		new FillCommand(x, y, Color.black)
-				.doTo(this, new DummyToolController());
+		new FillCommand(x, y, Color.black).doTo(this);
 		checkImage(pixels);
 	}
 
@@ -127,8 +120,8 @@ public class TestFillCommand implements ImageKeeper {
 				"...o.");
 
 		FillCommand fill = new FillCommand(3, 2, Color.black);
-		fill.doTo(this, new DummyToolController());
-		fill.undoTo(this, new DummyToolController());
+		fill.doTo(this);
+		fill.undoTo(this);
 
 		checkImage(//
 				".o...",//

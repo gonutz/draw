@@ -2,9 +2,8 @@ package draw.commands;
 
 import java.awt.image.BufferedImage;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.ImageUtils;
-import draw.ToolController;
 
 public class ImageDisplayCommand implements UndoableCommand {
 
@@ -17,13 +16,13 @@ public class ImageDisplayCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		keeper.setImage(ImageUtils.copyImage(original));
+	public void undoTo(UndoContext context) {
+		context.setImage(ImageUtils.copyImage(original));
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
-		keeper.setImage(ImageUtils.copyImage(loaded));
+	public void doTo(UndoContext context) {
+		context.setImage(ImageUtils.copyImage(loaded));
 	}
 
 	@Override

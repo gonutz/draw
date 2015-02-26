@@ -5,12 +5,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.ImageUtils;
 import draw.Rectangle;
 import draw.SelectionKeeper;
 import draw.Tool;
-import draw.ToolController;
 
 public class SelectionMoveCommand implements UndoableCommand {
 
@@ -74,18 +73,18 @@ public class SelectionMoveCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		toolController.selectTool(Tool.RectangleSelection);
-		setImageAndSelectionTo(keeper, original.copy());
+	public void undoTo(UndoContext context) {
+		context.selectTool(Tool.RectangleSelection);
+		setImageAndSelectionTo(context, original.copy());
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
-		toolController.selectTool(Tool.RectangleSelection);
-		setImageAndSelectionTo(keeper, selection.copy());
+	public void doTo(UndoContext context) {
+		context.selectTool(Tool.RectangleSelection);
+		setImageAndSelectionTo(context, selection.copy());
 	}
 
-	private void setImageAndSelectionTo(ImageKeeper keeper, Rectangle area) {
+	private void setImageAndSelectionTo(UndoContext keeper, Rectangle area) {
 		Graphics g = keeper.getImage().getGraphics();
 		drawAreaTo(g, area);
 		selectionKeeper.setSelection(area.copy());

@@ -5,10 +5,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.Rectangle;
 import draw.SelectionKeeper;
-import draw.ToolController;
 
 public class DeleteSelectionCommand implements UndoableCommand {
 
@@ -36,16 +35,16 @@ public class DeleteSelectionCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		Graphics g = keeper.getImage().getGraphics();
+	public void undoTo(UndoContext context) {
+		Graphics g = context.getImage().getGraphics();
 		g.drawImage(deleted, selection.left(), selection.top(),
 				selection.width(), selection.height(), null);
 		selector.setSelection(selection.copy());
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
-		Graphics2D g = (Graphics2D) keeper.getImage().getGraphics();
+	public void doTo(UndoContext context) {
+		Graphics2D g = (Graphics2D) context.getImage().getGraphics();
 		g.setBackground(clearColor);
 		Rectangle r = selection;
 		g.clearRect(r.left(), r.top(), r.width(), r.height());

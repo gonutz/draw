@@ -16,7 +16,7 @@ import draw.commands.StrokeCommand;
 import draw.commands.UndoHistory;
 import draw.commands.UndoableCommand;
 
-public class DrawAreaController implements ImageProvider, ImageKeeper,
+public class DrawAreaController implements ImageProvider, UndoContext,
 		SelectionKeeper, ToolChangeObserver, ImageDisplay {
 
 	private DrawAreaView view;
@@ -75,17 +75,24 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		this.clipboard = clipboard;
 	}
 
+	@Override
 	public BufferedImage getImage() {
 		return image;
 	}
 
+	@Override
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
 
+	@Override
+	public void selectTool(Tool tool) {
+		toolController.selectTool(tool);
+	}
+
 	public void undoLastAction() {
 		setSelection(null);
-		if (history.undoTo(this, toolController))
+		if (history.undoTo(this))
 			view.refresh();
 		selection.stopMovement();
 	}
@@ -93,7 +100,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	public void redoPreviousAction() {
 		updatingTool = true;
 		selection.stopMovement();
-		if (history.redoTo(this, toolController))
+		if (history.redoTo(this))
 			view.refresh();
 		updatingTool = false;
 	}
@@ -102,7 +109,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		NewImageCommand newImageCommand = new NewImageCommand(image, width,
 				height, drawSettings.getBackgroundColor());
 		makeUndoableIfThisIsNotTheVeryFirstImage(newImageCommand);
-		newImageCommand.doTo(this, toolController);
+		newImageCommand.doTo(this);
 		setSelection(null);
 		view.refresh();
 	}
@@ -153,7 +160,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void undoCurrentPenStroke() {
-		pen.stroke.undoTo(this, toolController);
+		pen.stroke.undoTo(this);
 		state = State.Idle;
 	}
 
@@ -172,7 +179,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 	}
 
 	private void undoCurrentLineStroke() {
-		line.stroke.undoTo(this, toolController);
+		line.stroke.undoTo(this);
 		state = State.Idle;
 	}
 
@@ -206,7 +213,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 
 	private void fillWith(int x, int y, Color color) {
 		FillCommand fill = new FillCommand(x, y, color);
-		fill.doTo(this, toolController);
+		fill.doTo(this);
 		history.addCommand(fill);
 		view.refresh();
 	}
@@ -286,7 +293,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			updateSelection(selection.getRect());
 			break;
 		case DrawingLine:
-			line.stroke.undoTo(this, toolController);
+			line.stroke.undoTo(this);
 			line.stroke.setLine(image, line.startX, line.startY, x, y);
 			setViewDirty();
 			break;
@@ -328,7 +335,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			DeleteSelectionCommand delete = new DeleteSelectionCommand(image,
 					selection.getRect(), drawSettings.getBackgroundColor(),
 					this);
-			delete.doTo(this, toolController);
+			delete.doTo(this);
 			history.addCommand(delete);
 			view.refresh();
 		}
@@ -357,7 +364,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 			int h = toPaste.getHeight();
 			Rectangle newSelection = new Rectangle(x, y, x + w - 1, y + h - 1);
 			PasteCommand paste = new PasteCommand(toPaste, newSelection);
-			paste.doTo(this, toolController);
+			paste.doTo(this);
 			history.addCommand(paste);
 			view.refresh();
 		}
@@ -375,17 +382,16 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		}
 
 		@Override
-		public void undoTo(ImageKeeper keeper, ToolController toolController) {
-			keeper.setImage(ImageUtils.copyImage(background));
+		public void undoTo(UndoContext context) {
+			context.setImage(ImageUtils.copyImage(background));
 		}
 
 		@Override
-		public void doTo(ImageKeeper keeper, ToolController toolController) {
+		public void doTo(UndoContext context) {
 			selection.setMovement(new SelectionMoveCommand(image, newSelection
 					.copy(), toPaste, DrawAreaController.this));
 			updatingTool = true;
-			selection.getMovement().doTo(DrawAreaController.this,
-					toolController);
+			selection.getMovement().doTo(DrawAreaController.this);
 			updatingTool = false;
 			setSelection(newSelection);
 		}
@@ -421,7 +427,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (width != image.getWidth() || height != image.getHeight()) {
 			ResizeCommand resize = new ResizeCommand(width, height,
 					drawSettings.getBackgroundColor());
-			resize.doTo(this, toolController);
+			resize.doTo(this);
 			history.addCommand(resize);
 			view.refresh();
 		}
@@ -431,7 +437,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (selection.isActive()) {
 			MirrorHorizontallyCommand mirror = new MirrorHorizontallyCommand(
 					selection.getRect(), this);
-			mirror.doTo(this, toolController);
+			mirror.doTo(this);
 			history.addCommand(mirror);
 		}
 	}
@@ -440,7 +446,7 @@ public class DrawAreaController implements ImageProvider, ImageKeeper,
 		if (selection.isActive()) {
 			MirrorVerticallyCommand mirror = new MirrorVerticallyCommand(
 					selection.getRect(), this);
-			mirror.doTo(this, toolController);
+			mirror.doTo(this);
 			history.addCommand(mirror);
 		}
 	}

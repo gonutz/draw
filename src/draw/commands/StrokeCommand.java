@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import draw.Bresenham;
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.Tool;
-import draw.ToolController;
 
 public class StrokeCommand implements UndoableCommand {
 
@@ -72,22 +71,24 @@ public class StrokeCommand implements UndoableCommand {
 		pixelChanges.add(0, new PixelChange(x, y, oldColor));
 	}
 
-	public void undoTo(ImageKeeper image, ToolController toolController) {
-		Graphics g = image.getImage().getGraphics();
+	@Override
+	public void undoTo(UndoContext context) {
+		Graphics g = context.getImage().getGraphics();
 		for (PixelChange p : pixelChanges) {
 			g.setColor(new Color(p.oldColor));
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
-		toolController.selectTool(tool);
+		context.selectTool(tool);
 	}
 
-	public void doTo(ImageKeeper image, ToolController toolController) {
-		Graphics g = image.getImage().getGraphics();
+	@Override
+	public void doTo(UndoContext context) {
+		Graphics g = context.getImage().getGraphics();
 		for (PixelChange p : pixelChanges) {
 			g.setColor(strokeColor);
 			g.drawLine(p.x, p.y, p.x, p.y);
 		}
-		toolController.selectTool(tool);
+		context.selectTool(tool);
 	}
 
 	@Override

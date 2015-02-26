@@ -4,9 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.ImageUtils;
-import draw.ToolController;
 
 public class ResizeCommand implements UndoableCommand {
 
@@ -22,20 +21,20 @@ public class ResizeCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		keeper.setImage(ImageUtils.copyImage(originalImage));
+	public void undoTo(UndoContext context) {
+		context.setImage(ImageUtils.copyImage(originalImage));
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
-		BufferedImage image = keeper.getImage();
+	public void doTo(UndoContext context) {
+		BufferedImage image = context.getImage();
 		originalImage = ImageUtils.copyImage(image);
 		BufferedImage copy = new BufferedImage(width, height, image.getType());
 		Graphics2D g = (Graphics2D) copy.getGraphics();
 		g.setBackground(backgroundColor);
 		g.clearRect(0, 0, width, height);
 		g.drawImage(image, 0, 0, null);
-		keeper.setImage(copy);
+		context.setImage(copy);
 	}
 
 	@Override

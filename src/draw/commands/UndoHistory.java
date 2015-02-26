@@ -3,8 +3,7 @@ package draw.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import draw.ImageKeeper;
-import draw.ToolController;
+import draw.UndoContext;
 
 public class UndoHistory {
 
@@ -29,14 +28,14 @@ public class UndoHistory {
 	 * @return true if there was a command undone and false if not (if the
 	 *         history is empty).
 	 */
-	public boolean undoTo(ImageKeeper image, ToolController c) {
+	public boolean undoTo(UndoContext context) {
 		if (nothingToUndo())
 			return false;
 		UndoableCommand toUndo = undoList.get(undoIndex);
-		toUndo.undoTo(image, c);
+		toUndo.undoTo(context);
 		undoIndex--;
 		if (!toUndo.hasAnyEffect())
-			return undoTo(image, c);
+			return undoTo(context);
 		return true;
 	}
 
@@ -50,14 +49,14 @@ public class UndoHistory {
 	 * @return true if something was re-done and false if not (if nothing has
 	 *         been previously undone).
 	 */
-	public boolean redoTo(ImageKeeper image, ToolController c) {
+	public boolean redoTo(UndoContext context) {
 		if (nothingToRedo())
 			return false;
 		undoIndex++;
 		UndoableCommand toRedo = undoList.get(undoIndex);
-		toRedo.doTo(image, c);
+		toRedo.doTo(context);
 		if (!toRedo.hasAnyEffect())
-			return redoTo(image, c);
+			return redoTo(context);
 		return true;
 	}
 

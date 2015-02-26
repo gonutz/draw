@@ -2,11 +2,10 @@ package draw.commands;
 
 import java.awt.image.WritableRaster;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.Rectangle;
 import draw.SelectionKeeper;
 import draw.Tool;
-import draw.ToolController;
 
 public class MirrorHorizontallyCommand implements UndoableCommand {
 
@@ -20,21 +19,21 @@ public class MirrorHorizontallyCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		mirror(keeper, toolController);
+	public void undoTo(UndoContext context) {
+		mirror(context);
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
-		mirror(keeper, toolController);
+	public void doTo(UndoContext context) {
+		mirror(context);
 	}
 
-	private void mirror(ImageKeeper keeper, ToolController toolController) {
+	private void mirror(UndoContext context) {
 		int y = selection.top();
 		int height = selection.height();
 		int[] leftPixels = new int[4 * height];
 		int[] rightPixels = new int[4 * height];
-		WritableRaster raster = keeper.getImage().getRaster();
+		WritableRaster raster = context.getImage().getRaster();
 		for (int x = 0; x < selection.width() / 2; x++) {
 			int left = selection.left() + x;
 			leftPixels = raster.getPixels(left, y, 1, height, leftPixels);
@@ -43,7 +42,7 @@ public class MirrorHorizontallyCommand implements UndoableCommand {
 			raster.setPixels(left, y, 1, height, rightPixels);
 			raster.setPixels(right, y, 1, height, leftPixels);
 		}
-		toolController.selectTool(Tool.RectangleSelection);
+		context.selectTool(Tool.RectangleSelection);
 		selectionKeeper.setSelection(selection.copy());
 	}
 

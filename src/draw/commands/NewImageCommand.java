@@ -4,9 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.ImageUtils;
-import draw.ToolController;
 
 public class NewImageCommand implements UndoableCommand {
 
@@ -24,16 +23,16 @@ public class NewImageCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		keeper.setImage(ImageUtils.copyImage(oldImage));
+	public void undoTo(UndoContext context) {
+		context.setImage(ImageUtils.copyImage(oldImage));
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
+	public void doTo(UndoContext context) {
 		BufferedImage newImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_4BYTE_ABGR);
 		clearImageTo(newImage, newBackgroundColor);
-		keeper.setImage(newImage);
+		context.setImage(newImage);
 	}
 
 	private void clearImageTo(BufferedImage image, Color c) {

@@ -7,9 +7,8 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 
-import draw.ImageKeeper;
+import draw.UndoContext;
 import draw.Tool;
-import draw.ToolController;
 
 public class FillCommand implements UndoableCommand {
 
@@ -31,9 +30,9 @@ public class FillCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void undoTo(ImageKeeper keeper, ToolController toolController) {
-		fillScanLinesWithColor(keeper.getImage(), oldColor);
-		toolController.selectTool(Tool.Fill);
+	public void undoTo(UndoContext context) {
+		fillScanLinesWithColor(context.getImage(), oldColor);
+		context.selectTool(Tool.Fill);
 	}
 
 	private void fillScanLinesWithColor(BufferedImage image, int[] fillWith) {
@@ -48,13 +47,13 @@ public class FillCommand implements UndoableCommand {
 	}
 
 	@Override
-	public void doTo(ImageKeeper keeper, ToolController toolController) {
-		BufferedImage image = keeper.getImage();
+	public void doTo(UndoContext context) {
+		BufferedImage image = context.getImage();
 		if (!scanLinesAreKnown)
 			findAndFillScanLinesToFill(image);
 		else
 			fillScanLinesWithColor(image, fillColor);
-		toolController.selectTool(Tool.Fill);
+		context.selectTool(Tool.Fill);
 	}
 
 	private void findAndFillScanLinesToFill(BufferedImage image) {
