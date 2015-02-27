@@ -1569,12 +1569,12 @@ public class TestDrawAreaController {
 		controller.delete();
 
 		// TODO implement pasting
-		// assertPixelsAreSet(BLACK, WHITE, p(0, 0));
+		assertPixelsAreSet(BLACK, WHITE, p(0, 0));
 	}
 
 	@Test
 	public void redoneMovedPastedArea_CanBeMovedAgain() {
-		// this is an actual bug in the program
+		// this test was for a bug in the program
 		new20x10imageWithSelectionTool();
 		selectRect(0, 0, 2, 2);
 		controller.copy();
