@@ -30,6 +30,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	private Rectangle selection;
 	private int zoomFactor = 1;
 	private Robot robot;
+	private int lastMouseX, lastMouseY;
 
 	public DrawArea() {
 		initialize();
@@ -74,9 +75,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	public void zoomIn() {
 		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
 				.clone();
-		int centerX = visible.x + visible.width / 2;
-		int centerY = visible.y + visible.height / 2;
-		zoomInAt(visible, centerX, centerY);
+		zoomInAt(visible, lastMouseX, lastMouseY);
 	}
 
 	public void zoomInAt(java.awt.Rectangle visible, int panelX, int panelY) {
@@ -107,9 +106,7 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 	public void zoomOut() {
 		java.awt.Rectangle visible = (java.awt.Rectangle) getVisibleRect()
 				.clone();
-		int centerX = visible.x + visible.width / 2;
-		int centerY = visible.y + visible.height / 2;
-		zoomOutAt(visible, centerX, centerY);
+		zoomOutAt(visible, lastMouseX, lastMouseY);
 	}
 
 	public void zoomOutAt(java.awt.Rectangle visible, int panelX, int panelY) {
@@ -217,6 +214,8 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 			@Override
 			public void mouseExited(MouseEvent e) {
 				positionView.setNoPosition();
+				lastMouseX = 0;
+				lastMouseY = 0;
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
@@ -230,6 +229,8 @@ public class DrawArea extends JPanel implements DrawAreaView, Scrollable,
 				int y = e.getY() / zoomFactor;
 				controller.mouseMovedTo(x, y);
 				positionView.setPosition(x, y);
+				lastMouseX = e.getX();
+				lastMouseY = e.getY();
 			}
 
 			@Override
