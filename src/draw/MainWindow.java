@@ -26,17 +26,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 public class MainWindow implements ToolView, ErrorDisplay, PositionView,
@@ -83,6 +73,7 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 						window.colorPalette, window.currentColors);
 				window.colorPalette
 						.setAndActivateController(window.paletteController);
+				window.currentColors.setController(window.paletteController);
 				window.drawAreaController = new DrawAreaController(
 						window.drawArea);
 				window.drawArea.setController(window.drawAreaController);
@@ -689,9 +680,10 @@ public class MainWindow implements ToolView, ErrorDisplay, PositionView,
 		mainFrame.getContentPane().add(colorAndStatusContainer,
 				BorderLayout.SOUTH);
 
-		currentColors = new CurrentColors();
+		JColorChooser colorChooser = new JColorChooser();
+		currentColors = new CurrentColors(colorChooser);
 		colorContainer.add(currentColors);
-		colorPalette = new ColorPalette();
+		colorPalette = new ColorPalette(colorChooser);
 		colorContainer.add(colorPalette);
 
 		positionLabel = new JLabel("");

@@ -19,7 +19,6 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 	private static final long serialVersionUID = 1L;
 	private ColorBox[] colorBoxes;
 	private ColorPaletteViewController controller;
-	private JColorChooser colorChooser = new JColorChooser();
 	private BufferedImage colorBackground;
 
 	private class ColorBox extends JPanel {
@@ -33,13 +32,13 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 		}
 	}
 
-	public ColorPalette() {
+	public ColorPalette(final JColorChooser colorChooser) {
 		setBorder(null);
 		setLayout(new GridLayout(3, 10, 1, 1));
 		this.setPreferredSize(new Dimension(309, 92));
 		fillInNumberLabels();
 		fillWithColorBoxes();
-		setClickListenersOnBoxes();
+		setClickListenersOnBoxes(colorChooser);
 		createColorBackground();
 	}
 
@@ -56,7 +55,7 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 		}
 	}
 
-	private void setClickListenersOnBoxes() {
+	private void setClickListenersOnBoxes(final JColorChooser colorChooser) {
 		for (int i = 0; i < 20; i++) {
 			final int index = i;
 			colorBoxes[i].addMouseListener(new MouseListener() {
@@ -68,10 +67,13 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 						controller.selectBackgroundColor(index);
 					if (isLeftOrRightDoubleClick(e)) {
 						colorChooser.setColor(colorBoxes[index].getBackground());
-						JColorChooser.createDialog(null, "Select new color",
-								true, colorChooser,
-								new ColorAcceptListener(index, e.getButton()),
-								null).setVisible(true);
+						JColorChooser.createDialog(
+								null,
+								"Select new color",
+								true,
+								colorChooser,
+								new ColorAcceptListener(colorChooser, index, e
+										.getButton()), null).setVisible(true);
 					}
 				}
 
@@ -117,8 +119,11 @@ public class ColorPalette extends JPanel implements ColorPaletteView {
 	private class ColorAcceptListener implements ActionListener {
 		int index;
 		int button;
+		JColorChooser colorChooser;
 
-		public ColorAcceptListener(int index, int button) {
+		public ColorAcceptListener(JColorChooser colorChooser, int index,
+				int button) {
+			this.colorChooser = colorChooser;
 			this.index = index;
 			this.button = button;
 		}
